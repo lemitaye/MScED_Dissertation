@@ -24,10 +24,10 @@ all_persons <- all_persons %>%
   ) %>%
   select(sn, f00_nr, dob, f03_sex, age_month, age_year, everything())
 
-gc()
 
 # prepare kids, mothers, and fathers data sets ####
 kids <- all_persons %>%
+  filter(p02_relation == 3) %>% # extracts sons/daughters
   mutate(
     child_no = str_c(sn, f00_nr),
     moth_no = str_c(sn, p14a_motherpnr),
@@ -45,14 +45,15 @@ kids <- all_persons %>%
     child_sch_attend = p17_schoolattend,
     child_educ = p20_edulevel,
     child_private = p19_edupubpriv,
-    child_pop_group = p05_pop_group
+    child_pop_group = p05_pop_group,
+    province = p_province,
+    district = p_district,
+    municip = p_munic
   )
-
-gc()
 
 mothers <- all_persons %>%
   mutate(moth_no = str_c(sn, f00_nr)) %>%
-  ## semi_join(x, y) keeps all obs. in x that have a match in y:
+  # semi_join(x, y) keeps all obs. in x that have a match in y:
   semi_join(kids, by = "moth_no") %>%
   # other variables need to be added (not final list)
   select(
@@ -62,15 +63,14 @@ mothers <- all_persons %>%
     moth_dob = dob,
     moth_marital = p03_marital_st,
     moth_pp_group = p05_pop_group,
-    moth_educ = p20_edulevel,
+    moth_educ = derp_educational_level,
     moth_ceb = p32_childeverborn,
     moth_age_fstbr = p33_agefirstbirth,
     moth_employ = derp_employ_status,
     moth_employ_official = derp_employ_status_official,
-    moth_employ_extended = derp_employ_status_expanded
+    moth_employ_extended = derp_employ_status_expanded,
+    moth_income = p16_income 
   )
-
-gc()
 
 fathers <- all_persons %>%
   mutate(fath_no = str_c(sn, f00_nr)) %>%
@@ -83,13 +83,13 @@ fathers <- all_persons %>%
     fath_dob = dob,
     fath_marital = p03_marital_st,
     fath_pp_group = p05_pop_group,
-    fath_educ = p20_edulevel,
+    fath_educ = derp_educational_level,
     fath_employ = derp_employ_status,
     fath_employ_official = derp_employ_status_official,
-    fath_employ_extended = derp_employ_status_expanded
+    fath_employ_extended = derp_employ_status_expanded,
+    fath_income =  p16_income  
   )
 
-gc()
 
 # join all three above
 data <- kids %>%
@@ -146,3 +146,42 @@ data <- data %>%
 
 # save data
 write_csv(data, file = "data/kids_data.csv")
+
+##
+
+kids %>% 
+  left_join(mothers, by = "moth_no") %>% 
+  filter(is.na(moth_dob))
+
+# anti_join(x, y) drops all observations in x that have a match in y:
+mothers %>%
+  anti_join(kids, by = "moth_no")
+
+fathers %>% 
+  anti_join(kids, by = "fath_no")
+
+kids %>% 
+  anti_join(mothers, by = "moth_no")
+
+all_persons %>% 
+  count(p02_relation)
+
+# "moth_no" is unique
+mothers %>% 
+  count(moth_no) %>% 
+  filter(n>1)
+
+# "fath_no" is also unique
+fathers %>% 
+  count(fath_no) %>% 
+  filter(n > 1)
+
+
+
+
+
+
+
+
+
+
