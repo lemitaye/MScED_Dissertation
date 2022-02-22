@@ -28,6 +28,12 @@ all_persons <- all_persons %>%
 # prepare kids, mothers, and fathers data sets ####
 kids <- all_persons %>%
   filter(p02_relation == 3) %>% # extracts sons/daughters
+  filter(
+    p14_motheralive == 1, # mother alive
+    p15_fatheralive == 1, # father alive
+    !(p14a_motherpnr %in% c(98, 99)), # mother in the hh
+    !(p15a_fatherpnr %in% c(98, 99)) # father in the hh
+  ) %>%
   mutate(
     child_no = str_c(sn, f00_nr),
     moth_no = str_c(sn, p14a_motherpnr),
@@ -55,8 +61,8 @@ mothers <- all_persons %>%
   mutate(moth_no = str_c(sn, f00_nr)) %>%
   # semi_join(x, y) keeps all obs. in x that have a match in y:
   semi_join(kids, by = "moth_no") %>%
-  # other variables need to be added (not final list)
   select(
+    # other variables need to be added (not final list)
     moth_no,
     moth_age_year = age_year,
     moth_age_month = age_month,
@@ -69,14 +75,14 @@ mothers <- all_persons %>%
     moth_employ = derp_employ_status,
     moth_employ_official = derp_employ_status_official,
     moth_employ_extended = derp_employ_status_expanded,
-    moth_income = p16_income 
+    moth_income = p16_income
   )
 
 fathers <- all_persons %>%
   mutate(fath_no = str_c(sn, f00_nr)) %>%
   semi_join(kids, by = "fath_no") %>%
-  # other variables need to be added (not final list)
   select(
+    # other variables need to be added (not final list)
     fath_no,
     fath_age_year = age_year,
     fath_age_month = age_month,
@@ -87,7 +93,7 @@ fathers <- all_persons %>%
     fath_employ = derp_employ_status,
     fath_employ_official = derp_employ_status_official,
     fath_employ_extended = derp_employ_status_expanded,
-    fath_income =  p16_income  
+    fath_income =  p16_income
   )
 
 
@@ -100,37 +106,36 @@ data <- kids %>%
 rm(list = c("fathers", "mothers", "kids", "all_persons"))
 gc()
 
-# The following function enables us to extract first and second borns
+# The following function enables us to extract first- and second-borns
 dobs <- function(tbl = data, n) {
   tbl <- tbl %>%
     select(moth_no, child_dob) %>%
     group_by(moth_no) %>%
     arrange(child_dob, .by_group = TRUE) %>%
     # n = 1 for "firstborn_dob" and n = 2 for "secondborn_dob"
-    slice( n ) %>%
-    ungroup() 
-  
+    slice(n) %>%
+    ungroup()
+
   # conditionally generate dobs for 1st and 2nd borns
   if (n == 1) {
-    tbl <- tbl %>% 
+    tbl <- tbl %>%
       rename(firstborn_dob = "child_dob") %>%
-      # using the "interval()" function from lubridate
+      # using the "interval()" function from lubridate to calc. age
       mutate(
         firstborn_age = interval(
           firstborn_dob, ymd(20111010)
         ) %/% years(1)
       )
   } else if (n == 2) {
-    tbl <- tbl %>% 
+    tbl <- tbl %>%
       rename(secondborn_dob = "child_dob") %>%
-      # using the "interval()" function from lubridate
       mutate(
         secondborn_age = interval(
           secondborn_dob, ymd(20111010)
         ) %/% years(1)
       )
   }
-    
+
   return(tbl)
 }
 
@@ -146,42 +151,3 @@ data <- data %>%
 
 # save data
 write_csv(data, file = "data/kids_data.csv")
-
-##
-
-kids %>% 
-  left_join(mothers, by = "moth_no") %>% 
-  filter(is.na(moth_dob))
-
-# anti_join(x, y) drops all observations in x that have a match in y:
-mothers %>%
-  anti_join(kids, by = "moth_no")
-
-fathers %>% 
-  anti_join(kids, by = "fath_no")
-
-kids %>% 
-  anti_join(mothers, by = "moth_no")
-
-all_persons %>% 
-  count(p02_relation)
-
-# "moth_no" is unique
-mothers %>% 
-  count(moth_no) %>% 
-  filter(n>1)
-
-# "fath_no" is also unique
-fathers %>% 
-  count(fath_no) %>% 
-  filter(n > 1)
-
-
-
-
-
-
-
-
-
-
