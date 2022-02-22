@@ -1,28 +1,18 @@
-
 # Created on: February 22, 2022
 # DEPENDS ON: import_append.do
+# outputs: kids_data.csv
 
-# This script loads the data produced by Stata, processes it, and  
-# produces cleaned data for analysis.
+# This script loads the data produced by Stata, processes it, and
+# produces raw data for cleaning
+# (make sure to load the packages in "master.R")
 
-# packages
-library(haven)
-library(tidyverse)
-library(janitor)
-library(lubridate)
-library(AER)
-library(stargazer)
-library(scales)
-library(broom)
-library(car)
-
-theme_set(theme_light())
 
 # Load the data ####
+
 # (takes a while; data has > 2mil obs.)
-memory.limit(9999999999)   # expand the working memory
+memory.limit(9999999999) # expand the working memory
 all_persons <- read_csv("data/all_persons.csv")
-gc()   # free unused memory
+gc() # free unused memory
 
 all_persons <- all_persons %>%
   clean_names() %>%
@@ -110,62 +100,49 @@ data <- kids %>%
 rm(list = c("fathers", "mothers", "kids", "all_persons"))
 gc()
 
-# The following two definitely need a function
-firstborn_dob <- data %>%
-  select(moth_no, child_dob) %>%
-  group_by(moth_no) %>%
-  arrange(child_dob, .by_group = TRUE) %>%
-  slice(1) %>%
-  ungroup() %>%
-  rename(firstborn_dob = "child_dob") %>%
-  mutate(
-    firstborn_age = interval(
-      firstborn_dob, ymd(20111010)
-      ) %/% years(1)
-    )
+# The following function enables us to extract first and second borns
+dobs <- function(tbl = data, n) {
+  tbl <- tbl %>%
+    select(moth_no, child_dob) %>%
+    group_by(moth_no) %>%
+    arrange(child_dob, .by_group = TRUE) %>%
+    # n = 1 for "firstborn_dob" and n = 2 for "secondborn_dob"
+    slice( n ) %>%
+    ungroup() 
+  
+  # conditionally generate dobs for 1st and 2nd borns
+  if (n == 1) {
+    tbl <- tbl %>% 
+      rename(firstborn_dob = "child_dob") %>%
+      # using the "interval()" function from lubridate
+      mutate(
+        firstborn_age = interval(
+          firstborn_dob, ymd(20111010)
+        ) %/% years(1)
+      )
+  } else if (n == 2) {
+    tbl <- tbl %>% 
+      rename(secondborn_dob = "child_dob") %>%
+      # using the "interval()" function from lubridate
+      mutate(
+        secondborn_age = interval(
+          secondborn_dob, ymd(20111010)
+        ) %/% years(1)
+      )
+  }
+    
+  return(tbl)
+}
 
-secondborn_dob <- data %>%
-  select(moth_no, child_dob) %>%
-  group_by(moth_no) %>%
-  arrange(child_dob, .by_group = TRUE) %>%
-  slice(2) %>%
-  ungroup() %>%
-  rename(secondborn_dob = "child_dob") %>%
-  mutate(
-    secondborn_age = interval(
-      secondborn_dob, ymd(20111010)
-      ) %/% years(1))
+#  Get first and second born obs. (very time-intensive)
+firstborn_dob <- dobs(n = 1)
+secondborn_dob <- dobs(n = 2)
 
+# put everything together:
 data <- data %>%
   left_join(firstborn_dob, by = "moth_no") %>%
   left_join(secondborn_dob, by = "moth_no") %>%
   filter(firstborn_age <= 18)
 
 # save data
-write_csv(data, path = "data/kids_data.csv")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+write_csv(data, file = "data/kids_data.csv")
