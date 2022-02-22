@@ -72,7 +72,6 @@ mothers <- all_persons %>%
     moth_educ = derp_educational_level,
     moth_ceb = p32_childeverborn,
     moth_age_fstbr = p33_agefirstbirth,
-    moth_employ = derp_employ_status,
     moth_employ_official = derp_employ_status_official,
     moth_employ_extended = derp_employ_status_expanded,
     moth_income = p16_income
@@ -90,7 +89,6 @@ fathers <- all_persons %>%
     fath_marital = p03_marital_st,
     fath_pp_group = p05_pop_group,
     fath_educ = derp_educational_level,
-    fath_employ = derp_employ_status,
     fath_employ_official = derp_employ_status_official,
     fath_employ_extended = derp_employ_status_expanded,
     fath_income =  p16_income
