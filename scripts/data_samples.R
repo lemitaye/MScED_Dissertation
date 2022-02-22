@@ -9,10 +9,11 @@
 
 rm(list = ls())
 
-# Load saved data ####
+# Load saved data 
 data <- read_csv("data/kids_data.csv")
 
-# Get the 2+ and 3+ sample
+
+# Get the raw 2+ and 3+ samples
 gt2_sample0 <- data %>%
   filter(firstborn_age %>% between(6, 18)) %>%
   group_by(moth_no) %>%
@@ -27,6 +28,7 @@ gt2_sample0 <- data %>%
 gt3_sample0 <- gt2_sample0 %>%
   filter(no_kids >= 3) %>%
   filter(secondborn_age %>% between(6, 18))
+
 
 # This function enables us to get data frames with all the instruments 
 get_parity <- function(tbl, n) {
@@ -58,7 +60,6 @@ get_parity <- function(tbl, n) {
       ),
       same_sex_12 = boy_12 + girl_12,
 
-      # and for the twins:
       twins_1 = case_when(
         (child_dob_1 == child_dob_2) ~ 1,
         TRUE ~ 0
@@ -99,18 +100,50 @@ get_parity <- function(tbl, n) {
   return(tbl)
 }
 
+
 # get all the instruments we need for the respective sample
 parity_gt2 <- get_parity(gt2_sample0, n = 3)  # for the 2+ sample
 parity_gt3 <- get_parity(gt3_sample0, n = 4)  # for the 3+ sample
 
 
+# Join with parity data frames and do some cleaning:
+gt2_sample <- gt2_sample0 %>%
+  left_join(parity_gt2, by = "moth_no") %>%
+  filter(birth_order == 1) %>%
+  # Filter out twins at first birth (and unrealistic obs.)
+  filter(!(twins_1 == 1), no_kids < 10) %>%
+  mutate(boy = case_when(child_sex == 1 ~ 1, child_sex == 2 ~ 0)) %>%
+  select(
+    moth_no:child_sex, boy, birth_order:twins_2, no_kids,
+    everything(), -(firstborn_dob:secondborn_age)
+  )
 
+gt3_sample <- gt3_sample0 %>%
+  left_join(parity_gt3, by = "moth_no") %>%
+  # Filter out twins at first and second birth (and unrealistic obs.)
+  filter(
+    birth_order %in% c(1, 2),
+    !(twins_1 == 1 | twins_2 == 1),
+    no_kids < 10
+  ) %>%
+  mutate(boy = case_when(child_sex == 1 ~ 1, child_sex == 2 ~ 0)) %>%
+  select(
+    moth_no:child_sex, boy, birth_order:twins_2, twins_3, no_kids,
+    everything(), -(firstborn_dob:secondborn_age)
+  )
 
+gt2_sample %>% 
+  summarise_all( ~sum(is.na(.)) )
 
+gt2_sample %>%
+  filter(!is.na(moth_dob), !is.na(fath_dob), !is.na(child_private)) %>%
+  select(-fath_employ, -moth_employ) %>% 
+  summarise_all( ~sum(is.na(.)) )
 
-
-
-
+gt3_sample %>% 
+  select(-fath_employ, -moth_employ) %>% 
+  filter(!is.na(moth_dob), !is.na(fath_dob), !is.na(child_private)) %>%
+  summarise_all( ~sum(is.na(.)) )
 
 
 
