@@ -7,11 +7,26 @@
 # Date of this version: February 22, 2022
 ########################################################################
 
-# Some preparations:
+# Some preparations: ####
+
 rm(list = ls())
 
-# Call R scripts
-source("data.R"        ,echo=TRUE,max=1000) # Data import and cleaning
-source("descriptives.R",echo=TRUE,max=1000) # Descriptive statistics
-source("estimation.R"  ,echo=TRUE,max=1000) # Estimation of model 
-source("results.R"     ,echo=TRUE,max=1000) # Tables and Figures
+# packages
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(AER)
+library(stargazer)
+library(scales)
+library(broom)
+library(car)
+
+theme_set(theme_light())
+
+
+# Call R scripts ####
+source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
+source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning
+source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive statistics
+source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of model 
+source("scripts/results.R"     ,echo=TRUE,max=1000) # Tables and Figures
