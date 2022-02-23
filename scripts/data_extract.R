@@ -37,14 +37,13 @@ kids <- all_persons %>%
   ) %>%
   mutate(
     child_no = str_c(sn, f00_nr),
-    moth_no = str_c(sn, p14a_motherpnr),
-    fath_no = str_c(sn, p15a_fatherpnr)
+    moth_no = str_c(sn, p14a_motherpnr)
   ) %>%
   select(
     # other variables need to be added (not final list)
     child_no,
     moth_no,
-    fath_no,
+    # fath_no,
     child_dob = dob,
     child_sex = f03_sex,
     child_age_year = age_year,
@@ -53,7 +52,7 @@ kids <- all_persons %>%
     child_educ = p20_edulevel,
     child_private = p19_edupubpriv,
     child_pop_group = p05_pop_group,
-    fath_pnr == p15a_fatherpnr,
+    fath_pnr = p15a_fatherpnr,
     province = p_province,
     district = p_district,
     municip = p_munic
@@ -95,7 +94,7 @@ mothers <- all_persons %>%
 #   )
 
 
-# join all three above
+# join the above
 data <- kids %>%
   left_join(mothers, by = "moth_no") 
 # %>%
@@ -207,7 +206,12 @@ data <- data %>%
         moth_pp_group == 3 ~ "Indian or Asian",
         moth_pp_group == 4 ~ "White",
         moth_pp_group == 5 ~ "Other",
-      ) %>% factor()
+      ) %>% factor(),
+    fath_inhh = 
+      case_when(
+        fath_pnr %in% 1:30 ~ 1,
+        fath_pnr == 98 ~ 0
+      )
     # ,
     # fath_pp_group =
     #   case_when(
@@ -320,5 +324,5 @@ data <- data %>%
   )
 
 
-# save data
+# save data ####
 write_csv(data, file = "data/kids_data.csv")

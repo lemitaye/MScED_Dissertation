@@ -30,7 +30,7 @@ stargazer(
 
 covars <- c(
   "child_age_month", "boy", "district", "moth_educ", "moth_pp_group", 
-  "moth_age_year", "moth_income", "fath_educ", "fath_income"
+  "moth_age_year", "moth_income", "fath_inhh"
 )
 
 fm1_c <- as.formula(
@@ -236,8 +236,41 @@ stargazer(
   keep.stat = c("n", "rsq")
 )
 
-#####
+# 3+ sample #####
 
+# Angrist et al. (2010) cluster the standard errors for the regressions using
+# the 3+ sample by mohter's ID. (see p. 791)
+m5 <- lm(no_kids ~ same_sex_123 + boy, data = gt3_sample)
+m6 <- lm(no_kids ~ boy_123 + girl_123 + boy_3:I(1-same_sex_12), 
+         data = gt3_sample)
+m7 <- lm(no_kids ~ twins_3, data = gt3_sample)
+stargazer(m5, m6, m7, type = "text", keep.stat = c("n","rsq"))
+
+# Educational attainment
+OLS_B1 <- lm(educ_attain ~ no_kids, data = gt3_sample)
+IV_B1 <- ivreg(educ_attain ~ no_kids | 
+                 twins_3, data = gt3_sample)
+IV_B2 <- ivreg(educ_attain ~ no_kids | 
+                 same_sex_123, data = gt3_sample)
+IV_B3 <- ivreg(educ_attain ~ no_kids | 
+                 boy_123 + girl_123, data = gt3_sample)
+IV_B4 <- ivreg(educ_attain ~ no_kids | 
+                 twins_3 + boy_123 + girl_123, data = gt3_sample)
+stargazer(OLS_B1, IV_B1, IV_B2, IV_B3, IV_B4, 
+          type = "text", keep.stat = c("n","rsq"))
+
+# Private school attendance
+OLS_B2 <- lm(private_school ~ no_kids, data = gt3_sample)
+IV_B5 <- ivreg(private_school ~ no_kids | 
+                 twins_3, data = gt3_sample)
+IV_B6 <- ivreg(private_school ~ no_kids | 
+                 same_sex_123, data = gt3_sample)
+IV_B7 <- ivreg(private_school ~ no_kids | 
+                 boy_123 + girl_123, data = gt3_sample)
+IV_B8 <- ivreg(private_school ~ no_kids | 
+                 twins_3 + boy_123 + girl_123, data = gt3_sample)
+stargazer(OLS_B2, IV_B5, IV_B6, IV_B7, IV_B8, 
+          type = "text", keep.stat = c("n","rsq"))
 
 
 

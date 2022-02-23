@@ -122,15 +122,21 @@ gt2_sample <- gt2_sample0 %>%
   left_join(parity_gt2, by = "moth_no") %>%
   filter(birth_order == 1) %>%
   # Filter out twins at first birth (and unrealistic obs.)
-  filter(!(twins_1 == 1), no_kids < 10, fath_age_year < 82) %>%
+  filter(
+    !(twins_1 == 1), no_kids < 10
+    # , fath_age_year < 82
+    ) %>%
   mutate( boy = case_when(
     child_sex == "Male" ~ 1, 
     child_sex == "Female" ~ 0) ) %>%
   select(
-    moth_no:child_sex, boy, birth_order:twins_2, no_kids,
-    everything(), -(firstborn_dob:secondborn_age)
+    child_no :child_sex, boy, birth_order:twins_2, no_kids,
+    everything(), -(firstborn_dob:secondborn_age), -fath_pnr
   ) %>%
-  filter(!is.na(moth_dob), !is.na(fath_dob))
+  filter(
+    !is.na(moth_dob)
+    # , !is.na(fath_dob)
+    )
 
 
 gt3_sample <- gt3_sample0 %>%
@@ -181,14 +187,16 @@ gt2_sample <- gt2_sample %>%
 
 ### Parents' education & background ####
 
-gt2_sample <- gt2_sample %>% 
-  mutate(district = factor(district), municip = factor(municip)) %>% 
+gt2_sample <- gt2_sample %>% glimpse()
   filter(!is.na(moth_inlf))
 
+gt2_sample %>% 
+  count(fath_inhh)
 
-
-
-
+# Next:
+# +3 sample
+# alternative measure for educ: left behind
+# heterogeneity analysis
 
 
 
