@@ -26,6 +26,7 @@ all_persons <- all_persons %>%
 
 
 # prepare kids, mothers, and fathers data sets ####
+
 kids <- all_persons %>%
   filter(p02_relation == 3) %>% # extracts sons/daughters
   filter(
@@ -145,11 +146,11 @@ data <- data %>%
   left_join(secondborn_dob, by = "moth_no") %>%
   filter(firstborn_age <= 18)
 
-# label variables (labels are obtained from documentation and Stata file)
+# label variables (labels are obtained from documentation and Stata file) ####
 data <- data %>%
   mutate(
     child_sex = case_when(
-      child_sex == 1 ~ "Male", 
+      child_sex == 1 ~ "Male",
       child_sex == 2 ~ "Female"
     ) %>% factor(),
     child_sch_attend = case_when(
@@ -174,7 +175,7 @@ data <- data %>%
         moth_educ == 6 ~ "Higher",
         moth_educ == 7 ~ "Other"
       ) %>% factor(),
-    fath_educ = 
+    fath_educ =
       case_when(
         fath_educ == 1 ~ "No schooling",
         fath_educ == 2 ~ "Some primary",
@@ -214,7 +215,7 @@ data <- data %>%
       ) %>% factor()
   )
 
-data <- data %>% 
+data <- data %>%
   mutate(
     moth_inlf = case_when(
       moth_employ %in% 1:2 ~ 1,
@@ -238,8 +239,8 @@ data <- data %>%
       ) %>% factor()
   )
 
-data <- data %>% 
-  mutate( 
+data <- data %>%
+  mutate(
     province = case_when(
       province == 1 ~ "Western Cape",
       province == 2 ~ "Eastern Cape",
@@ -290,6 +291,27 @@ data <- data %>%
         fath_income == 99 ~ "Unspecified"
       ) %>% factor()
   )
+
+data <- data %>%
+  mutate(
+    moth_marital = case_when(
+      moth_marital == 1 ~ "Married",
+      moth_marital == 2 ~ "Living together",
+      moth_marital == 3 ~ "Never married",
+      moth_marital == 4 ~ "Widower/widow",
+      moth_marital == 5 ~ "Separated",
+      moth_marital == 6 ~ "Divorced"
+    ) %>% factor(),
+    fath_marital = case_when(
+      fath_marital == 1 ~ "Married",
+      fath_marital == 2 ~ "Living together",
+      fath_marital == 3 ~ "Never married",
+      fath_marital == 4 ~ "Widower/widow",
+      fath_marital == 5 ~ "Separated",
+      fath_marital == 6 ~ "Divorced"
+    ) %>% factor()
+  )
+
 
 # save data
 write_csv(data, file = "data/kids_data.csv")
