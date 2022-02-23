@@ -25,39 +25,29 @@ stargazer(
   )
 
 # Conditional:
-
-covars <- c(
-  "district", "moth_educ", "moth_pp_group", "moth_age_year", "moth_income", 
-  "fath_educ", "fath_income"
-  )
-
 m1_c <- lm(
-  no_kids ~ same_sex_12 + child_age_month + boy + as.formula(
-          paste( covars, collapse = "+" ) ),
+  no_kids ~ same_sex_12 + child_age_month + boy + district + moth_educ +
+    moth_pp_group + moth_age_year + moth_income + fath_educ + fath_income,
   data = gt2_sample
 )
 
 m2_c <- lm(
-  as.formula(
-    paste( "no_kids ~ boy_1 + boy_2 + same_sex_12 + ", 
-           paste( covars, collapse= "+" ) )
-  ),
+  no_kids ~ boy_1 + boy_2 + same_sex_12 + child_age_month + boy +
+    district + moth_educ + moth_pp_group + moth_age_year +
+    moth_income + fath_educ + fath_income,
   data = gt2_sample
 )
 
 m3_c <- lm(
-  as.formula(
-    paste( "no_kids ~ boy_1 + boy_12 + girl_12 + ", 
-           paste( covars, collapse= "+" ) )
-  ),
+  no_kids ~ boy_1 + boy_12 + girl_12 + child_age_month + boy + district +
+    moth_educ + moth_pp_group + moth_age_year + moth_income + fath_educ +
+    fath_income,
   data = gt2_sample
 )
 
 m4_c <- lm(
-  as.formula(
-    paste( "no_kids ~ twins_2 + ", 
-           paste( covars, collapse= "+" ) )
-  ),
+  no_kids ~ twins_2 + child_age_month + boy + district + moth_educ +
+    moth_pp_group + moth_age_year + moth_income + fath_educ + fath_income,
   data = gt2_sample
 )
 
@@ -70,7 +60,14 @@ stargazer(
   keep.stat = c("n","rsq")
   ) 
 
-as.formula(paste("y ~ ", paste(covars, collapse= "+")))
+stargazer( 
+  m1_u, m2_u, m3_u, m4_u, m1_c, m2_c, m3_c, m4_c, 
+  keep = c(
+    "boy_1", "boy_2", "same_sex_12", "boy_12", "girl_12", "twins_2"
+  ),
+  type = "text", 
+  keep.stat = c("n","rsq")
+) 
 
 
 
