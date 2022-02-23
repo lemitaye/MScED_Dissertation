@@ -14,6 +14,10 @@ rm(list = ls())
 # Load saved data 
 data <- read_csv("data/kids_data.csv")
 
+# convert all character columns into factors
+data <- data %>% 
+  mutate_if(is.character, as.factor)
+
 
 # Get the raw 2+ and 3+ samples
 gt2_sample0 <- data %>%
@@ -143,126 +147,7 @@ gt3_sample <- gt3_sample0 %>%
 
 ### Parents' education & background ####
 
-gt2_sample <- gt2_sample %>%
-  mutate(
-    moth_educ =
-      case_when(
-        moth_educ == 1 ~ "No schooling",
-        moth_educ == 2 ~ "Some primary",
-        moth_educ == 3 ~ "Completed primary",
-        moth_educ == 4 ~ "Some secondary",
-        moth_educ == 5 ~ "Grade 12/Std 10",
-        moth_educ == 6 ~ "Higher",
-        moth_educ == 7 ~ "Other"
-      ) %>% factor(),
-    fath_educ = 
-      case_when(
-        fath_educ == 1 ~ "No schooling",
-        fath_educ == 2 ~ "Some primary",
-        fath_educ == 3 ~ "Completed primary",
-        fath_educ == 4 ~ "Some secondary",
-        fath_educ == 5 ~ "Grade 12/Std 10",
-        fath_educ == 6 ~ "Higher",
-        fath_educ == 7 ~ "Other"
-      ) %>% factor()
-  )
 
-gt2_sample <- gt2_sample %>%
-  mutate(
-    moth_pp_group =
-      case_when(
-        moth_pp_group == 1 ~ "Black African",
-        moth_pp_group == 2 ~ "Coloured",
-        moth_pp_group == 3 ~ "Indian or Asian",
-        moth_pp_group == 4 ~ "White",
-        moth_pp_group == 5 ~ "Other",
-      ) %>% factor(),
-    fath_pp_group =
-      case_when(
-        fath_pp_group == 1 ~ "Black African",
-        fath_pp_group == 2 ~ "Coloured",
-        fath_pp_group == 3 ~ "Indian or Asian",
-        fath_pp_group == 4 ~ "White",
-        fath_pp_group == 5 ~ "Other",
-      ) %>% factor()
-  )
-
-gt2_sample <- gt2_sample %>% 
-  mutate(
-    moth_inlf = case_when(
-      moth_employ %in% 1:2 ~ 1,
-      moth_employ == 3 ~ 0
-    ),
-    fath_inlf = case_when(
-      fath_employ %in% 1:2 ~ 1,
-      fath_employ == 3 ~ 0
-    ),
-    moth_employ =
-      case_when(
-        moth_employ == 1 ~ "Employed",
-        moth_employ == 2 ~ "Unemployed",
-        moth_employ == 3 ~ "Not economically active"
-      ) %>% factor(),
-    fath_employ =
-      case_when(
-        fath_employ == 1 ~ "Employed",
-        fath_employ == 2 ~ "Unemployed",
-        fath_employ == 3 ~ "Not economically active"
-      ) %>% factor()
-  )
-
-gt2_sample <- gt2_sample %>% 
-  mutate( 
-    province = case_when(
-      province == 1 ~ "Western Cape",
-      province == 2 ~ "Eastern Cape",
-      province == 3 ~ "Northern Cape",
-      province == 4 ~ "Free State",
-      province == 5 ~ "Kwazulu-Natal",
-      province == 6 ~ "North West",
-      province == 7 ~ "Gauteng",
-      province == 8 ~ "Mpumalanga",
-      province == 9 ~ "Limpopo"
-    ) %>% factor(),
-    district = factor(district),
-    municip = factor(municip)
-    )
-
-gt2_sample <- gt2_sample %>%
-  mutate(
-    moth_income =
-      case_when(
-        moth_income == 1 ~ "No income",
-        moth_income == 2 ~ "R 1 - R 4800",
-        moth_income == 3 ~ "R 4801 - R 9600",
-        moth_income == 4 ~ "R 9601 - R 19200",
-        moth_income == 5 ~ "R 19201 - R 38400",
-        moth_income == 6 ~ "R 38401 - R 76800",
-        moth_income == 7 ~ "R 76801 - R 153600",
-        moth_income == 8 ~ "R 153601 - R 307200",
-        moth_income == 9 ~ "R 307201 - R 614400",
-        moth_income == 10 ~ "R 614401 - R 1228800",
-        moth_income == 11 ~ "R 1228801 - R 2457600",
-        moth_income == 12 ~ "R 2457601 or more",
-        moth_income == 99 ~ "Unspecified"
-      ) %>% factor(),
-    fath_income =
-      case_when(
-        fath_income == 1 ~ "No income",
-        fath_income == 2 ~ "R 1 - R 4800",
-        fath_income == 3 ~ "R 4801 - R 9600",
-        fath_income == 4 ~ "R 9601 - R 19200",
-        fath_income == 5 ~ "R 19201 - R 38400",
-        fath_income == 6 ~ "R 38401 - R 76800",
-        fath_income == 7 ~ "R 76801 - R 153600",
-        fath_income == 8 ~ "R 153601 - R 307200",
-        fath_income == 9 ~ "R 307201 - R 614400",
-        fath_income == 10 ~ "R 614401 - R 1228800",
-        fath_income == 11 ~ "R 1228801 - R 2457600",
-        fath_income == 12 ~ "R 2457601 or more",
-        fath_income == 99 ~ "Unspecified"
-      ) %>% factor()
-  )
 
 
 
@@ -273,10 +158,7 @@ gt2_sample <- gt2_sample %>%
   filter(child_private %in% c(1, 2)) %>%
   mutate(private_school = case_when(
     child_private == 2 ~ 1, TRUE ~ 0
-  )) %>%
-  mutate(child_sex = case_when(
-    child_sex == 1 ~ "Male", child_sex == 2 ~ "Female"
-  ) %>% factor())
+  )) 
 
 # constructing educational attainment variable
 gt2_sample <- gt2_sample %>%
