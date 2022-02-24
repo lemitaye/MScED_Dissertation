@@ -17,8 +17,12 @@ data <- read_csv("data/kids_data.csv")
 
 # convert all character columns into factors
 data <- data %>%
-  mutate_if(is.character, as.factor) %>% 
-  mutate(district = factor(district), municip = factor(municip))
+  mutate_if(is.character, as.factor) %>%
+  mutate(
+    district = factor(district), 
+    municip = factor(municip),
+    moth_no = factor(moth_no)
+    )
 
 
 # Get the raw 2+ and 3+ samples
@@ -125,18 +129,19 @@ gt2_sample <- gt2_sample0 %>%
   filter(
     !(twins_1 == 1), no_kids < 10
     # , fath_age_year < 82
-    ) %>%
-  mutate( boy = case_when(
-    child_sex == "Male" ~ 1, 
-    child_sex == "Female" ~ 0) ) %>%
+  ) %>%
+  mutate(boy = case_when(
+    child_sex == "Male" ~ 1,
+    child_sex == "Female" ~ 0
+  )) %>%
   select(
-    child_no :child_sex, boy, birth_order:twins_2, no_kids,
+    child_no:child_sex, boy, birth_order:twins_2, no_kids,
     everything(), -(firstborn_dob:secondborn_age), -fath_pnr
   ) %>%
   filter(
     !is.na(moth_dob)
     # , !is.na(fath_dob)
-    )
+  )
 
 
 gt3_sample <- gt3_sample0 %>%
@@ -147,11 +152,12 @@ gt3_sample <- gt3_sample0 %>%
     !(twins_1 == 1 | twins_2 == 1),
     no_kids < 10
   ) %>%
-  mutate( boy = case_when(
-    child_sex == "Male" ~ 1, 
-    child_sex == "Female" ~ 0)) %>%
+  mutate(boy = case_when(
+    child_sex == "Male" ~ 1,
+    child_sex == "Female" ~ 0
+  )) %>%
   select(
-    moth_no:child_sex, boy, birth_order:twins_2, twins_3, no_kids,
+    child_no:child_sex, boy, birth_order:twins_2, twins_3, no_kids,
     everything(), -(firstborn_dob:secondborn_age)
   )
 
@@ -159,7 +165,6 @@ gt3_sample <- gt3_sample0 %>%
 # Construct Variables ####
 
 ## 2+ sample ####
-
 
 ### outcome variables ####
 
@@ -185,60 +190,39 @@ gt2_sample <- gt2_sample %>%
   mutate(educ_attain = child_educ_gen / mean_educ_age_sex)
 
 
-### Parents' education & background ####
+## 2+ sample ####
 
-gt2_sample <- gt2_sample %>% glimpse()
-  filter(!is.na(moth_inlf))
+### outcome variables ####
 
-gt2_sample %>% 
-  count(fath_inhh)
+# Dummy for private school attendance & child sex (factor)
+gt3_sample <- gt3_sample %>%
+  filter(child_private %in% c("Private", "Public (government)")) %>%
+  mutate(
+    private_school = case_when(
+    child_private == "Private" ~ 1, TRUE ~ 0
+  ))
+
+# constructing educational attainment variable
+gt3_sample <- gt3_sample %>%
+  filter(child_educ %in% 0:12 | child_educ == 98) %>%
+  mutate(
+    child_educ_gen = case_when(
+      as.numeric(child_educ) == 98 ~ 1,
+      TRUE ~ as.numeric(child_educ) + 2
+    )
+  ) %>%
+  group_by(child_age_year, boy) %>%
+  mutate(mean_educ_age_sex = mean(child_educ_gen)) %>%
+  ungroup() %>%
+  mutate(educ_attain = child_educ_gen / mean_educ_age_sex)
+
+
+
+
+
+
 
 # Next:
 # +3 sample
 # alternative measure for educ: left behind
-# heterogeneity analysis
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# heterogeneity analysis (>= 10 yrs. old)
