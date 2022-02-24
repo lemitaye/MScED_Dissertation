@@ -1,11 +1,11 @@
-########################################################################
+########################################################################~
 # MSc Thesis of Lemi Taye Daba
 # Univestiy of Oxford
 # Title: "The Relationship Between ..."
 #
 # R Script "master"
 # Date of this version: February 22, 2022
-########################################################################
+########################################################################~
 
 # Some preparations: ####
 
@@ -20,6 +20,7 @@ library(stargazer)
 library(scales)
 library(broom)
 library(car)
+library(lfe)
 
 theme_set(theme_light())
 
