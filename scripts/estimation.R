@@ -10,6 +10,24 @@ rm(list = ls())
 gt2_sample <- read_csv("data/gt2_sample.csv")
 gt3_sample <- read_csv("data/gt3_sample.csv")
 
+# convert all character columns into factors
+gt2_sample <- gt2_sample %>%
+  mutate_if(is.character, as.factor) %>%
+  mutate(
+    district = factor(district),
+    municip = factor(municip),
+    moth_no = factor(moth_no)
+    )
+
+gt3_sample <- gt3_sample %>%
+  mutate_if(is.character, as.factor) %>%
+  mutate(
+    district = factor(district),
+    municip = factor(municip),
+    moth_no = factor(moth_no)
+  )
+
+
 # Functions for constructing formulas ####
 
 make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE) {
@@ -45,7 +63,6 @@ make_formula_gt2 <- function(dep_var, instrument = 0) {
   
   return(f)
 }
-
 
 make_formula_gt3 <- function(dep_var, instrument = 0) {
   

@@ -15,15 +15,6 @@ rm(list = ls())
 # Load saved data
 data <- read_csv("data/kids_data.csv")
 
-# convert all character columns into factors
-# data <- data %>%
-#   mutate_if(is.character, as.factor) %>%
-#   mutate(
-#     district = factor(district), 
-#     municip = factor(municip),
-#     moth_no = factor(moth_no)
-#     )
-
 
 # Get the raw 2+ and 3+ samples
 gt2_sample0 <- data %>%
