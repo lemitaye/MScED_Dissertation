@@ -10,90 +10,27 @@ rm(list = ls())
 gt2_sample <- read_csv("data/gt2_sample.csv")
 gt3_sample <- read_csv("data/gt3_sample.csv")
 
-# First-Stage ####
+# Functions for constructing formulas ####
 
-# 2+ sample
-
-# Unconditional:
-m1_u <- lm(no_kids ~ same_sex_12, data = gt2_sample)
-m2_u <- lm(no_kids ~ boy_1 + boy_2 + same_sex_12, data = gt2_sample)
-m3_u <- lm(no_kids ~ boy_1 + boy_12 + girl_12, data = gt2_sample)
-m4_u <- lm(no_kids ~ twins_2, data = gt2_sample)
-
-stargazer(
-  m1_u, m2_u, m3_u, m4_u, 
-  type = "text", 
-  keep.stat = c("n","rsq")
-  )
-
-# Conditional:
-
-covars <- c(
-  "child_age_month", "boy", "district", "moth_educ", "moth_pp_group", 
-  "moth_age_year", "moth_income", "fath_inhh"
-)
-
-fm1_c <- as.formula(
-  paste("no_kids ~ same_sex_12 + ", 
-        paste(covars, collapse = "+"))
-  )
-
-m1_c <- lm( fm1_c, data = gt2_sample )
-
-
-fm2_c <- as.formula(
-  paste("no_kids ~ boy_1 + boy_2 + same_sex_12 + ", 
-        paste(covars, collapse = "+"))
-)
-
-m2_c <- lm( fm2_c, data = gt2_sample )
-
-fm3_c <- as.formula(
-  paste("no_kids ~ boy_1 + boy_12 + girl_12 + ", 
-        paste(covars, collapse = "+"))
-)
-
-m3_c <- lm( fm3_c, data = gt2_sample )
-
-
-fm4_c <- as.formula(
-  paste("no_kids ~ twins_2 + child_age_month +", 
-        paste(covars, collapse = "+"))
-)
-
-m4_c <- lm( fm4_c, data = gt2_sample)
-
-
-stargazer(
-  m1_c, m2_c, m3_c, m4_c, 
-  keep = c(
-    "boy_1", "boy_2", "same_sex_12", "boy_12", "girl_12", "twins_2"
-    ),
-  type = "text", 
-  keep.stat = c("n","rsq")
-  ) 
-
-stargazer( 
-  m1_u, m2_u, m3_u, m4_u, m1_c, m2_c, m3_c, m4_c, 
-  keep = c(
-    "boy_1", "boy_2", "same_sex_12", "boy_12", "girl_12", "twins_2"
-  ),
-  type = "text", 
-  keep.stat = c("n","rsq")
-) 
-
-# F-tests 
-linearHypothesis(m1_c, c("same_sex_12"))
-linearHypothesis(m2_c, c("boy_1", "boy_2", "same_sex_12"))
-linearHypothesis(m3_c, c("boy_1", "boy_12", "girl_12"))
-linearHypothesis(m4_c, c("twins_2"))
-
-# 2+ sample ####
-
-## 2SLS/IV regressions ####
+make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE) {
+  # Define a vector of covariates
+  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
+  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
+  covar <- paste( paste(covar1, collapse = "+"), "|",  
+                  paste(covar2, collapse = "+") )
+  
+  if (clus) {
+    f <- as.formula( paste( dep_var, " ~ ", instrument, " + ", covar,
+                            " | 0 | moth_no" ) )
+  } else {
+    f <- as.formula( paste( dep_var, " ~ ", instrument, " + ", covar ) )
+  }
+  
+  return(f)
+}
 
 make_formula_gt2 <- function(dep_var, instrument = 0) {
-  
+  # Define a vector of covariates
   covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
   covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
   covar <- paste( paste(covar1, collapse = "+"), "|",  
@@ -108,6 +45,83 @@ make_formula_gt2 <- function(dep_var, instrument = 0) {
   
   return(f)
 }
+
+
+make_formula_gt3 <- function(dep_var, instrument = 0) {
+  
+  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
+  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
+  covar <- paste( paste(covar1, collapse = "+"), "|",  
+                  paste(covar2, collapse = "+") )
+  
+  if (instrument == 0) {
+    f <- as.formula( paste( dep_var, " ~ no_kids + ", covar, 
+                            " | 0 | moth_no" ) )
+  } else {
+    f <- as.formula( paste( dep_var, " ~ ", covar, 
+                            " | (no_kids ~ ", instrument, ")", " | moth_no" ) )
+  }
+  
+  return(f)
+}
+
+
+
+# First-Stage ####
+
+## 2+ sample ####
+
+fm_a1 <- make_formula_frst_stg("no_kids", "twins_2")
+fm_a2 <- make_formula_frst_stg("no_kids", "same_sex_12")
+fm_a3 <- make_formula_frst_stg("no_kids", "boy_12 + girl_12")
+fm_a4 <- make_formula_frst_stg("no_kids", "twins_2 + boy_12 + girl_12")
+
+ma_1 <- felm( fm_a1, data = gt2_sample )
+ma_2 <- felm( fm_a2, data = gt2_sample )
+ma_3 <- felm( fm_a3, data = gt2_sample )
+ma_4 <- felm( fm_a4, data = gt2_sample )
+
+stargazer(
+  ma_1, ma_2, ma_3, ma_4, 
+  keep = c(
+    "boy_1", "same_sex_12", "boy_12", "girl_12", "twins_2"
+  ),
+  type = "text", 
+  keep.stat = c("n","rsq")
+) 
+
+# F-tests 
+linearHypothesis(ma_1, c("same_sex_12"))
+linearHypothesis(ma_2, c("boy_1", "boy_2", "same_sex_12"))
+linearHypothesis(ma_3, c("boy_1", "boy_12", "girl_12"))
+linearHypothesis(ma_4, c("twins_2"))
+
+## 3+ sample ####
+
+# These are all clustere by mother's id
+fm_b1 <- make_formula_frst_stg("no_kids", "twins_3", clus = TRUE)
+fm_b2 <- make_formula_frst_stg("no_kids", "same_sex_123", clus = TRUE)
+fm_b3 <- make_formula_frst_stg("no_kids", "boy_123 + girl_123", clus = TRUE)
+fm_b4 <- make_formula_frst_stg("no_kids", "twins_3 + boy_123 + girl_123", 
+                               clus = TRUE)
+
+mb_1 <- felm( fm_b1, data = gt3_sample )
+mb_2 <- felm( fm_b2, data = gt3_sample )
+mb_3 <- felm( fm_b3, data = gt3_sample )
+mb_4 <- felm( fm_b4, data = gt3_sample )
+
+stargazer(
+  mb_1, mb_2, mb_3, mb_4, 
+  keep = c(
+    "boy_1", "same_sex_123", "boy_123", "girl_123", "twins_3"
+  ),
+  type = "text", 
+  keep.stat = c("n","rsq")
+) 
+
+# 2SLS/IV regressions ####
+
+## 2+ sample ####
 
 ### Educational attainment ####
 
@@ -135,7 +149,7 @@ stargazer(
 fOLS_A2 <- make_formula_gt2("private_school")
 fIV_A5 <- make_formula_gt2("private_school", "twins_2")
 fIV_A6 <- make_formula_gt2("private_school", "same_sex_12")
-fIV_A7 <- make_formula_gt2("private_school", "boy_12 + girl_12")
+fIV_A7 <- make_formula_gt2("private_school", "boy_123 + girl_123")
 fIV_A8 <- make_formula_gt2("private_school", "twins_2 + boy_12 + girl_12")
 
 OLS_A2 <- felm(fOLS_A2, data = gt2_sample)
@@ -173,35 +187,7 @@ stargazer(
   keep.stat = c("n", "rsq")
 )
 
-# 3+ sample #####
-
-# Angrist et al. (2010) cluster the standard errors for the regressions using
-# the 3+ sample by mohter's ID. (see p. 791)
-m5 <- lm(no_kids ~ same_sex_123 + boy, data = gt3_sample)
-m6 <- lm(no_kids ~ boy_123 + girl_123 + boy_3:I(1-same_sex_12), 
-         data = gt3_sample)
-m7 <- lm(no_kids ~ twins_3, data = gt3_sample)
-stargazer(m5, m6, m7, type = "text", keep.stat = c("n","rsq"))
-
-## 2SLS/IV regressions ####
-
-make_formula_gt3 <- function(dep_var, instrument = 0) {
-  
-  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
-  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
-  covar <- paste( paste(covar1, collapse = "+"), "|",  
-                  paste(covar2, collapse = "+") )
-  
-  if (instrument == 0) {
-    f <- as.formula( paste( dep_var, " ~ no_kids + ", covar, 
-                            " | 0 | moth_no" ) )
-  } else {
-    f <- as.formula( paste( dep_var, " ~ ", covar, 
-                            " | (no_kids ~ ", instrument, ")", " | moth_no" ) )
-  }
-  
-  return(f)
-}
+## 3+ sample #####
 
 ### Educational attainment ####
 
@@ -267,6 +253,7 @@ stargazer(
 
 # Think of ways of getting robust std. errors for the 2+ sample
 
+# Sub-sample analysis
 
 
 

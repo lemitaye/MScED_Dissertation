@@ -164,10 +164,6 @@ gt3_sample <- gt3_sample0 %>%
 
 # Construct Variables ####
 
-## 2+ sample ####
-
-### outcome variables ####
-
 gen_private <- function(tbl) {
   tbl <- tbl %>%
     filter(
@@ -181,7 +177,6 @@ gen_private <- function(tbl) {
   return(tbl)
 }
 
-# a function to calculate mode!
 get_mode <- function(x, na.rm = FALSE) {
   if(na.rm){
     x = x[!is.na(x)]
@@ -227,8 +222,6 @@ gt3_sample <- gen_educ_attains(gt3_sample)
 # save data
 write_csv(gt2_sample, file = "data/gt2_sample.csv")
 write_csv(gt3_sample, file = "data/gt3_sample.csv")
-
-# age in years, month of birth and province
 
 # Next:
 # +3 sample
