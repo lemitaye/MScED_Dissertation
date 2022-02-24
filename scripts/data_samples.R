@@ -16,13 +16,13 @@ rm(list = ls())
 data <- read_csv("data/kids_data.csv")
 
 # convert all character columns into factors
-data <- data %>%
-  mutate_if(is.character, as.factor) %>%
-  mutate(
-    district = factor(district), 
-    municip = factor(municip),
-    moth_no = factor(moth_no)
-    )
+# data <- data %>%
+#   mutate_if(is.character, as.factor) %>%
+#   mutate(
+#     district = factor(district), 
+#     municip = factor(municip),
+#     moth_no = factor(moth_no)
+#     )
 
 
 # Get the raw 2+ and 3+ samples
@@ -168,59 +168,67 @@ gt3_sample <- gt3_sample0 %>%
 
 ### outcome variables ####
 
-# Dummy for private school attendance & child sex (factor)
-gt2_sample <- gt2_sample %>%
-  filter(child_private %in% c("Private", "Public (government)")) %>%
-  mutate(private_school = case_when(
-    child_private == "Private" ~ 1, TRUE ~ 0
-  ))
+gen_private <- function(tbl) {
+  tbl <- tbl %>%
+    filter(
+      child_private %in% c("Private", "Public (government)")
+    ) %>%
+    mutate(
+      private_school = case_when(
+        child_private == "Private" ~ 1, TRUE ~ 0
+      ))
+  
+  return(tbl)
+}
 
-# constructing educational attainment variable
-gt2_sample <- gt2_sample %>%
-  filter(child_educ %in% 0:12 | child_educ == 98) %>%
-  mutate(
-    child_educ_gen = case_when(
-      as.numeric(child_educ) == 98 ~ 1,
-      TRUE ~ as.numeric(child_educ) + 2
+# a function to calculate mode!
+get_mode <- function(x, na.rm = FALSE) {
+  if(na.rm){
+    x = x[!is.na(x)]
+  }
+  
+  ux <- unique(x)
+  return(ux[which.max(tabulate(match(x, ux)))])
+}
+
+gen_educ_attains <- function(tbl) {
+  tbl <- tbl %>%
+    filter(child_educ %in% 0:12 | child_educ == 98) %>%
+    mutate(
+      child_educ_gen = case_when(
+        as.numeric(child_educ) == 98 ~ 1,
+        TRUE ~ as.numeric(child_educ) + 2
+      ),
+      birth_month = month(child_dob)
+    ) %>%
+    # grouping by age in years, month of birth and province 
+    group_by(child_age_year, birth_month, province) %>%
+    mutate(
+      mean_educ_agg = mean(child_educ_gen),
+      mode_educ_agg = get_mode(child_educ_gen)
+    ) %>%
+    ungroup() %>%
+    mutate(
+      educ_attain = child_educ_gen / mean_educ_agg,
+      behind = (child_educ_gen < mode_educ_agg)
     )
-  ) %>%
-  group_by(child_age_year, boy) %>%
-  mutate(mean_educ_age_sex = mean(child_educ_gen)) %>%
-  ungroup() %>%
-  mutate(educ_attain = child_educ_gen / mean_educ_age_sex)
+  
+  return(tbl)
+}
 
+gt2_sample <- gen_private(gt2_sample)
+gt3_sample <- gen_private(gt3_sample)
 
-## 2+ sample ####
-
-### outcome variables ####
-
-# Dummy for private school attendance & child sex (factor)
-gt3_sample <- gt3_sample %>%
-  filter(child_private %in% c("Private", "Public (government)")) %>%
-  mutate(
-    private_school = case_when(
-    child_private == "Private" ~ 1, TRUE ~ 0
-  ))
-
-# constructing educational attainment variable
-gt3_sample <- gt3_sample %>%
-  filter(child_educ %in% 0:12 | child_educ == 98) %>%
-  mutate(
-    child_educ_gen = case_when(
-      as.numeric(child_educ) == 98 ~ 1,
-      TRUE ~ as.numeric(child_educ) + 2
-    )
-  ) %>%
-  group_by(child_age_year, boy) %>%
-  mutate(mean_educ_age_sex = mean(child_educ_gen)) %>%
-  ungroup() %>%
-  mutate(educ_attain = child_educ_gen / mean_educ_age_sex)
+gt2_sample <- gen_educ_attains(gt2_sample)
+gt3_sample <- gen_educ_attains(gt3_sample)
 
 
 
+# save data
+write_csv(gt2_sample, file = "data/gt2_sample.csv")
+write_csv(gt3_sample, file = "data/gt3_sample.csv")
 
-
-
+# age in years, month of birth and province
 
 # Next:
 # +3 sample
