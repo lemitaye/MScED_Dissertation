@@ -225,63 +225,25 @@ stargazer(
   )
 
 # Private school attendance
-OLS_B2 <- lm(private_school ~ no_kids, data = gt3_sample)
-IV_B5 <- ivreg(private_school ~ no_kids | 
-                 twins_3, data = gt3_sample)
-IV_B6 <- ivreg(private_school ~ no_kids | 
-                 same_sex_123, data = gt3_sample)
-IV_B7 <- ivreg(private_school ~ no_kids | 
-                 boy_123 + girl_123, data = gt3_sample)
-IV_B8 <- ivreg(private_school ~ no_kids | 
-                 twins_3 + boy_123 + girl_123, data = gt3_sample)
-stargazer(OLS_B2, IV_B5, IV_B6, IV_B7, IV_B8, 
-          type = "text", keep.stat = c("n","rsq"))
+fOLS_B2 <- make_formula_gt3("private_school")
+fIV_B5  <- make_formula_gt3("private_school", "twins_3")
+fIV_B6  <- make_formula_gt3("private_school", "same_sex_123")
+fIV_B7  <- make_formula_gt3("private_school", "boy_123 + girl_123")
+fIV_B8  <- make_formula_gt3("private_school", "twins_3 + boy_123 + girl_123")
 
+OLS_B2 <- felm(fOLS_B2, data = gt3_sample)
+IV_B5  <- felm(fIV_B5, data = gt3_sample)
+IV_B6  <- felm(fIV_B6, data = gt3_sample)
+IV_B7  <- felm(fIV_B7, data = gt3_sample)
+IV_B8  <- felm(fIV_B8, data = gt3_sample)
 
-# test
-
-covars <- c(
-  "child_age_month", "boy", "district", "moth_educ", "moth_pp_group", 
-  "moth_age_year", "moth_income", "fath_inhh"
-)
-
-fiv <- as.formula( # same_sex instrument
-  paste(
-    "moth_inlf ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | boy_12 + girl_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-ivest <- felm(
-  educ_attain ~ no_kids + child_age_month + boy + moth_age_year + fath_inhh | 
-    district + moth_educ + moth_pp_group + moth_income  
-  data = gt2_sample
-  )
-
-
-stargazer(IV_A1, type = "text", keep = c("no_kids"), keep.stat = c("n","rsq"))
 stargazer(
-  summary(ivest), 
-  type = "text", 
+  OLS_B2, IV_B5, IV_B6, IV_B7, IV_B8, 
   keep = c("no_kids"), 
+  type = "text", 
   keep.stat = c("n","rsq")
   )
 
-j <- felm(
-  educ_attain|private_school|moth_inlf ~ child_age_month + boy + 
-    moth_age_year + fath_inhh | district + moth_educ + moth_pp_group + 
-    moth_income | (no_kids ~ twins_2), 
-  data = gt2_sample
-)
-
-J_educ <- summary(j, lhs = "educ_attain", robust = TRUE)
-as(J_ed)
-
-stargazer(J_educ, 
-          lhs = "educ_attain",
-          type = "text", 
-          keep = c("no_kids"), 
-          keep.stat = c("n","rsq"))
 
 # Think of ways of getting robust std. errors for the 2+ sample
 
