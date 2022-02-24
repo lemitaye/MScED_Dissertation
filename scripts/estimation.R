@@ -272,23 +272,6 @@ fIV_B2 <- make_formula("educ_attain", "same_sex_123")
 fIV_B3 <- make_formula("educ_attain", "boy_123 + girl_123")
 fIV_B4 <- make_formula("educ_attain", "twins_3 + boy_123 + girl_123")
 
-fOLS_B1 <- as.formula( paste("educ_attain ~ no_kids + ", covar, 
-                             " | 0 | moth_no") )
-
-fIV_B1 <- as.formula( paste("educ_attain ~ ", covar, 
-                  " | (no_kids ~ twins_3)", " | moth_no" ) )
-
-fIV_B2 <- as.formula( paste("educ_attain ~ ", covar, 
-                  " | (no_kids ~ same_sex_123)", " | moth_no") )
-
-fIV_B3 <- as.formula( paste("educ_attain ~ ", covar, 
-                  " | (no_kids ~ boy_123 + girl_123)", 
-                  " | moth_no") )
-
-fIV_B4 <- as.formula( paste("educ_attain ~ ", covar, 
-                  " | (no_kids ~ twins_3 + boy_123 + girl_123)", 
-                  " | moth_no") )
-
 OLS_B1 <- felm(fOLS_B1, data = gt3_sample)
 IV_B1 <- felm(fIV_B1, data = gt3_sample)
 IV_B2 <- felm(fIV_B2, data = gt3_sample)
