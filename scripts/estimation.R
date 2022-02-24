@@ -88,12 +88,9 @@ linearHypothesis(m2_c, c("boy_1", "boy_2", "same_sex_12"))
 linearHypothesis(m3_c, c("boy_1", "boy_12", "girl_12"))
 linearHypothesis(m4_c, c("twins_2"))
 
+# 2+ sample ####
 
-# 2SLS/IV regressions ####
-
-## 2+ sample ####
-
-### Educational attainment ####
+## 2SLS/IV regressions ####
 
 make_formula_gt2 <- function(dep_var, instrument = 0) {
   
@@ -111,6 +108,8 @@ make_formula_gt2 <- function(dep_var, instrument = 0) {
   
   return(f)
 }
+
+### Educational attainment ####
 
 fOLS_A1 <- make_formula_gt2("educ_attain")
 fIV_A1 <- make_formula_gt2("educ_attain", "twins_2")
@@ -184,6 +183,7 @@ m6 <- lm(no_kids ~ boy_123 + girl_123 + boy_3:I(1-same_sex_12),
 m7 <- lm(no_kids ~ twins_3, data = gt3_sample)
 stargazer(m5, m6, m7, type = "text", keep.stat = c("n","rsq"))
 
+## 2SLS/IV regressions ####
 
 make_formula_gt3 <- function(dep_var, instrument = 0) {
   
@@ -203,7 +203,7 @@ make_formula_gt3 <- function(dep_var, instrument = 0) {
   return(f)
 }
 
-# Educational attainment
+### Educational attainment ####
 
 fOLS_B1 <- make_formula_gt3("educ_attain")
 fIV_B1 <- make_formula_gt3("educ_attain", "twins_3")
@@ -224,7 +224,7 @@ stargazer(
   keep.stat = c("n","rsq")
   )
 
-# Private school attendance
+### Private school attendance ####
 fOLS_B2 <- make_formula_gt3("private_school")
 fIV_B5  <- make_formula_gt3("private_school", "twins_3")
 fIV_B6  <- make_formula_gt3("private_school", "same_sex_123")
@@ -243,6 +243,26 @@ stargazer(
   type = "text", 
   keep.stat = c("n","rsq")
   )
+
+### Mothers' LFP ####
+fOLS_B3 <- make_formula_gt3("moth_inlf")
+fIV_B9  <- make_formula_gt3("moth_inlf", "twins_3")
+fIV_B10 <- make_formula_gt3("moth_inlf", "same_sex_123")
+fIV_B11 <- make_formula_gt3("moth_inlf", "boy_123 + girl_123")
+fIV_B12 <- make_formula_gt3("moth_inlf", "twins_3 + boy_123 + girl_123")
+
+OLS_B3 <- felm(fOLS_B3, data = gt3_sample)
+IV_B9  <- felm(fIV_B9, data = gt3_sample)
+IV_B10 <- felm(fIV_B10, data = gt3_sample)
+IV_B11 <- felm(fIV_B11, data = gt3_sample)
+IV_B12 <- felm(fIV_B12, data = gt3_sample)
+
+stargazer(
+  OLS_B3, IV_B9, IV_B10, IV_B11, IV_B12, 
+  keep = c("no_kids"), 
+  type = "text", 
+  keep.stat = c("n","rsq")
+)
 
 
 # Think of ways of getting robust std. errors for the 2+ sample
