@@ -95,43 +95,34 @@ linearHypothesis(m4_c, c("twins_2"))
 
 ### Educational attainment ####
 
-fOLS_A1 <- as.formula(
-  paste("educ_attain ~ no_kids + ", paste(covars, collapse = "+"))
-)
+make_formula_gt2 <- function(dep_var, instrument = 0) {
+  
+  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
+  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
+  covar <- paste( paste(covar1, collapse = "+"), "|",  
+                  paste(covar2, collapse = "+") )
+  
+  if (instrument == 0) {
+    f <- as.formula( paste( dep_var, " ~ no_kids + ", covar ) )
+  } else {
+    f <- as.formula( paste( dep_var, " ~ ", covar, 
+                            " | (no_kids ~ ", instrument, ")" ) )
+  }
+  
+  return(f)
+}
 
-fIV_A1 <- as.formula( # twins_2 instrument
-  paste(
-    "educ_attain ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | twins_2 + ", paste(covars, collapse = "+"))
-  )
-)
+fOLS_A1 <- make_formula_gt2("educ_attain")
+fIV_A1 <- make_formula_gt2("educ_attain", "twins_2")
+fIV_A2 <- make_formula_gt2("educ_attain", "same_sex_12")
+fIV_A3 <- make_formula_gt2("educ_attain", "boy_12 + girl_12")
+fIV_A4 <- make_formula_gt2("educ_attain", "twins_2 + boy_12 + girl_12")
 
-fIV_A2 <- as.formula( # same_sex instrument
-  paste(
-    "educ_attain ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | same_sex_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A3 <- as.formula( # same_sex instrument disaggregated
-  paste(
-    "educ_attain ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | boy_12 + girl_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A4 <- as.formula( # all instruments
-  paste(
-    "educ_attain ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | twins_2 + boy_12 + girl_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-OLS_A1 <- lm(fOLS_A1, data = gt2_sample)
-IV_A1 <- ivreg(fIV_A1, data = gt2_sample)
-IV_A2 <- ivreg(fIV_A2, data = gt2_sample)
-IV_A3 <- ivreg(fIV_A3, data = gt2_sample)
-IV_A4 <- ivreg(fIV_A4, data = gt2_sample)
+OLS_A1 <- felm(fOLS_A1, data = gt2_sample)
+IV_A1 <- felm(fIV_A1, data = gt2_sample)
+IV_A2 <- felm(fIV_A2, data = gt2_sample)
+IV_A3 <- felm(fIV_A3, data = gt2_sample)
+IV_A4 <- felm(fIV_A4, data = gt2_sample)
 
 stargazer(
   OLS_A1, IV_A1, IV_A2, IV_A3, IV_A4,
@@ -142,44 +133,17 @@ stargazer(
 
 
 ### Private school attendance ####
+fOLS_A2 <- make_formula_gt2("private_school")
+fIV_A5 <- make_formula_gt2("private_school", "twins_2")
+fIV_A6 <- make_formula_gt2("private_school", "same_sex_12")
+fIV_A7 <- make_formula_gt2("private_school", "boy_12 + girl_12")
+fIV_A8 <- make_formula_gt2("private_school", "twins_2 + boy_12 + girl_12")
 
-fOLS_A2 <- as.formula(
-  paste("private_school ~ no_kids + ", paste(covars, collapse = "+"))
-)
-
-fIV_A5 <- as.formula( # twins_2 instrument
-  paste(
-    "private_school ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | twins_2 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A6 <- as.formula( # same_sex instrument
-  paste(
-    "private_school ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | same_sex_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A7 <- as.formula( # same_sex instrument
-  paste(
-    "private_school ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | boy_12 + girl_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A8 <- as.formula( # same_sex instrument
-  paste(
-    "private_school ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | twins_2 + boy_12 + girl_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-OLS_A2 <- lm(fOLS_A2, data = gt2_sample)
-IV_A5  <- ivreg(fIV_A5, data = gt2_sample)
-IV_A6  <- ivreg(fIV_A6, data = gt2_sample)
-IV_A7  <- ivreg(fIV_A7, data = gt2_sample)
-IV_A8  <- ivreg(fIV_A8, data = gt2_sample)
+OLS_A2 <- felm(fOLS_A2, data = gt2_sample)
+IV_A5  <- felm(fIV_A5, data = gt2_sample)
+IV_A6  <- felm(fIV_A6, data = gt2_sample)
+IV_A7  <- felm(fIV_A7, data = gt2_sample)
+IV_A8  <- felm(fIV_A8, data = gt2_sample)
 
 stargazer(
   OLS_A2, IV_A5, IV_A6, IV_A7, IV_A8,
@@ -191,43 +155,17 @@ stargazer(
 
 ### Mothers' LFP ####
 
-fOLS_A3 <- as.formula(
-  paste("moth_inlf ~ no_kids + ", paste(covars, collapse = "+"))
-)
+fOLS_A3 <- make_formula_gt2("moth_inlf")
+fIV_A9  <- make_formula_gt2("moth_inlf", "twins_2")
+fIV_A10 <- make_formula_gt2("moth_inlf", "same_sex_12")
+fIV_A11 <- make_formula_gt2("moth_inlf", "boy_12 + girl_12")
+fIV_A12 <- make_formula_gt2("moth_inlf", "twins_2 + boy_12 + girl_12")
 
-fIV_A9 <- as.formula( # twins_2 instrument
-  paste(
-    "moth_inlf ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | twins_2 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A10 <- as.formula( # same_sex instrument
-  paste(
-    "moth_inlf ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | same_sex_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A11 <- as.formula( # same_sex instrument
-  paste(
-    "moth_inlf ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | boy_12 + girl_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-fIV_A12 <- as.formula( # same_sex instrument
-  paste(
-    "moth_inlf ~ no_kids + ", paste(covars, collapse = "+"),
-    paste(" | twins_2 + boy_12 + girl_12 + ", paste(covars, collapse = "+") )
-  )
-)
-
-OLS_A3 <- lm(fOLS_A3, data = gt2_sample)
-IV_A9  <- ivreg(fIV_A9, data = gt2_sample)
-IV_A10 <- ivreg(fIV_A10, data = gt2_sample)
-IV_A11 <- ivreg(fIV_A11, data = gt2_sample)
-IV_A12 <- ivreg(fIV_A12, data = gt2_sample)
+OLS_A3 <- felm(fOLS_A3, data = gt2_sample)
+IV_A9  <- felm(fIV_A9, data = gt2_sample)
+IV_A10 <- felm(fIV_A10, data = gt2_sample)
+IV_A11 <- felm(fIV_A11, data = gt2_sample)
+IV_A12 <- felm(fIV_A12, data = gt2_sample)
 
 stargazer(
   OLS_A3, IV_A9, IV_A10, IV_A11, IV_A12,
@@ -246,9 +184,8 @@ m6 <- lm(no_kids ~ boy_123 + girl_123 + boy_3:I(1-same_sex_12),
 m7 <- lm(no_kids ~ twins_3, data = gt3_sample)
 stargazer(m5, m6, m7, type = "text", keep.stat = c("n","rsq"))
 
-# Educational attainment
 
-make_formula <- function(dep_var, instrument = 0) {
+make_formula_gt3 <- function(dep_var, instrument = 0) {
   
   covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
   covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
@@ -266,11 +203,13 @@ make_formula <- function(dep_var, instrument = 0) {
   return(f)
 }
 
-fOLS_B1 <- make_formula("educ_attain")
-fIV_B1 <- make_formula("educ_attain", "twins_3")
-fIV_B2 <- make_formula("educ_attain", "same_sex_123")
-fIV_B3 <- make_formula("educ_attain", "boy_123 + girl_123")
-fIV_B4 <- make_formula("educ_attain", "twins_3 + boy_123 + girl_123")
+# Educational attainment
+
+fOLS_B1 <- make_formula_gt3("educ_attain")
+fIV_B1 <- make_formula_gt3("educ_attain", "twins_3")
+fIV_B2 <- make_formula_gt3("educ_attain", "same_sex_123")
+fIV_B3 <- make_formula_gt3("educ_attain", "boy_123 + girl_123")
+fIV_B4 <- make_formula_gt3("educ_attain", "twins_3 + boy_123 + girl_123")
 
 OLS_B1 <- felm(fOLS_B1, data = gt3_sample)
 IV_B1 <- felm(fIV_B1, data = gt3_sample)
@@ -282,7 +221,8 @@ stargazer(
   OLS_B1, IV_B1, IV_B2, IV_B3, IV_B4,
   keep = c("no_kids"), 
   type = "text", 
-  keep.stat = c("n","rsq"))
+  keep.stat = c("n","rsq")
+  )
 
 # Private school attendance
 OLS_B2 <- lm(private_school ~ no_kids, data = gt3_sample)
@@ -343,7 +283,7 @@ stargazer(J_educ,
           keep = c("no_kids"), 
           keep.stat = c("n","rsq"))
 
-
+# Think of ways of getting robust std. errors for the 2+ sample
 
 
 
