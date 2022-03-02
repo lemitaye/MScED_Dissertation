@@ -148,11 +148,11 @@ fIV_A2 <- make_formula_gt2("educ_attain", "same_sex_12")
 fIV_A3 <- make_formula_gt2("educ_attain", "boy_12 + girl_12")
 fIV_A4 <- make_formula_gt2("educ_attain", "twins_2 + boy_12 + girl_12")
 
-OLS_A1 <- felm(fOLS_A1, data = gt2_sample, subset = (child_age_year <= 14))
-IV_A1 <- felm(fIV_A1, data = gt2_sample, subset = (child_age_year <= 14))
-IV_A2 <- felm(fIV_A2, data = gt2_sample, subset = (child_age_year <= 14))
-IV_A3 <- felm(fIV_A3, data = gt2_sample, subset = (child_age_year <= 14))
-IV_A4 <- felm(fIV_A4, data = gt2_sample, subset = (child_age_year <= 14))
+OLS_A1 <- felm(fOLS_A1, data = gt2_sample, subset = (child_age_year > 9))
+IV_A1 <- felm(fIV_A1, data = gt2_sample, subset = (child_age_year > 9))
+IV_A2 <- felm(fIV_A2, data = gt2_sample, subset = (child_age_year > 9))
+IV_A3 <- felm(fIV_A3, data = gt2_sample, subset = (child_age_year > 9))
+IV_A4 <- felm(fIV_A4, data = gt2_sample, subset = (child_age_year > 9))
 
 stargazer(
   OLS_A1, IV_A1, IV_A2, IV_A3, IV_A4,
@@ -191,11 +191,11 @@ fIV_A6 <- make_formula_gt2("private_school", "same_sex_12")
 fIV_A7 <- make_formula_gt2("private_school", "boy_12 + girl_12")
 fIV_A8 <- make_formula_gt2("private_school", "twins_2 + boy_12 + girl_12")
 
-OLS_A2 <- felm(fOLS_A2, data = gt2_sample, subset = (child_age_year > 14))
-IV_A5  <- felm(fIV_A5, data = gt2_sample, subset = (child_age_year > 14))
-IV_A6  <- felm(fIV_A6, data = gt2_sample, subset = (child_age_year > 14))
-IV_A7  <- felm(fIV_A7, data = gt2_sample, subset = (child_age_year > 14))
-IV_A8  <- felm(fIV_A8, data = gt2_sample, subset = (child_age_year > 14))
+OLS_A2 <- felm(fOLS_A2, data = gt2_sample, subset = (child_age_year > 9))
+IV_A5  <- felm(fIV_A5, data = gt2_sample, subset = (child_age_year > 9))
+IV_A6  <- felm(fIV_A6, data = gt2_sample, subset = (child_age_year > 9))
+IV_A7  <- felm(fIV_A7, data = gt2_sample, subset = (child_age_year > 9))
+IV_A8  <- felm(fIV_A8, data = gt2_sample, subset = (child_age_year > 9))
 
 stargazer(
   OLS_A2, IV_A5, IV_A6, IV_A7, IV_A8,
@@ -213,11 +213,11 @@ fIV_A10 <- make_formula_gt2("moth_inlf", "same_sex_12")
 fIV_A11 <- make_formula_gt2("moth_inlf", "boy_12 + girl_12")
 fIV_A12 <- make_formula_gt2("moth_inlf", "twins_2 + boy_12 + girl_12")
 
-OLS_A3 <- felm(fOLS_A3, data = gt2_sample, )
-IV_A9  <- felm(fIV_A9, data = gt2_sample)
-IV_A10 <- felm(fIV_A10, data = gt2_sample)
-IV_A11 <- felm(fIV_A11, data = gt2_sample)
-IV_A12 <- felm(fIV_A12, data = gt2_sample)
+OLS_A3 <- felm(fOLS_A3, data = gt2_sample, subset = (child_age_year > 9))
+IV_A9  <- felm(fIV_A9, data = gt2_sample, subset = (child_age_year > 9))
+IV_A10 <- felm(fIV_A10, data = gt2_sample, subset = (child_age_year > 9))
+IV_A11 <- felm(fIV_A11, data = gt2_sample, subset = (child_age_year > 9))
+IV_A12 <- felm(fIV_A12, data = gt2_sample, subset = (child_age_year > 9))
 
 stargazer(
   OLS_A3, IV_A9, IV_A10, IV_A11, IV_A12,
@@ -271,12 +271,6 @@ stargazer(
   keep.stat = c("n","rsq")
 )
 
-
-# Think of ways of getting robust std. errors for the 2+ sample
-
-# Sub-sample analysis
-#  * population group (e.g., black and non-black)
-#  * mother's age (e.g., >30 and <= 30)
 
 
 ### Private school attendance ####
@@ -384,37 +378,122 @@ stargazer(
 
 
 
+# Think of ways of getting robust std. errors for the 2+ sample
+
+# Sub-sample analysis
+#  * population group (e.g., black and non-black)
+#  * mother's age (e.g., >30 and <= 30)
+
+# Run both OLS & IV regs for each age and plot in a graph 
+
+# Try out:
+
+## Load example dataset
+data(tli)
+
+## Demonstrate data.frame
+tli.table <- xtable(tli[1:20, ])
+print(tli.table, 
+      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table1.tex")
+print(tli.table, type = "html")
+xtable(mtcars)
+mt.table <- xtable(mtcars, auto = TRUE)
+print(mt.table, 
+      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table2.tex")
+
+
+"D:/MSc_ED/Thesis/SA_2011_Census/outline/"
 
 
 
+ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
+trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
+group <- gl(2,10,20, labels = c("Ctl","Trt"))
+weight <- c(ctl, trt)
+lm.D9 <- lm(weight ~ group)
+print(xtable(lm.D9),
+      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table3.tex")
+print(xtable(anova(lm.D9)))
 
 
+## Demonstrate include.rownames, include.colnames,
+## only.contents and add.to.row arguments
+library(xtable)
+set.seed(2345)
+x <- matrix(sample(0:9, size = 4*3, replace = TRUE), nrow = 4, ncol = 3)
+rownames(x) <- c("foo", "baa", "here", "there")
+colnames(x) <- c("(1)", "(2)", "(3)")
+
+xres <- xtable(x)
+
+print(xres, file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table4.tex")
+
+digits(xres) <- rep(0, 7)
+addtorow <- list()
+addtorow$pos <- list()
+addtorow$pos[[1]] <- c(0, 2)
+addtorow$pos[[2]] <- 4
+addtorow$command <- c('\vspace{2mm} \n', '\vspace{10mm} \n')
+print(xres, add.to.row = addtorow, include.rownames = FALSE,
+      include.colnames = TRUE, only.contents = TRUE,
+      hline.after = c(0, 0, 9, 9),
+      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table4.tex")
+
+res <- stargazer(
+  OLS_A1, 
+  # IV_A1, IV_A2, IV_A3, IV_A4,
+  keep = c("no_kids"),
+  type = "text",
+  keep.stat = c("n", "rsq") 
+)
+
+library(textTools)
+
+str_rm_non_alphanumeric(c("test 67890 * % $ "))
+str_rm_blank_space(c("test 67890 * % $ "))
+
+res[[8]] %>% 
+  str_rm_words("no_kids") %>% 
+  str_rm_blank_space() 
 
 
+stargazer(
+  OLS_A1, OLS_A4, OLS_A2, OLS_A3,
+  keep = c("no_kids"),
+  type = "text",
+  keep.stat = c("n"),
+  flip=TRUE
+)
 
+stargazer(
+  IV_A1, IV_A13, IV_A5, IV_A9, 
+  keep = c("no_kids"),
+  type = "text",
+  keep.stat = c("n") 
+)
 
+OLS <- OLS_A1
 
+coef(summary(OLS_A1))
+coef(summary(OLS_A2))
+coef(summary(OLS_A3))
+coef(summary(OLS_A4))
 
+rownames( coef(summary(OLS_A1)) ) <- c(
+  "educ_attain",  "behind",  "private_school", "moth_inlf", "place holder"
+  )
 
+x <- matrix(sample(0:9, size = 4*3, replace = TRUE), nrow = 5, ncol = 1)
 
+rownames(x) <- c("educ_attain",  "behind",  "private_school", "moth_inlf", "place holder")
+colnames(x) <- c("no_kids")
 
+OLS$coefficients <- x
+OLS$lhs <- c("no_kids")
 
+rownames(A) <- c("educ_attain",  "behind",  "private_school", "moth_inlf", "place holder")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+stargazer(OLS, type = "text")
 
 
 
