@@ -119,7 +119,17 @@ data_model_ols %>%
     caption = "The red dots indicate coefficient estimate and the lines are 95% confidence intervals"
   )
 
+# Tables of Descriptive Statistics ####
 
+gt2_descript <- gt2_sample %>% 
+  select(boy:child_age_month) %>% 
+  as.data.frame() 
+
+stargazer(
+  gt2_descript, 
+  type = "text",
+  omit.summary.stat = c("p25", "p75")
+  )
 
 
 
