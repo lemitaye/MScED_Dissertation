@@ -16,8 +16,6 @@ gt2_sample <- gt2_sample %>%
   mutate(
     district = factor(district),
     municip = factor(municip),
-    moth_no = factor(moth_no),
-    behind = as.numeric(behind)
     )
 
 gt3_sample <- gt3_sample %>%
@@ -68,7 +66,7 @@ make_formula_gt2 <- function(dep_var, instrument = 0) {
 make_formula_gt3 <- function(dep_var, instrument = 0) {
   
   covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
-  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
+  covar2 <- c("birth_order", "district", "moth_educ", "moth_pp_group", "moth_income")
   covar <- paste( paste(covar1, collapse = "+"), "|",  
                   paste(covar2, collapse = "+") )
   
@@ -377,120 +375,53 @@ stargazer(
   keep.stat = c("n", "rsq")
 )
 
+# Regression Tables #######
 
-
-# Think of ways of getting robust std. errors for the 2+ sample
-
-# Sub-sample analysis
-#  * population group (e.g., black and non-black)
-#  * mother's age (e.g., >30 and <= 30)
-
-# Run both OLS & IV regs for each age and plot in a graph 
-
-# Try out:
-
-## Load example dataset
-data(tli)
-
-## Demonstrate data.frame
-tli.table <- xtable(tli[1:20, ])
-print(tli.table, 
-      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table1.tex")
-print(tli.table, type = "html")
-xtable(mtcars)
-mt.table <- xtable(mtcars, auto = TRUE)
-print(mt.table, 
-      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table2.tex")
-
-
-"D:/MSc_ED/Thesis/SA_2011_Census/outline/"
-
-
-
-ctl <- c(4.17,5.58,5.18,6.11,4.50,4.61,5.17,4.53,5.33,5.14)
-trt <- c(4.81,4.17,4.41,3.59,5.87,3.83,6.03,4.89,4.32,4.69)
-group <- gl(2,10,20, labels = c("Ctl","Trt"))
-weight <- c(ctl, trt)
-lm.D9 <- lm(weight ~ group)
-print(xtable(lm.D9),
-      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table3.tex")
-print(xtable(anova(lm.D9)))
-
-
-## Demonstrate include.rownames, include.colnames,
-## only.contents and add.to.row arguments
-library(xtable)
-set.seed(2345)
-x <- matrix(sample(0:9, size = 4*3, replace = TRUE), nrow = 4, ncol = 3)
-rownames(x) <- c("foo", "baa", "here", "there")
-colnames(x) <- c("(1)", "(2)", "(3)")
-
-xres <- xtable(x)
-
-print(xres, file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table4.tex")
-
-digits(xres) <- rep(0, 7)
-addtorow <- list()
-addtorow$pos <- list()
-addtorow$pos[[1]] <- c(0, 2)
-addtorow$pos[[2]] <- 4
-addtorow$command <- c('\vspace{2mm} \n', '\vspace{10mm} \n')
-print(xres, add.to.row = addtorow, include.rownames = FALSE,
-      include.colnames = TRUE, only.contents = TRUE,
-      hline.after = c(0, 0, 9, 9),
-      file="D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table4.tex")
-
-res <- stargazer(
-  OLS_A1, 
-  # IV_A1, IV_A2, IV_A3, IV_A4,
-  keep = c("no_kids"),
-  type = "text",
-  keep.stat = c("n", "rsq") 
+models <- list(
+  ols_2 = list(OLS_A1, OLS_A4, OLS_A2, OLS_A3), 
+  iv_twins_2 = list(IV_A1, IV_A13, IV_A5, IV_A9),
+  iv_same_sex_2 = list(IV_A2, IV_A14, IV_A6, IV_A10),
+  iv_boy_girl_2 = list(IV_A3, IV_A15, IV_A7, IV_A11),
+  iv_all_2 = list(IV_A4, IV_A16, IV_A8, IV_A12),
+  ols_3 = list(OLS_B1, OLS_B4, OLS_B2, OLS_B3), 
+  iv_twins_3 = list(IV_B1, IV_B13, IV_B5, IV_B9),
+  iv_same_sex_3 = list(IV_B2, IV_B14, IV_B6, IV_B10),
+  iv_boy_girl_3 = list(IV_B3, IV_B15, IV_B7, IV_B11),
+  iv_all_3 = list(IV_B4, IV_B16, IV_B8, IV_B12)
+  # add estimation objects from 3+ sample here
 )
 
-library(textTools)
+# Create empty lists
+make_list <- function() {
+  x <- list(
+    ols_2 = double(4), iv_twins_2 = double(4), iv_same_sex_2 = double(4), 
+    iv_boy_girl_2 = double(4), iv_all_2 = double(4),
+    ols_3 = double(4), iv_twins_3 = double(4), iv_same_sex_3 = double(4), 
+    iv_boy_girl_3 = double(4), iv_all_3 = double(4)
+    ) 
+  
+  return(x)
+}
 
-str_rm_non_alphanumeric(c("test 67890 * % $ "))
-str_rm_blank_space(c("test 67890 * % $ "))
+coef_list <- make_list()
+se_list <- make_list()
+p_list <- make_list()
 
-res[[8]] %>% 
-  str_rm_words("no_kids") %>% 
-  str_rm_blank_space() 
-
-
-OLS <- lm(no_kids ~ educ_attain + behind + private_school + moth_inlf, 
-          data = gt2_sample)
-
-iv <- ivreg(no_kids ~ educ_attain + behind + private_school + moth_inlf 
-            | twins_2 + behind + private_school + moth_inlf, 
-          data = gt2_sample)
-
-coef(summary(OLS_A1))
-coef(summary(OLS_A2))
-coef(summary(OLS_A3))
-coef(summary(OLS_A4))
-
-rownames( coef(summary(OLS_A1)) ) <- c(
-  "educ_attain",  "behind",  "private_school", "moth_inlf", "place holder"
-  )
-
-x <- matrix(sample(0:9, size = 4*3, replace = TRUE), nrow = 5, ncol = 1)
-
-rownames(x) <- c("educ_attain",  "behind",  "private_school", "moth_inlf", "place holder")
-colnames(x) <- c("no_kids")
-
-OLS$coefficients <- x
-OLS$lhs <- c("no_kids")
-
-rownames(A) <- c("educ_attain",  "behind",  "private_school", "moth_inlf", "place holder")
-
-
-
-
-#######
-
-set.seed()
-x <- matrix(sample(0:9, size = 4*3, replace = TRUE), nrow = 4, ncol = 3)
+# Collect coefficients, standard errors, and p-values
+for (i in seq_along(models)) {
+  for (j in seq_along(models[[i]])) {
+    # The first and sixth models are OLS; needed robust s.e.
+    if (i == 1 | i == 6) {
+      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,1]
+      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,2]
+      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,4]
+    } else {
+      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,1]
+      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,2]
+      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,4]
+    }
+  }
+}
 
 ## Create a fictitious data
 set.seed(2345)
@@ -505,6 +436,7 @@ d <- data.frame(
   iv = rnorm(n) + 5
 )
 
+# Run reg. using fictitious data as placeholders
 ols <- lm(no_kids ~ 0 + educ_attain + behind + private_school + moth_inlf, 
           data = d)
 
@@ -512,177 +444,29 @@ iv <- ivreg(no_kids ~ 0 + educ_attain + behind + private_school + moth_inlf
             | iv + behind + private_school + moth_inlf, 
             data = d)
 
-# Consider writing a loop
-
-### coefficients ####
-
-coef_list <- list(
-# OLS
-ols = c(
-coef(summary(OLS_A1, robust = TRUE))[1,1],
-coef(summary(OLS_A4, robust = TRUE))[1,1],
-coef(summary(OLS_A2, robust = TRUE))[1,1],
-coef(summary(OLS_A3, robust = TRUE))[1,1]
-),
-# IV -twins_2
-iv_twins = c(
-coef(summary(IV_A1))[5,1],
-coef(summary(IV_A13))[5,1],
-coef(summary(IV_A5))[5,1],
-coef(summary(IV_A9))[5,1]
-),
-# IV - same_sex_12
-iv_same_sex = c(
-  coef(summary(IV_A2))[5,1],
-  coef(summary(IV_A14))[5,1],
-  coef(summary(IV_A6))[5,1],
-  coef(summary(IV_A10))[5,1]
-),
-# IV - boy_12 + girl_12
-iv_boy_girl = c(
-  coef(summary(IV_A3))[5,1],
-  coef(summary(IV_A15))[5,1],
-  coef(summary(IV_A7))[5,1],
-  coef(summary(IV_A11))[5,1]
-),
-# IV - twins_2 + boy_12 + girl_12 
-iv_all = c(
-  coef(summary(IV_A4))[5,1],
-  coef(summary(IV_A16))[5,1],
-  coef(summary(IV_A8))[5,1],
-  coef(summary(IV_A12))[5,1]
+labels <- c(
+  "Educational Attainment",
+  "Left Behind",
+  "Private School",
+  "Mothers LFP"
 )
-)
-
-### std. errors ####
-
-se_list <- list(
-  # OLS
-  c(
-    coef(summary(OLS_A1, robust = TRUE))[1,2],
-    coef(summary(OLS_A4, robust = TRUE))[1,2],
-    coef(summary(OLS_A2, robust = TRUE))[1,2],
-    coef(summary(OLS_A3, robust = TRUE))[1,2]
-  ),
-  # IV - twins_2
-  c(
-    coef(summary(IV_A1))[5,2],
-    coef(summary(IV_A13))[5,2],
-    coef(summary(IV_A5))[5,2],
-    coef(summary(IV_A9))[5,2]
-  ),
-  # IV - same_sex_12
-  c(
-    coef(summary(IV_A2))[5,2],
-    coef(summary(IV_A14))[5,2],
-    coef(summary(IV_A6))[5,2],
-    coef(summary(IV_A10))[5,2]
-  ),
-  # IV - boy_12 + girl_12
-  c(
-    coef(summary(IV_A3))[5,2],
-    coef(summary(IV_A15))[5,2],
-    coef(summary(IV_A7))[5,2],
-    coef(summary(IV_A11))[5,2]
-  ),
-  # IV - twins_2 + boy_12 + girl_12 
-  c(
-    coef(summary(IV_A4))[5,2],
-    coef(summary(IV_A16))[5,2],
-    coef(summary(IV_A7))[5,2],
-    coef(summary(IV_A12))[5,2]
-  )
-)
-
-### p-values ####
-
-p_list <- list(
-  # OLS
-  c(
-    coef(summary(OLS_A1, robust = TRUE))[1,4],
-    coef(summary(OLS_A4, robust = TRUE))[1,4],
-    coef(summary(OLS_A2, robust = TRUE))[1,4],
-    coef(summary(OLS_A3, robust = TRUE))[1,4]
-  ),
-  # IV - twins_2
-  c(
-    coef(summary(IV_A1))[5,4],
-    coef(summary(IV_A13))[5,4],
-    coef(summary(IV_A5))[5,4],
-    coef(summary(IV_A9))[5,4]
-  ),
-  # IV - same_sex_12
-  c(
-    coef(summary(IV_A2))[5,4],
-    coef(summary(IV_A14))[5,4],
-    coef(summary(IV_A6))[5,4],
-    coef(summary(IV_A10))[5,4]
-  ),
-  # IV - boy_12 + girl_12
-  c(
-    coef(summary(IV_A3))[5,4],
-    coef(summary(IV_A15))[5,4],
-    coef(summary(IV_A7))[5,4],
-    coef(summary(IV_A11))[5,4]
-  ),
-  # IV - twins_2 + boy_12 + girl_12 
-  c(
-    coef(summary(IV_A4))[5,4],
-    coef(summary(IV_A16))[5,4],
-    coef(summary(IV_A7))[5,4],
-    coef(summary(IV_A12))[5,4]
-  )
-)
-
-### stargazer ####
-
-models <- list(
-  ols_results = list(OLS_A1, OLS_A4, OLS_A2, OLS_A3), 
-  iv_twins = list(IV_A1, IV_A13, IV_A5, IV_A9),
-  iv_same_sex = list(IV_A2, IV_A14, IV_A6, IV_A10),
-  iv_boy_girl = list(IV_A3, IV_A15, IV_A7, IV_A11),
-  iv_all = list(IV_A4, IV_A16, IV_A8, IV_A12)
-  # add estimation objects from 3+ sample here
-)
-
-# Create empty lists
-make_list <- function() {
-  x <- list(ols = double(4), iv_twins = double(4), 
-              iv_same_sex = double(4), iv_boy_girl = double(4), 
-              iv_all = double(4)) # expand this to accommodate 3+ estimations
-  
-  return(x)
-}
-
-coef_list <- make_list()
-se_list <- make_list()
-p_list <- make_list()
-
-# Collect coefficients, standard errors, and p-values
-for (i in seq_along(models)) {
-  for (j in seq_along(models[[i]])) {
-    if (i == 1) {
-      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[1,1]
-      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[1,2]
-      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[1,4]
-    } else {
-      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,1]
-      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,2]
-      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,4]
-    }
-  }
-}
 
 stargazer(
-  OLS, iv, iv, iv, iv,
+  ols, iv, iv, iv, iv, ols, iv, iv, iv, iv,
   coef = coef_list,
   se = se_list,
   p = p_list,
-  type = "text",
+  # type = "text",
   omit.stat = "all",
-  style = "aer"
-  # ,
-  # out = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
+  style = "aer",
+  covariate.labels = labels,
+  column.labels   = c("OLS", "IV", "OLS", "IV"),
+  column.separate = c(1, 4, 1, 4),
+  dep.var.labels.include = FALSE,
+  model.names = FALSE,
+  star.cutoffs = c(0.05, 0.01, 0.001)
+  ,
+  out = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
 )
 
 

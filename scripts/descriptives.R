@@ -131,7 +131,8 @@ stargazer(
   omit.summary.stat = c("p25", "p75")
   )
 
-
+# include birth order in the 3+ sample
+# table for first stage, descriptive stat. and main regressions
 
 
 
