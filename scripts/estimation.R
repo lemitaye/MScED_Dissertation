@@ -29,20 +29,34 @@ gt3_sample <- gt3_sample %>%
 
 # Functions for constructing formulas ####
 
-make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE) {
+make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE, old = FALSE) {
   # Define a vector of covariates
   covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
   covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
-  covar <- paste( paste(covar1, collapse = "+"), "|",  
-                  paste(covar2, collapse = "+") )
-  
+  covar <- paste(
+    paste(covar1, collapse = "+"), "|",
+    paste(covar2, collapse = "+")
+  )
+
   if (clus) {
-    f <- as.formula( paste( dep_var, " ~ ", instrument, " + ", covar,
-                            " | 0 | moth_no" ) )
+    f <- as.formula(paste(
+      dep_var, " ~ ", instrument, " + ", covar,
+      " | 0 | moth_no"
+    ))
+  } else if (old) {
+    f <- as.formula(
+      paste(
+        dep_var, " ~ ",
+        paste( paste(covar1, collapse = "+"),
+          paste(covar2, collapse = "+"),
+        collapse = "+"
+        )
+      )
+    )
   } else {
-    f <- as.formula( paste( dep_var, " ~ ", instrument, " + ", covar ) )
+    f <- as.formula(paste(dep_var, " ~ ", instrument, " + ", covar))
   }
-  
+
   return(f)
 }
 
@@ -103,14 +117,9 @@ stargazer(
     "boy_1", "same_sex_12", "boy_12", "girl_12", "twins_2"
   ),
   type = "text", 
-  keep.stat = c("n","rsq")
+  # keep.stat = c("n","rsq", "f"),
+  star.cutoffs = c(0.05, 0.01, 0.001)
 ) 
-
-# F-tests 
-# linearHypothesis(ma_1, c("same_sex_12"))
-# linearHypothesis(ma_2, c("boy_1", "boy_2", "same_sex_12"))
-# linearHypothesis(ma_3, c("boy_1", "boy_12", "girl_12"))
-# linearHypothesis(ma_4, c("twins_2"))
 
 ## 3+ sample ####
 
@@ -134,6 +143,53 @@ stargazer(
   type = "text", 
   keep.stat = c("n","rsq")
 ) 
+
+
+## Using traditional LM (for F-statistic) ####
+
+covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
+covar2 <- c("birth_order", "district", "moth_educ", "moth_pp_group", "moth_income")
+
+ma_1_o <- lm(
+  no_kids ~ twins_2 + child_age_month + boy + moth_age_year +
+    fath_inhh + district + moth_educ + moth_pp_group +
+    moth_income,
+  data = gt2_sample, subset = (child_age_year > 9)
+)
+
+ma_2_o <- lm(
+  no_kids ~ same_sex_12 + child_age_month + boy + moth_age_year +
+    fath_inhh + district + moth_educ + moth_pp_group +
+    moth_income,
+  data = gt2_sample, subset = (child_age_year > 9)
+)
+
+ma_3_o <- lm(
+  no_kids ~ boy_12 + girl_12 + child_age_month + boy + moth_age_year +
+    fath_inhh + district + moth_educ + moth_pp_group +
+    moth_income,
+  data = gt2_sample, subset = (child_age_year > 9)
+)
+
+ma_4_o <- lm(
+  no_kids ~ twins_2 + boy_12 + girl_12 + child_age_month + boy + moth_age_year +
+    fath_inhh + district + moth_educ + moth_pp_group +
+    moth_income,
+  data = gt2_sample, subset = (child_age_year > 9)
+)
+
+
+
+# F-tests
+linearHypothesis(ma_1_o, c("twins_2"))
+linearHypothesis(ma_2_o, c("same_sex_12"))
+linearHypothesis(ma_3_o, c("boy_12",  "girl_12"))
+linearHypothesis(ma_4_o, c("twins_2", "boy_12",  "girl_12"))
+
+# Good first-stage F-stats!
+
+
+
 
 # 2SLS/IV regressions ####
 
@@ -451,6 +507,13 @@ labels <- c(
   "Mothers LFP"
 )
 
+last_lines = list(
+  c("IV used", "-", "Twins2", "SameSex12", "Boy12", "Twins2, Boy12",
+    "-", "Twins3", "SameSex123", "Boy123", "Twins3, Boy123"),
+  c(" ", " ", " ", " ", "Girl12", "Girl12",
+    " ", " ", " ", " ", "Girl123", "Girl123")
+)
+
 stargazer(
   ols, iv, iv, iv, iv, ols, iv, iv, iv, iv,
   coef = coef_list,
@@ -460,11 +523,13 @@ stargazer(
   omit.stat = "all",
   style = "aer",
   covariate.labels = labels,
-  column.labels   = c("OLS", "IV", "OLS", "IV"),
-  column.separate = c(1, 4, 1, 4),
+  column.labels   = c("2+ Sample", "3+ Sample"),
+  column.separate = c(5, 5),
   dep.var.labels.include = FALSE,
   model.names = FALSE,
-  star.cutoffs = c(0.05, 0.01, 0.001)
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  float = FALSE,
+  add.lines = last_lines
   ,
   out = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
 )
