@@ -40,7 +40,7 @@ p_list <- make_list()
 for (i in seq_along(models)) {
   for (j in seq_along(models[[i]])) {
     # The first and sixth models are OLS; needed robust s.e.
-    if (i == 1 | i == 6) {
+    if (i == 1 | i == 5) { # Toggle this when removing columns
       coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,1]
       se_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,2]
       p_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,4]
@@ -84,7 +84,7 @@ last_lines = list(
   c("IV used", "-", "Twins2", "Boy12", "Twins2, Boy12",
     "-", "Twins3", "Boy123", "Twins3, Boy123"),
   c(" ", " ", " ", "Girl12", "Girl12",
-    " ", " ", " ", "Girl123", "Girl123")
+    " ", " ", "Girl123", "Girl123")
 )
 
 star.out <- stargazer(
@@ -106,7 +106,7 @@ star.out <- stargazer(
   notes = NULL
 )
 
-long_note = "*** Significant at 0.1%, ** Significant at 1%, * Significant at 5%. Robust standard errors are in parentheses.  
+long_note = "*** Significant at 0.1\\%, ** Significant at 1\\%, * Significant at 5\\%. Robust standard errors are in parentheses.  
 Covariates for all models include age (in months) and sex of child, mother's education, 
 dummies for mother's population group and income range, dummies for districts, and a dummy for whether the father resides in the household. 
 The regressions for the 3+ sample are clustered by mother's ID."
