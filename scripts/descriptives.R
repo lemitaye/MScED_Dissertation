@@ -122,33 +122,119 @@ data_model_ols %>%
 # Tables of Descriptive Statistics ####
 
 gt2_descript <- gt2_sample %>% 
-  select(boy:child_age_month) %>% 
+  select(
+    no_kids,
+    twins_2,
+    same_sex_12,
+    boy_12,
+    girl_12,
+    male = boy,
+    child_age_year,
+    child_age_month,
+    child_educ,
+    moth_age_year,
+    # moth_age_month,
+    # dummies for mother's population group
+    moth_age_fstbr,
+    fath_inhh,
+    educ_attain,
+    behind,
+    moth_inlf,
+    private_school
+    ) %>% 
   as.data.frame() 
 
-stargazer(
+gt3_descript <- gt3_sample %>% 
+  select(
+    no_kids,
+    twins_3,
+    same_sex_123,
+    boy_123,
+    girl_123,
+    male = boy,
+    child_age_year,
+    child_age_month,
+    child_educ,
+    moth_age_year,
+    # moth_age_month,
+    # dummies for mother's population group
+    moth_age_fstbr,
+    fath_inhh,
+    educ_attain,
+    behind,
+    moth_inlf,
+    private_school
+  ) %>% 
+  as.data.frame() 
+
+star_descr2 <- stargazer(
   gt2_descript, 
-  type = "text",
-  omit.summary.stat = c("p25", "p75")
+  # type = "text",
+  summary.stat = c("mean", "sd", "min", "max"),
+  title = "Table of Summary Statistics"
   )
+
+star_descr3 <- stargazer(
+  gt3_descript, 
+  # type = "text",
+  summary.stat = c("mean", "sd", "min", "max")
+)
+
+star_descript <- star_panel(star_descr2, star_descr3,
+           same.summary.stats = FALSE,
+           panel.label.fontface = "bold",
+           panel.names = 
+             c("2+ Sample", "3+ Sample")
+) %>% 
+  star_insert_row(
+    c(
+      "\\hline \\\\[-1.8ex] ",
+      "Observations & \\multicolumn{4}{c}{1000} \\\\",
+      "\\hline \\\\[-1.8ex] ",
+      "Observations & \\multicolumn{4}{c}{1000} \\\\"
+    ),
+    insert.after = c(28, 28, 48)
+  ) 
+
+star_tex_write(
+  star_descript, 
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table8.tex"
+)
+
 
 # include birth order in the 3+ sample
 # table for first stage, descriptive stat. and main regressions
 # Foucs on first stage
+# marital status of the mother in regs.
 
+## -- Regressoin example -- ##
+library(stargazer)
+data(mtcars)
+star.out.1 <- stargazer(mtcars, title = "Table of Summary Statistics") 
 
+star.out.2 <- stargazer(mtcars) 
 
+##stargazer panel -- different summary statistics across panels.
+star.panel.out2 <- star_panel(star.out.1, star.out.2,
+                              same.summary.stats = FALSE,
+                              panel.label.fontface = "bold",
+                              panel.names = 
+                                c("2+ Sample", "3+ Sample")
+) %>% 
+  star_insert_row(
+    c(
+      "\\hline \\\\[-1.8ex] ",
+      " Observations & \\multicolumn{5}{c}{32} \\\\",
+      "\\hline \\\\[-1.8ex] ",
+      " Observations & \\multicolumn{5}{c}{32} \\\\"
+    ),
+    insert.after = c(23, 23, 38)
+  ) 
 
-
-
-
-
-
-
-
-
-
-
-
+star_tex_write(
+  star.panel.out2, 
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table8.tex"
+  )
 
 
 
