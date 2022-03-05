@@ -21,6 +21,7 @@ library(scales)
 library(broom)
 library(car)
 library(lfe)
+library(starpolishr)
 
 theme_set(theme_light())
 

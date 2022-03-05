@@ -198,7 +198,15 @@ linearHypothesis(ma_4_o, c("twins_2", "boy_12", "girl_12"))
 
 # Good first-stage F-stats!
 
-
+stargazer(
+  ma_1_o, ma_2_o, ma_3_o, ma_4_o,
+  keep = c(
+    "boy_1", "same_sex_12", "boy_12", "girl_12", "twins_2"
+  ),
+  type = "text",
+  keep.stat = c("n","rsq"),
+  star.cutoffs = c(0.05, 0.01, 0.001)
+)
 
 
 # 2SLS/IV regressions ####
