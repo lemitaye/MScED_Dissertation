@@ -9,12 +9,12 @@
 models <- list(
   ols_2 = list(OLS_A1, OLS_A4, OLS_A2, OLS_A3), 
   iv_twins_2 = list(IV_A1, IV_A13, IV_A5, IV_A9),
-  iv_same_sex_2 = list(IV_A2, IV_A14, IV_A6, IV_A10),
+  # iv_same_sex_2 = list(IV_A2, IV_A14, IV_A6, IV_A10),
   iv_boy_girl_2 = list(IV_A3, IV_A15, IV_A7, IV_A11),
   iv_all_2 = list(IV_A4, IV_A16, IV_A8, IV_A12),
   ols_3 = list(OLS_B1, OLS_B4, OLS_B2, OLS_B3), 
   iv_twins_3 = list(IV_B1, IV_B13, IV_B5, IV_B9),
-  iv_same_sex_3 = list(IV_B2, IV_B14, IV_B6, IV_B10),
+  # iv_same_sex_3 = list(IV_B2, IV_B14, IV_B6, IV_B10),
   iv_boy_girl_3 = list(IV_B3, IV_B15, IV_B7, IV_B11),
   iv_all_3 = list(IV_B4, IV_B16, IV_B8, IV_B12)
   # add estimation objects from 3+ sample here
@@ -23,9 +23,9 @@ models <- list(
 # Create empty lists
 make_list <- function() {
   x <- list(
-    ols_2 = double(4), iv_twins_2 = double(4), iv_same_sex_2 = double(4), 
+    ols_2 = double(4), iv_twins_2 = double(4), 
     iv_boy_girl_2 = double(4), iv_all_2 = double(4),
-    ols_3 = double(4), iv_twins_3 = double(4), iv_same_sex_3 = double(4), 
+    ols_3 = double(4), iv_twins_3 = double(4), 
     iv_boy_girl_3 = double(4), iv_all_3 = double(4)
   ) 
   
@@ -81,32 +81,43 @@ labels <- c(
 )
 
 last_lines = list(
-  c("IV used", "-", "Twins2", "SameSex12", "Boy12", "Twins2, Boy12",
-    "-", "Twins3", "SameSex123", "Boy123", "Twins3, Boy123"),
-  c(" ", " ", " ", " ", "Girl12", "Girl12",
-    " ", " ", " ", " ", "Girl123", "Girl123")
+  c("IV used", "-", "Twins2", "Boy12", "Twins2, Boy12",
+    "-", "Twins3", "Boy123", "Twins3, Boy123"),
+  c(" ", " ", " ", "Girl12", "Girl12",
+    " ", " ", " ", "Girl123", "Girl123")
 )
 
-stargazer(
-  ols, iv, iv, iv, iv, ols, iv, iv, iv, iv,
+star.out <- stargazer(
+  ols, iv, iv, iv, ols, iv, iv, iv, 
   coef = coef_list,
   se = se_list,
   p = p_list,
   # type = "text",
   omit.stat = "all",
-  style = "aer",
+  # style = "aer",
+  dep.var.caption  = "",
   covariate.labels = labels,
-  column.labels   = c("2+ Sample", "3+ Sample"),
-  column.separate = c(5, 5),
+  column.labels   = c("OLS", "IV", "OLS", "IV"),
+  column.separate = c(1, 3, 1, 3),
   dep.var.labels.include = FALSE,
   model.names = FALSE,
   star.cutoffs = c(0.05, 0.01, 0.001),
-  float = FALSE,
-  add.lines = last_lines
-  ,
-  out = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
+  add.lines = last_lines,
+  notes = NULL
 )
 
+long_note = "*** Significant at 0.1%, ** Significant at 1%, * Significant at 5%. Robust standard errors are in parentheses.  
+Covariates for all models include age (in months) and sex of child, mother's education, 
+dummies for mother's population group and income range, dummies for districts, and a dummy for whether the father resides in the household. 
+The regressions for the 3+ sample are clustered by mother's ID."
+
+star_sidewaystable(star.out) %>% 
+star_notes_tex(
+  note.type = "caption", #Use the latex 'caption' package for notes
+  note = long_note) %>% 
+  star_tex_write(
+    file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
+  )
 
 # First Stages
 
@@ -154,7 +165,12 @@ star_insert_row(
 
 
 
-
+data(mtcars)
+star.out <- stargazer(mtcars)
+star_sidewaystable(star.out) %>% 
+  star_tex_write(
+    file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table9noh.tex"
+  )
 
 
 

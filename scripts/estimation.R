@@ -43,16 +43,6 @@ make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE, old = FALSE
       dep_var, " ~ ", instrument, " + ", covar,
       " | 0 | moth_no"
     ))
-  } else if (old) {
-    f <- as.formula(
-      paste(
-        dep_var, " ~ ",
-        paste(paste(covar1, collapse = "+"),
-          paste(covar2, collapse = "+"),
-          collapse = "+"
-        )
-      )
-    )
   } else {
     f <- as.formula(paste(dep_var, " ~ ", instrument, " + ", covar))
   }
@@ -406,87 +396,87 @@ stargazer(
 
 ### Educational attainment ####
 
-OLS_SS_B1 <- felm(fOLS_A1,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-IV_SS_B1 <- felm(fIV_A1,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-IV_SS_B3 <- felm(fIV_A3,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-IV_SS_B4 <- felm(fIV_A4,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-
-OLS_SS_NB1 <- felm(fOLS_A1,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_SS_NB1 <- felm(fIV_A1,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_SS_NB3 <- felm(fIV_A3,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_SS_NB4 <- felm(fIV_A4,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-
-stargazer(
-  OLS_SS_B1, IV_SS_B1, IV_SS_B3, IV_SS_B4, OLS_SS_NB1, IV_SS_NB3, IV_SS_NB4,
-  keep = c("no_kids"),
-  type = "text",
-  keep.stat = c("n", "rsq")
-)
-
-
-### Left Behind ####
-
-OLS_SS_B2 <- felm(fOLS_A4,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-IV_SS_B5 <- felm(fIV_A13,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-IV_SS_B6 <- felm(fIV_A15,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-IV_SS_B7 <- felm(fIV_A16,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-)
-
-OLS_SS_NB2 <- felm(fOLS_A4,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_SS_NB5 <- felm(fIV_A13,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_SS_NB6 <- felm(fIV_A15,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_SS_NB7 <- felm(fIV_A16,
-  data = gt2_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-
-stargazer(
-  OLS_SS_B2, IV_SS_B5, IV_SS_B6, IV_SS_B7, OLS_SS_NB2, IV_SS_NB5, IV_SS_NB6, IV_SS_NB7,
-  keep = c("no_kids"),
-  type = "text",
-  keep.stat = c("n", "rsq")
-)
+# OLS_SS_B1 <- felm(fOLS_A1,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# IV_SS_B1 <- felm(fIV_A1,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# IV_SS_B3 <- felm(fIV_A3,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# IV_SS_B4 <- felm(fIV_A4,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# 
+# OLS_SS_NB1 <- felm(fOLS_A1,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# IV_SS_NB1 <- felm(fIV_A1,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# IV_SS_NB3 <- felm(fIV_A3,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# IV_SS_NB4 <- felm(fIV_A4,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# 
+# stargazer(
+#   OLS_SS_B1, IV_SS_B1, IV_SS_B3, IV_SS_B4, OLS_SS_NB1, IV_SS_NB3, IV_SS_NB4,
+#   keep = c("no_kids"),
+#   type = "text",
+#   keep.stat = c("n", "rsq")
+# )
+# 
+# 
+# ### Left Behind ####
+# 
+# OLS_SS_B2 <- felm(fOLS_A4,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# IV_SS_B5 <- felm(fIV_A13,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# IV_SS_B6 <- felm(fIV_A15,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# IV_SS_B7 <- felm(fIV_A16,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
+# )
+# 
+# OLS_SS_NB2 <- felm(fOLS_A4,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# IV_SS_NB5 <- felm(fIV_A13,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# IV_SS_NB6 <- felm(fIV_A15,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# IV_SS_NB7 <- felm(fIV_A16,
+#   data = gt2_sample,
+#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
+# )
+# 
+# stargazer(
+#   OLS_SS_B2, IV_SS_B5, IV_SS_B6, IV_SS_B7, OLS_SS_NB2, IV_SS_NB5, IV_SS_NB6, IV_SS_NB7,
+#   keep = c("no_kids"),
+#   type = "text",
+#   keep.stat = c("n", "rsq")
+# )
