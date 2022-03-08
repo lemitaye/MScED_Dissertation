@@ -132,19 +132,24 @@ gt2_descript <- gt2_sample %>%
     child_age_year,
     child_age_month,
     child_educ,
-    moth_age_year,
-    # moth_age_month,
-    # dummies for mother's population group
-    moth_age_fstbr,
-    fath_inhh,
     educ_attain,
     behind,
+    private_school,
+    moth_age_year,
+    moth_age_fstbr,
+    moth_pp_group,
+    moth_educ,
+    moth_marital,
     moth_inlf,
-    private_school
-    ) %>% 
-  as.data.frame() 
+    fath_inhh,
+    province
+    ) %>% dummy_cols(
+      c("moth_pp_group", "moth_educ", "moth_marital", "province")
+      ) %>% 
+  select(-c(moth_pp_group, moth_educ, province, moth_marital))
 
 gt3_descript <- gt3_sample %>% 
+  filter(!is.na(moth_pp_group)) %>% 
   select(
     no_kids,
     twins_3,
@@ -155,24 +160,216 @@ gt3_descript <- gt3_sample %>%
     child_age_year,
     child_age_month,
     child_educ,
-    moth_age_year,
-    # moth_age_month,
-    # dummies for mother's population group
-    moth_age_fstbr,
-    fath_inhh,
     educ_attain,
     behind,
+    private_school,
+    moth_age_year,
+    moth_age_fstbr,
+    moth_pp_group,
+    moth_educ,
+    moth_marital,
     moth_inlf,
-    private_school
+    fath_inhh,
+    province,
+    birth_order
+  ) 
+
+gt3_descript_frstbrn <- gt3_descript %>% 
+  filter(birth_order == 1) %>% 
+  dummy_cols(
+    c("moth_pp_group", "moth_educ", "moth_marital", "province")
   ) %>% 
-  as.data.frame() 
+  select(
+    -c(moth_pp_group, moth_educ, province, moth_marital, birth_order)
+  )
+
+gt3_descript_both <- gt3_descript %>%
+  dummy_cols(
+  c("moth_pp_group", "moth_educ", "moth_marital", "province")
+) %>% 
+  select(
+    -c(moth_pp_group, moth_educ, province, moth_marital, birth_order)
+    )
+
+sd_rm_bin <- function(x) {
+  
+  if ( min(x, na.rm = TRUE) == 0 && max(x, na.rm = TRUE) == 1 ) {
+    res <- NA
+  } else {
+    res <- sd(x, na.rm = TRUE)
+  }
+
+  res
+}
+
+mean_2 <- gt2_descript %>% 
+  map_dbl(mean, na.rm = TRUE) %>% 
+  round(3)
+
+sd_2 <- gt2_descript %>% 
+  map_dbl(sd_rm_bin) %>% 
+  round(3)
+
+mean_3_frstbrn <- gt3_descript_frstbrn %>% 
+  map_dbl(mean, na.rm = TRUE) %>% 
+  round(3)
+
+sd_3_frstbrn <- gt3_descript_frstbrn %>% 
+  map_dbl(sd_rm_bin) %>% 
+  round(3)
+
+mean_3_both <- gt3_descript_both %>% 
+  map_dbl(mean, na.rm = TRUE) %>% 
+  round(3)
+
+sd_3_both <- gt3_descript_both %>% 
+  map_dbl(sd_rm_bin) %>% 
+  round(3)
+
+x <- cbind(mean_2, sd_2) %>% 
+  data.frame() %>% 
+  rownames_to_column("variable")
+
+y <- cbind(mean_3_frstbrn, sd_3_frstbrn, mean_3_both, sd_3_both) %>% 
+  data.frame() %>% 
+  rownames_to_column("variable")
+
+z <- full_join(x, y, by = "variable")
+z$empty0 <- NA
+z$empty1 <- NA
+z$empty2 <- NA
+z <- select(z, empty0, variable, mean_2, sd_2, empty1, mean_3_frstbrn,
+            sd_3_frstbrn, empty2, mean_3_both, sd_3_both)
+
+cols <- pull(z, "variable")  
+cbind(cols) # to see the vector
+cols_arrg <- cols[
+  c(1, 6, 7, 8, 9, 2, 17, 3, 4, 5, 18, 19, 20, 10, 11, 12, 13, 14, 16, 15)
+]
+
+# cols <- c(
+#   "no_kids", "male", "child_age_year", "child_age_month", "child_educ", "twins_2", 
+#   "twins_3", "same_sex_12", "boy_12", "girl_12", "same_sex_123", "boy_123", "girl_123",
+#   "moth_age_year", "moth_age_fstbr", "fath_in_hh", "educ_attain", "behind"
+# )
+
+z$variable <- factor(z$variable, levels = cols_arrg)
+z <- z[order(z$variable), ]
+
+names <- c("Number of Kids", "Male", "Age in years", "Age in months")
+
+star.summary <- stargazer(
+  z, 
+  # type = "text",
+  summary = FALSE,
+  rownames = FALSE,
+  covariate.labels = c("", "", "Mean", "sd", "Mean", "sd"),
+  header = FALSE
+  ) %>% 
+  star_insert_row(
+      "\\multicolumn{2}{l}{Mother's Population Group} &  &  &  & \\\\",
+    insert.after = c(25)
+  ) %>% 
+  star_add_column_numbers(insert.after = 8)
+
+
+
+star_tex_write(
+  star.summary, 
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table9.tex"
+)
+
+
+
+star_write_and_compile_pdf(
+  star.summary, 
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table9.tex"
+)
+
+star.out <- stargazer(as.matrix(head(mtcars)))
+print(star.out)
+##Insert column number using default values
+star_add_column_numbers(star.out, insert.after = 10)
+
+
+xtab <- xtable(z, caption = "Summary Statistics") 
+
+align(xtab) <- "rllccp{0.5cm}cc" {rllrrlrrlrr}
+digits(xtab) <- 3
+
+addtorow <- list()
+addtorow$pos <- list(0, 0, 0, 0, 16, 21, 28, 34)
+addtorow$command <- c(
+  " & & \\multicolumn{2}{c}{2+ Sample} & & \\multicolumn{4}{c}{3+ Sample}  \\\\",
+  "\\cline{3-4}  \\cline{6-10}",
+  " & & \\multicolumn{2}{c}{Firstborns} & & \\multicolumn{2}{c}{Firstborns} & & \\multicolumn{2}{c}{Secondborns} \\\\",
+  " & & \\multicolumn{1}{c}{Mean} & \\multicolumn{1}{c}{sd} & & \\multicolumn{1}{c}{Mean} & \\multicolumn{1}{c}{sd} & & 
+  \\multicolumn{1}{c}{Mean} & \\multicolumn{1}{c}{sd} \\\\",
+  "\\multicolumn{2}{l}{Mother's Population Group} &  &  &  & & & & \\\\",
+  "\\multicolumn{2}{l}{Mother's Level of Education} &  &  &  & & & & \\\\",
+  "\\multicolumn{2}{l}{Mother's Marital Status} &  &  &  & & & & \\\\",
+  "\\multicolumn{2}{l}{Province} &  &  &  & & & & \\\\"
+  )
+
+print(
+  xtab,   
+  add.to.row = addtorow,
+  include.rownames = FALSE,
+  include.colnames = FALSE,
+  booktabs = TRUE,
+  floating = FALSE,
+  tabular.environment = "longtable",
+  # floating.environment = "sidewaystable",
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table10.tex"
+)
+# Xtable
+
+xtable(mtcars, align = xalign(mtcars), digits = xdigits(mtcars),
+       display = xdisplay(mtcars))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 star_descr2 <- stargazer(
-  gt2_descript, 
+  mtcars, 
   # type = "text",
-  summary.stat = c("mean", "sd", "min", "max"),
-  title = "Table of Summary Statistics"
-  )
+  summary.stat = c("mean", "sd"),
+  title = "Table of Summary Statistics",
+  out.header = TRUE
+  
+)
 
 star_descr3 <- stargazer(
   gt3_descript, 
@@ -181,10 +378,10 @@ star_descr3 <- stargazer(
 )
 
 star_descript <- star_panel(star_descr2, star_descr3,
-           same.summary.stats = FALSE,
-           panel.label.fontface = "bold",
-           panel.names = 
-             c("2+ Sample", "3+ Sample")
+                            same.summary.stats = FALSE,
+                            panel.label.fontface = "bold",
+                            panel.names = 
+                              c("2+ Sample", "3+ Sample")
 ) %>% 
   star_insert_row(
     c(
@@ -234,17 +431,105 @@ star.panel.out2 <- star_panel(star.out.1, star.out.2,
 star_tex_write(
   star.panel.out2, 
   file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table8.tex"
+)
+
+gt2_sample %>% 
+  count(moth_age_fstbr_gen)
+
+
+gt2_sample <- gt2_sample %>% 
+  mutate(
+    moth_age_fstbr_gen = interval(moth_dob, child_dob) %/% years(1)
+    ) 
+
+gt2_sample %>% 
+  group_by(twins_2) %>% 
+  summarise(
+    n = n(),
+    mean_age_frstbr = mean(moth_age_fstbr_gen),
+    sd_age_frstbr = sd(moth_age_fstbr_gen)        
+    )
+
+# Statistically significant d/ce in mean in the 2+ sample
+t.test(moth_age_fstbr_gen ~ twins_2, data = gt2_sample) %>% tidy()
+
+gt3_sample %>% 
+  count(moth_no) %>% 
+  count(n)
+  
+gt3_sample <- gt3_sample %>% 
+  group_by(moth_no) %>% 
+  mutate(no = n()) %>% 
+  ungroup() %>% 
+  filter(no == 2)
+
+gt3_sample <- gt3_sample %>% 
+  filter(birth_order == 1) %>% 
+  mutate(
+    moth_age_fstbr_gen = interval(moth_dob, child_dob) %/% years(1)
+  ) 
+
+gt3_sample %>% 
+  group_by(twins_3) %>% 
+  summarise(
+    n = n(),
+    mean_age_frstbr = mean(moth_age_fstbr_gen, na.rm = TRUE),
+    sd_age_frstbr = sd(moth_age_fstbr_gen, na.rm = TRUE)        
   )
 
+# Not that much robust in the 3+ sample
+t.test(moth_age_fstbr_gen ~ twins_3, data = gt3_sample) %>% tidy()
 
+# Test if twinning is correlated with other demographics
+# E.g., population group, socio-economic status
 
+gt2_sample %>% 
+  group_by(moth_income) %>% 
+  summarise(
+    twins = mean(twins_2), sd = sd(twins_2), n = n()
+  )
 
+gt3_sample %>% 
+  group_by(moth_pp_group) %>% 
+  summarise(
+    twins = mean(twins_3), sd = sd(twins_3), n = n()
+  )
 
+# 2+ sample
+# Some d/ce in population groups
+aov_pp_2 <- aov(twins_2 ~ moth_pp_group, data = gt2_sample)
+summary(aov_pp_2)
+TukeyHSD(aov_pp_2)
 
+# No d/ce in income group
+aov_inc_2 <- aov(twins_2 ~ moth_income, data = gt2_sample)
+summary(aov_inc_2)
+TukeyHSD(aov_inc_2)
 
+# Some d/ce in mother's education
+aov_educ_2 <- aov(twins_2 ~ moth_educ, 
+                  data = gt2_sample %>% filter(moth_pp_group != "White"))
+summary(aov_educ_2)
+TukeyHSD(aov_educ_2)
 
+# 3+ sample
+# No d/ce in population groups
+aov_pp_3 <- aov(twins_3 ~ moth_pp_group, data = gt3_sample)
+summary(aov_pp_3)
+TukeyHSD(aov_pp_3)
 
+# No d/ce in income group
+aov_inc_3 <- aov(twins_3 ~ moth_income, data = gt3_sample)
+summary(aov_inc_3)
+TukeyHSD(aov_inc_3)
 
+# Some d/ce in mother's education
+aov_educ_3 <- aov(twins_3 ~ moth_educ, data = gt3_sample)
+summary(aov_educ_3)
+TukeyHSD(aov_educ_3)
+
+# => Occurence of twins is higher among older mothers and 
+# whites
 
 
 
