@@ -323,6 +323,12 @@ data <- data %>%
     # ) %>% factor()
   )
 
+# Construct mother's age at first birth (the one in the data has NAs)
+
+data <- data %>% 
+  mutate(
+    moth_age_fstbr = interval(moth_dob, firstborn_dob) %/% years(1)
+  )
 
 # save data ####
 write_csv(data, file = "data/kids_data.csv")
