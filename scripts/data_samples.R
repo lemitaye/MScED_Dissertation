@@ -18,7 +18,7 @@ data <- read_csv("data/kids_data.csv")
 
 # Get the raw 2+ and 3+ samples
 gt2_sample0 <- data %>%
-  filter(firstborn_age %>% between(6, 18)) %>%
+  filter(firstborn_age %>% between(8, 18)) %>%
   group_by(moth_no) %>%
   arrange(child_dob, .by_group = TRUE) %>%
   mutate(
@@ -30,7 +30,7 @@ gt2_sample0 <- data %>%
 
 gt3_sample0 <- gt2_sample0 %>%
   filter(no_kids >= 3) %>%
-  filter(secondborn_age %>% between(6, 18))
+  filter(secondborn_age %>% between(8, 18))
 
 
 # This function enables us to get data frames with all the instruments
