@@ -101,7 +101,7 @@ data <- kids %>%
 #   left_join(fathers, by = "fath_no")
 
 # free-up some memory
-rm(list = c("fathers", "mothers", "kids", "all_persons"))
+rm(list = c("mothers", "kids", "all_persons"))
 gc()
 
 # The following function enables us to extract first- and second-borns
