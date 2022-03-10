@@ -209,10 +209,25 @@ gt2_sample <- gen_educ_attains(gt2_sample)
 gt3_sample <- gen_educ_attains(gt3_sample)
 
 
-
-# save data
-write_csv(gt2_sample, file = "data/gt2_sample.csv")
-write_csv(gt3_sample, file = "data/gt3_sample.csv")
+# make 3+ sample perfectly balanced:
+# gt3_sample <- gt3_sample %>%
+#   group_by(moth_no) %>%
+#   mutate(no = n()) %>%
+#   ungroup() %>%
+#   filter(no == 2)
+# 
+# # Filter unknowns and NAs
+# 
+# gt2_sample <- gt2_sample %>% 
+#   filter(complete.cases(.)) %>% count(moth_income)
+# 
+# gt3_sample %>% 
+#   filter(complete.cases(.))
+# 
+# 
+# # save data
+# write_csv(gt2_sample, file = "data/gt2_sample.csv")
+# write_csv(gt3_sample, file = "data/gt3_sample.csv")
 
 # Next:
 # +3 sample
