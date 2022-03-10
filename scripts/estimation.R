@@ -29,7 +29,7 @@ gt3_sample <- gt3_sample %>%
 
 # Functions for constructing formulas ####
 
-make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE, old = FALSE) {
+make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE) {
   # Define a vector of covariates
   covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
   covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
