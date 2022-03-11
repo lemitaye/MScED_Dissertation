@@ -344,7 +344,7 @@ uni_mults <- all_persons %>%
   group_by(sn) %>% 
   filter(duplicated(dob)) %>% 
   ungroup() %>% 
-  distinct(mults, sn ,dob) %>% 
+  distinct(sn ,dob) %>% 
   mutate(year = year(dob))
 
 uni_mults <- uni_mults %>% 
