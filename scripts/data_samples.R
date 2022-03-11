@@ -26,7 +26,8 @@ gt2_sample0 <- data %>%
     no_kids = n()
   ) %>%
   ungroup() %>%
-  filter(no_kids >= 2)
+  filter(no_kids >= 2) %>% 
+  mutate(spacing = moth_age_scndbr - moth_age_fstbr)
 
 gt3_sample0 <- gt2_sample0 %>%
   filter(no_kids >= 3) %>%
