@@ -119,26 +119,83 @@ star_notes_tex(
     file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
   )
 
-# First Stages
+# First Stages ####
 
-# F-tests
-t1 <- linearHypothesis(ma_1_o, c("twins_2"))
-t2 <- linearHypothesis(ma_2_o, c("same_sex_12"))
-t3 <- linearHypothesis(ma_3_o, c("boy_12", "girl_12"))
-t4 <- linearHypothesis(ma_4_o, c("twins_2", "boy_12", "girl_12"))
+# 3+ sample
+fa1 <- waldtest(ma_1, ~ twins_2)[["F"]]
+fa2 <- waldtest(ma_2, ~ same_sex_12)[["F"]]
+fa3 <- waldtest(ma_3, ~ boy_12 | girl_12)[["F"]]
+fa4 <- waldtest(ma_4, ~ twins_2 | boy_12 | girl_12)[["F"]]
 
-F_stats <- round( c(t1[2,5], t2[2,5], t3[2,5], t4[2,5]), 2)
+F_stats_a <- sprintf( c(0, fa1, fa2, fa3, fa4), fmt='%#.4g')
+F_stats_a[1] <- "F"
+F_line_a <- list(F_stats_a)
 
-stargazer(
-  ma_1_o, ma_2_o, ma_3_o, ma_4_o,
+
+frst_stg2 <- stargazer(
+  ma_1, ma_2, ma_3, ma_4,
   keep = c(
-    "boy_1", "same_sex_12", "boy_12", "girl_12", "twins_2"
+    "same_sex_12", "boy_12", "girl_12", "twins_2"
   ),
-  type = "text",
-  keep.stat = c("n","rsq"),
+  # type = "text",
+  keep.stat = c("rsq", "n"),
   star.cutoffs = c(0.05, 0.01, 0.001),
-  add.lines = F_stats
+  add.lines = F_line_a,
+  title = "First Stage Regressions",
+  dep.var.labels = "Number of Children",
+  covariate.labels = c("Twins2", "SameSex12", "Boy12", "Girl12")
 )
+
+# 3+ sample
+fb1 <- waldtest(mb_1, ~ twins_3)[["F"]]
+fb2 <- waldtest(mb_2, ~ same_sex_123)[["F"]]
+fb3 <- waldtest(mb_3, ~ boy_123 | girl_123)[["F"]]
+fb4 <- waldtest(mb_4, ~ twins_3 | boy_123 | girl_123)[["F"]]
+
+F_stats_b <- sprintf( c(0, fb1, fb2, fb3, fb4), fmt='%3.4g')
+F_stats_b[1] <- "F"
+F_line_b <- list(F_stats_b)
+
+
+frst_stg3 <- stargazer(
+  mb_1, mb_2, mb_3, mb_4,
+  keep = c(
+    "same_sex_123", "boy_123", "girl_123", "twins_3"
+  ),
+  # type = "text",
+  keep.stat = c("rsq", "n"),
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  add.lines = F_line_b,
+  covariate.labels = c("Twins3", "SameSex123", "Boy123", "Girl123")
+)
+
+long_note_frst <- "Covariates for all regressions include age (in months) and sex of child, 
+mother's characteristics, dummies for districts, and a dummy for whether the father resides in the household.
+The regressisons for the 3+ sample in addition include dummies for birth order. F statistics are from the Wald 
+test for exclusion restrictions of the relevant instrument(s) from the regression. Robust standard errors 
+(for the 2+ sample) and cluster robust standard errors (for the 3+ sample; clustered by mother's ID) are in parenthesis. 
+*** Significant at 0.1\\%, ** Significant at 1\\%, * Significant at 5\\%."
+
+
+frst_panel <- star_panel(
+  frst_stg2, frst_stg3,
+  same.summary.stats = FALSE, 
+  panel.label.fontface = "bold.italic",
+  panel.names = c("2+ Sample", "3+ Sample")
+) %>% 
+  star_notes_tex(
+  note.type = "threeparttable", #Use the latex 'caption' package for notes
+  note = long_note_frst
+  )
+
+star_tex_write(
+  frst_panel, 
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table11.tex"
+)
+
+
+#####
+
 
 
 ##latex example
@@ -151,7 +208,8 @@ mod.mtcars.3 <- lm(hp ~ wt + cyl, mtcars)
 stargazer(
   mod.mtcars.1, mod.mtcars.2, mod.mtcars.3, 
   type = "latex",
-  keep.stat = c("n", "rsq")
+  keep.stat = c("n", "rsq"),
+  add
 ) %>% 
 star_insert_row(
   c("Controls? & No & No & No \\\\",

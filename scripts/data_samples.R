@@ -210,26 +210,22 @@ gt3_sample <- gen_educ_attains(gt3_sample)
 
 
 # make 3+ sample perfectly balanced:
-# gt3_sample <- gt3_sample %>%
-#   group_by(moth_no) %>%
-#   mutate(no = n()) %>%
-#   ungroup() %>%
-#   filter(no == 2)
-# 
-# # Filter unknowns and NAs
-# 
-# gt2_sample <- gt2_sample %>% 
-#   filter(complete.cases(.)) %>% count(moth_income)
-# 
-# gt3_sample %>% 
-#   filter(complete.cases(.))
-# 
-# 
-# # save data
-# write_csv(gt2_sample, file = "data/gt2_sample.csv")
-# write_csv(gt3_sample, file = "data/gt3_sample.csv")
+gt3_sample <- gt3_sample %>%
+  group_by(moth_no) %>%
+  mutate(no = n()) %>%
+  ungroup() %>%
+  filter(no == 2)
 
-# Next:
-# +3 sample
-# alternative measure for educ: left behind
-# heterogeneity analysis (>= 10 yrs. old)
+# Filter unknowns and NAs
+gt2_sample <- gt2_sample %>%
+  filter(moth_income != "Unspecified") %>% 
+  filter(complete.cases(.)) 
+
+gt3_sample <- gt3_sample %>%
+  filter(moth_income != "Unspecified") %>% 
+  filter(complete.cases(.))
+
+
+# save data
+write_csv(gt2_sample, file = "data/gt2_sample.csv")
+write_csv(gt3_sample, file = "data/gt3_sample.csv")

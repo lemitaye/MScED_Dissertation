@@ -23,7 +23,8 @@ gt3_sample <- gt3_sample %>%
   mutate(
     district = factor(district),
     municip = factor(municip),
-    moth_no = factor(moth_no)
+    moth_no = factor(moth_no),
+    birth_order = factor(birth_order)
   )
 
 
@@ -31,8 +32,10 @@ gt3_sample <- gt3_sample %>%
 
 make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE) {
   # Define a vector of covariates
-  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
-  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
+  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh",
+              "moth_age_fstbr")
+  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income", 
+              "moth_marital")
   covar <- paste(
     paste(covar1, collapse = "+"), "|",
     paste(covar2, collapse = "+")
@@ -52,8 +55,10 @@ make_formula_frst_stg <- function(dep_var, instrument, clus = FALSE) {
 
 make_formula_gt2 <- function(dep_var, instrument = 0) {
   # Define a vector of covariates
-  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
-  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income")
+  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh",
+              "moth_age_fstbr")
+  covar2 <- c("district", "moth_educ", "moth_pp_group", "moth_income", 
+              "moth_marital")
   covar <- paste(
     paste(covar1, collapse = "+"), "|",
     paste(covar2, collapse = "+")
@@ -72,8 +77,10 @@ make_formula_gt2 <- function(dep_var, instrument = 0) {
 }
 
 make_formula_gt3 <- function(dep_var, instrument = 0) {
-  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
-  covar2 <- c("birth_order", "district", "moth_educ", "moth_pp_group", "moth_income")
+  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh",
+              "moth_age_fstbr")
+  covar2 <- c("birth_order", "district", "moth_educ", "moth_pp_group", 
+              "moth_income", "moth_marital")
   covar <- paste(
     paste(covar1, collapse = "+"), "|",
     paste(covar2, collapse = "+")
@@ -105,10 +112,10 @@ fm_a2 <- make_formula_frst_stg("no_kids", "same_sex_12")
 fm_a3 <- make_formula_frst_stg("no_kids", "boy_12 + girl_12")
 fm_a4 <- make_formula_frst_stg("no_kids", "twins_2 + boy_12 + girl_12")
 
-ma_1 <- felm(fm_a1, data = gt2_sample, subset = (child_age_year > 9))
-ma_2 <- felm(fm_a2, data = gt2_sample, subset = (child_age_year > 9))
-ma_3 <- felm(fm_a3, data = gt2_sample, subset = (child_age_year > 9))
-ma_4 <- felm(fm_a4, data = gt2_sample, subset = (child_age_year > 9))
+ma_1 <- felm(fm_a1, data = gt2_sample)
+ma_2 <- felm(fm_a2, data = gt2_sample)
+ma_3 <- felm(fm_a3, data = gt2_sample)
+ma_4 <- felm(fm_a4, data = gt2_sample)
 
 stargazer(
   ma_1, ma_2, ma_3, ma_4,
@@ -116,24 +123,29 @@ stargazer(
     "boy_1", "same_sex_12", "boy_12", "girl_12", "twins_2"
   ),
   type = "text",
-  # keep.stat = c("n","rsq", "f"),
-  star.cutoffs = c(0.05, 0.01, 0.001)
+  keep.stat = c("n","rsq")
 )
 
 ## 3+ sample ####
 
 # These are all clustered by mother's id
-fm_b1 <- make_formula_frst_stg("no_kids", "twins_3", clus = TRUE)
-fm_b2 <- make_formula_frst_stg("no_kids", "same_sex_123", clus = TRUE)
-fm_b3 <- make_formula_frst_stg("no_kids", "boy_123 + girl_123", clus = TRUE)
-fm_b4 <- make_formula_frst_stg("no_kids", "twins_3 + boy_123 + girl_123",
-  clus = TRUE
+fm_b1 <- make_formula_frst_stg(
+  "no_kids", "twins_3 + birth_order", clus = TRUE
+  )
+fm_b2 <- make_formula_frst_stg(
+  "no_kids", "same_sex_123 + birth_order", clus = TRUE
+  )
+fm_b3 <- make_formula_frst_stg(
+  "no_kids", "boy_123 + girl_123 + birth_order", clus = TRUE
+  )
+fm_b4 <- make_formula_frst_stg(
+  "no_kids", "twins_3 + boy_123 + girl_123 + birth_order", clus = TRUE
 )
 
-mb_1 <- felm(fm_b1, data = gt3_sample, subset = (child_age_year > 9))
-mb_2 <- felm(fm_b2, data = gt3_sample, subset = (child_age_year > 9))
-mb_3 <- felm(fm_b3, data = gt3_sample, subset = (child_age_year > 9))
-mb_4 <- felm(fm_b4, data = gt3_sample, subset = (child_age_year > 9))
+mb_1 <- felm(fm_b1, data = gt3_sample)
+mb_2 <- felm(fm_b2, data = gt3_sample)
+mb_3 <- felm(fm_b3, data = gt3_sample)
+mb_4 <- felm(fm_b4, data = gt3_sample)
 
 stargazer(
   mb_1, mb_2, mb_3, mb_4,
@@ -142,60 +154,6 @@ stargazer(
   ),
   type = "text",
   keep.stat = c("n", "rsq")
-)
-
-
-## Using traditional LM (for F-statistic) ####
-
-covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
-covar2 <- c("birth_order", "district", "moth_educ", "moth_pp_group", "moth_income")
-
-ma_1_o <- lm(
-  no_kids ~ twins_2 + child_age_month + boy + moth_age_year +
-    fath_inhh + district + moth_educ + moth_pp_group +
-    moth_income,
-  data = gt2_sample, subset = (child_age_year > 9)
-)
-
-ma_2_o <- lm(
-  no_kids ~ same_sex_12 + child_age_month + boy + moth_age_year +
-    fath_inhh + district + moth_educ + moth_pp_group +
-    moth_income,
-  data = gt2_sample, subset = (child_age_year > 9)
-)
-
-ma_3_o <- lm(
-  no_kids ~ boy_12 + girl_12 + child_age_month + boy + moth_age_year +
-    fath_inhh + district + moth_educ + moth_pp_group +
-    moth_income,
-  data = gt2_sample, subset = (child_age_year > 9)
-)
-
-ma_4_o <- lm(
-  no_kids ~ twins_2 + boy_12 + girl_12 + child_age_month + boy + moth_age_year +
-    fath_inhh + district + moth_educ + moth_pp_group +
-    moth_income,
-  data = gt2_sample, subset = (child_age_year > 9)
-)
-
-
-
-# F-tests
-linearHypothesis(ma_1_o, c("twins_2"))
-linearHypothesis(ma_2_o, c("same_sex_12"))
-linearHypothesis(ma_3_o, c("boy_12", "girl_12"))
-linearHypothesis(ma_4_o, c("twins_2", "boy_12", "girl_12"))
-
-# Good first-stage F-stats!
-
-stargazer(
-  ma_1_o, ma_2_o, ma_3_o, ma_4_o,
-  keep = c(
-    "boy_1", "same_sex_12", "boy_12", "girl_12", "twins_2"
-  ),
-  type = "text",
-  keep.stat = c("n","rsq"),
-  star.cutoffs = c(0.05, 0.01, 0.001)
 )
 
 
@@ -211,11 +169,11 @@ fIV_A2 <- make_formula_gt2("educ_attain", "same_sex_12")
 fIV_A3 <- make_formula_gt2("educ_attain", "boy_12 + girl_12")
 fIV_A4 <- make_formula_gt2("educ_attain", "twins_2 + boy_12 + girl_12")
 
-OLS_A1 <- felm(fOLS_A1, data = gt2_sample, subset = (child_age_year > 9))
-IV_A1 <- felm(fIV_A1, data = gt2_sample, subset = (child_age_year > 9))
-IV_A2 <- felm(fIV_A2, data = gt2_sample, subset = (child_age_year > 9))
-IV_A3 <- felm(fIV_A3, data = gt2_sample, subset = (child_age_year > 9))
-IV_A4 <- felm(fIV_A4, data = gt2_sample, subset = (child_age_year > 9))
+OLS_A1 <- felm(fOLS_A1, data = gt2_sample, subset = (moth_pp_group == "White"))
+IV_A1 <- felm(fIV_A1, data = gt2_sample, subset = (moth_pp_group == "White"))
+IV_A2 <- felm(fIV_A2, data = gt2_sample, subset = (moth_pp_group == "White"))
+IV_A3 <- felm(fIV_A3, data = gt2_sample, subset = (moth_pp_group == "White"))
+IV_A4 <- felm(fIV_A4, data = gt2_sample, subset = (moth_pp_group == "White"))
 
 stargazer(
   OLS_A1, IV_A1, IV_A2, IV_A3, IV_A4,
@@ -233,11 +191,11 @@ fIV_A14 <- make_formula_gt2("behind", "same_sex_12")
 fIV_A15 <- make_formula_gt2("behind", "boy_12 + girl_12")
 fIV_A16 <- make_formula_gt2("behind", "twins_2 + boy_12 + girl_12")
 
-OLS_A4 <- felm(fOLS_A4, data = gt2_sample, subset = (child_age_year > 9))
-IV_A13 <- felm(fIV_A13, data = gt2_sample, subset = (child_age_year > 9))
-IV_A14 <- felm(fIV_A14, data = gt2_sample, subset = (child_age_year > 9))
-IV_A15 <- felm(fIV_A15, data = gt2_sample, subset = (child_age_year > 9))
-IV_A16 <- felm(fIV_A16, data = gt2_sample, subset = (child_age_year > 9))
+OLS_A4 <- felm(fOLS_A4, data = gt2_sample, subset = (moth_pp_group != "White"))
+IV_A13 <- felm(fIV_A13, data = gt2_sample, subset = (moth_pp_group != "White"))
+IV_A14 <- felm(fIV_A14, data = gt2_sample, subset = (moth_pp_group != "White"))
+IV_A15 <- felm(fIV_A15, data = gt2_sample, subset = (moth_pp_group != "White"))
+IV_A16 <- felm(fIV_A16, data = gt2_sample, subset = (moth_pp_group != "White"))
 
 stargazer(
   OLS_A4, IV_A13, IV_A14, IV_A15, IV_A16,

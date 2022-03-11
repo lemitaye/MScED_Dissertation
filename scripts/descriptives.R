@@ -258,44 +258,11 @@ z <- z[order(z$variable), ]
 
 names <- c("Number of Kids", "Male", "Age in years", "Age in months")
 
-star.summary <- stargazer(
-  z, 
-  # type = "text",
-  summary = FALSE,
-  rownames = FALSE,
-  covariate.labels = c("", "", "Mean", "sd", "Mean", "sd"),
-  header = FALSE
-  ) %>% 
-  star_insert_row(
-      "\\multicolumn{2}{l}{Mother's Population Group} &  &  &  & \\\\",
-    insert.after = c(25)
-  ) %>% 
-  star_add_column_numbers(insert.after = 8)
-
-
-
-star_tex_write(
-  star.summary, 
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table9.tex"
-)
-
-
-
-star_write_and_compile_pdf(
-  star.summary, 
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table9.tex"
-)
-
-star.out <- stargazer(as.matrix(head(mtcars)))
-print(star.out)
-##Insert column number using default values
-star_add_column_numbers(star.out, insert.after = 10)
-
 
 xtab <- xtable(z, caption = "Summary Statistics") 
 
-align(xtab) <- "rllccp{0.5cm}cc" {rllrrlrrlrr}
-digits(xtab) <- 3
+# align(xtab) <- "rllccp{0.5cm}cc" {rllrrlrrlrr}
+# digits(xtab) <- 3
 
 addtorow <- list()
 addtorow$pos <- list(0, 0, 0, 0, 16, 21, 28, 34)
@@ -324,79 +291,12 @@ print(
 )
 # Xtable
 
+display(xtab) <- c("s", "s", "s", "g", "g", "s", "g", "g", "s", "g", "g")
+digits(xtab) <- 4
+
+
 xtable(mtcars, align = xalign(mtcars), digits = xdigits(mtcars),
        display = xdisplay(mtcars))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-star_descr2 <- stargazer(
-  mtcars, 
-  # type = "text",
-  summary.stat = c("mean", "sd"),
-  title = "Table of Summary Statistics",
-  out.header = TRUE
-  
-)
-
-star_descr3 <- stargazer(
-  gt3_descript, 
-  # type = "text",
-  summary.stat = c("mean", "sd", "min", "max")
-)
-
-star_descript <- star_panel(star_descr2, star_descr3,
-                            same.summary.stats = FALSE,
-                            panel.label.fontface = "bold",
-                            panel.names = 
-                              c("2+ Sample", "3+ Sample")
-) %>% 
-  star_insert_row(
-    c(
-      "\\hline \\\\[-1.8ex] ",
-      "Observations & \\multicolumn{4}{c}{1000} \\\\",
-      "\\hline \\\\[-1.8ex] ",
-      "Observations & \\multicolumn{4}{c}{1000} \\\\"
-    ),
-    insert.after = c(28, 28, 48)
-  ) 
-
-star_tex_write(
-  star_descript, 
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table8.tex"
-)
 
 
 # include birth order in the 3+ sample
@@ -404,43 +304,7 @@ star_tex_write(
 # Foucs on first stage
 # marital status of the mother in regs.
 
-## -- Regressoin example -- ##
-library(stargazer)
-data(mtcars)
-star.out.1 <- stargazer(mtcars, title = "Table of Summary Statistics") 
-
-star.out.2 <- stargazer(mtcars) 
-
-##stargazer panel -- different summary statistics across panels.
-star.panel.out2 <- star_panel(star.out.1, star.out.2,
-                              same.summary.stats = FALSE,
-                              panel.label.fontface = "bold",
-                              panel.names = 
-                                c("2+ Sample", "3+ Sample")
-) %>% 
-  star_insert_row(
-    c(
-      "\\hline \\\\[-1.8ex] ",
-      " Observations & \\multicolumn{5}{c}{32} \\\\",
-      "\\hline \\\\[-1.8ex] ",
-      " Observations & \\multicolumn{5}{c}{32} \\\\"
-    ),
-    insert.after = c(23, 23, 38)
-  ) 
-
-star_tex_write(
-  star.panel.out2, 
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table8.tex"
-)
-
-gt2_sample %>% 
-  count(moth_age_fstbr_gen)
-
-
-gt2_sample <- gt2_sample %>% 
-  mutate(
-    moth_age_fstbr_gen = interval(moth_dob, child_dob) %/% years(1)
-    ) 
+# Heterogeneity of First Stage ####
 
 gt2_sample %>% 
   group_by(twins_2) %>% 
@@ -450,24 +314,19 @@ gt2_sample %>%
     sd_age_frstbr = sd(moth_age_fstbr_gen)        
     )
 
+ha1 <- lm(moth_age_fstbr ~ twins_2, data = gt2_sample)
+summary(ha1)
+
+ha2 <- lm(moth_age_fstbr ~ twins_3, data = gt3_sample, 
+          subset = birth_order == 1)
+summary(ha2)
+
+
+
+
+
 # Statistically significant d/ce in mean in the 2+ sample
-t.test(moth_age_fstbr_gen ~ twins_2, data = gt2_sample) %>% tidy()
-
-gt3_sample %>% 
-  count(moth_no) %>% 
-  count(n)
-  
-gt3_sample <- gt3_sample %>% 
-  group_by(moth_no) %>% 
-  mutate(no = n()) %>% 
-  ungroup() %>% 
-  filter(no == 2)
-
-gt3_sample <- gt3_sample %>% 
-  filter(birth_order == 1) %>% 
-  mutate(
-    moth_age_fstbr_gen = interval(moth_dob, child_dob) %/% years(1)
-  ) 
+t.test(moth_age_fstbr ~ twins_2, data = gt2_sample) %>% tidy()
 
 gt3_sample %>% 
   group_by(twins_3) %>% 
@@ -531,7 +390,72 @@ TukeyHSD(aov_educ_3)
 # => Occurence of twins is higher among older mothers and 
 # whites
 
+library("ggpubr")
+ggline(gt2_sample, x = "moth_pp_group", y = "twins_2", 
+       add = c("mean_se", "jitter"), 
+       # order = c("ctrl", "trt1", "trt2"),
+       ylab = "Twins2", xlab = "Mother's Population Group")
 
+
+dobs <- all_persons %>%
+  select(
+    sn,
+    f00_nr,
+    dob = dob
+  ) 
+
+dobs_small <- dobs[1:10000, ]
+
+dobs_small %>% 
+  count(sn)
+
+all_births <- dobs %>% 
+  mutate(year = year(dob)) %>% 
+  count(year, name = "all")
+
+mults <- dobs %>% 
+  group_by(sn) %>% 
+  filter(duplicated(dob)) %>% 
+  ungroup()
+
+uni_mults <- distinct(mults, sn ,dob) %>% 
+  mutate(year = year(dob))
+
+uni_mults %>% 
+  count(year) %>% 
+  filter(year > 1970) %>% 
+  ggplot( aes(year, n) ) + 
+  geom_line()
+
+all_births %>% 
+  filter(year > 1950) %>% 
+  ggplot( aes(year, n) ) + 
+  geom_line()
+
+uni_mults %>% 
+  count(year, name = "mult") %>%  
+  filter(year > 1970) %>% 
+  left_join(all_births, by = "year") %>% 
+  mutate(prop = (mult/all)*1000) %>% 
+  ggplot(aes(year, prop)) +
+  geom_line() +
+  labs(
+    title = "Multiple Births Per 1000 Live Births",
+    x = "Year", 
+    y = ""
+    )
+
+  
+
+
+
+smokers  <- c( 83, 90, 129, 70 )
+patients <- c( 86, 93, 136, 82 )
+prop.test(smokers, patients)
+
+library(lessR)
+Prop_test(variable=sm, success="smoke", by=grp)
+Prop_test(variable = twins_2, by = moth_pp_group, success = 1, data = gt2_sample)
 
 
 
