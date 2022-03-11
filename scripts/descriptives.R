@@ -397,28 +397,17 @@ ggline(gt2_sample, x = "moth_pp_group", y = "twins_2",
        ylab = "Twins2", xlab = "Mother's Population Group")
 
 
-dobs <- all_persons %>%
-  select(
-    sn,
-    f00_nr,
-    dob = dob
-  ) 
-
-dobs_small <- dobs[1:10000, ]
-
-dobs_small %>% 
-  count(sn)
-
-all_births <- dobs %>% 
+all_births <- all_persons %>%
+  select(sn, dob)  %>% 
   mutate(year = year(dob)) %>% 
   count(year, name = "all")
 
-mults <- dobs %>% 
+uni_mults <- all_persons %>%
+  select(sn, dob) %>% 
   group_by(sn) %>% 
   filter(duplicated(dob)) %>% 
-  ungroup()
-
-uni_mults <- distinct(mults, sn ,dob) %>% 
+  ungroup() %>% 
+  distinct(mults, sn ,dob) %>% 
   mutate(year = year(dob))
 
 uni_mults %>% 
@@ -432,10 +421,10 @@ all_births %>%
   ggplot( aes(year, n) ) + 
   geom_line()
 
+uni_mults <- read_csv("data/uni_mults.csv")
+
 uni_mults %>% 
-  count(year, name = "mult") %>%  
-  filter(year > 1970) %>% 
-  left_join(all_births, by = "year") %>% 
+  filter(year %>% between(1970, 2011)) %>%
   mutate(prop = (mult/all)*1000) %>% 
   ggplot(aes(year, prop)) +
   geom_line() +
@@ -445,17 +434,85 @@ uni_mults %>%
     y = ""
     )
 
-  
+## Comparison of twins birth by pp. group and educ. level ####
+
+gt2_sample %>%
+  filter(moth_pp_group != "Other") %>% 
+  group_by(moth_pp_group) %>%
+  summarize(prop_twins = mean(twins_2)) %>%
+  mutate(
+    moth_pp_group = fct_reorder(moth_pp_group, prop_twins) %>% fct_rev()
+  ) %>%
+  ggplot(aes(moth_pp_group, prop_twins)) +
+  geom_col() +
+  scale_y_continuous(label = percent)
+
+gt3_sample %>%
+  filter(moth_pp_group != "Other") %>% 
+  group_by(moth_pp_group) %>%
+  summarize(prop_twins = mean(twins_3)) %>%
+  mutate(
+    moth_pp_group = fct_reorder(moth_pp_group, prop_twins) %>% fct_rev()
+  ) %>%
+  ggplot(aes(moth_pp_group, prop_twins)) +
+  geom_col() +
+  scale_y_continuous(label = percent)
+
+gt2_sample %>%
+  group_by(moth_educ) %>%
+  summarize(prop_twins = mean(twins_2)) %>%
+  mutate(
+    moth_educ = fct_reorder(moth_educ, prop_twins) %>% fct_rev()
+  ) %>%
+  ggplot(aes(moth_educ, prop_twins)) +
+  geom_col() +
+  scale_y_continuous(label = percent)
+
+gt3_sample %>%
+  filter(moth_educ != "Other") %>% 
+  group_by(moth_educ) %>%
+  summarize(prop_twins = mean(twins_3)) %>%
+  mutate(
+    moth_educ = fct_reorder(moth_educ, prop_twins) %>% fct_rev()
+  ) %>%
+  ggplot(aes(moth_educ, prop_twins)) +
+  geom_col() +
+  scale_y_continuous(label = percent)
+
+# # of kids by pp. group
+
+gt2_sample %>%
+  filter(moth_pp_group != "Other") %>% 
+  group_by(moth_pp_group) %>%
+  # mutate(
+  #   moth_pp_group = fct_reorder(moth_pp_group, prop_twins) %>% fct_rev()
+  # ) %>%
+  ggplot(aes(moth_pp_group, no_kids)) +
+  geom_boxplot() 
+
+gt2_sample %>% 
+  filter(no_kids > 4) %>% 
+  count(twins_2)
+
+# mother's starting birth at a younger age are likely to have more kids
+# gt2_sample %>% 
+#   filter(moth_age_fstbr %>% between(14, 35)) %>% 
+#   ggplot(aes(moth_age_fstbr, no_kids)) +
+#   geom_smooth()
+
+gt2_sample %>%
+  filter(moth_age_fstbr %>% between(14, 38)) %>%
+  group_by(moth_age_fstbr) %>% 
+  summarise(prop_twins = mean(twins_2)) %>% 
+  ggplot(aes(moth_age_fstbr, prop_twins)) +
+  geom_col() +
+  scale_y_continuous(label = percent)
 
 
 
-smokers  <- c( 83, 90, 129, 70 )
-patients <- c( 86, 93, 136, 82 )
-prop.test(smokers, patients)
 
-library(lessR)
-Prop_test(variable=sm, success="smoke", by=grp)
-Prop_test(variable = twins_2, by = moth_pp_group, success = 1, data = gt2_sample)
+
+
 
 
 
