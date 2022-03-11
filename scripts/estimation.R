@@ -438,3 +438,93 @@ stargazer(
 #   type = "text",
 #   keep.stat = c("n", "rsq")
 # )
+
+## Analysis of no-first stage sample ####
+
+gt2_sample %>% 
+  count(spacing)
+
+ma_1_t1 <- felm(fm_a1, data = gt2_sample, 
+                subset = (no_kids > 4))
+mb_2_t1 <- felm(fm_b1, data = gt3_sample, 
+                subset = (no_kids > 4))
+
+ma_3_t1 <- felm(fm_a3, data = gt2_sample, 
+                subset = (no_kids > 4))
+ma_4_t1 <- felm(fm_a4, data = gt2_sample, 
+                subset = (no_kids > 4))
+
+stargazer(
+  ma_1_t1, mb_2_t1,
+  # ma_2_t1, ma_3_t1, ma_4_t1,
+  keep = c(
+    "same_sex_12", "boy_12", "girl_12", "twins_2", "twins_3"
+  ),
+  type = "text",
+  keep.stat = c("n","rsq")
+)
+
+# Reduced form first stage
+
+fm_a1_t1 <- make_formula_frst_stg("educ_attain", "twins_2")
+fm_a2_t1 <- make_formula_frst_stg("behind", "twins_2")
+fm_a3_t1 <- make_formula_frst_stg("private_school", "twins_2")
+fm_a4_t1 <- make_formula_frst_stg("moth_inlf", "twins_2")
+
+rma_1_t1 <- felm(fm_a1_t1, data = gt2_sample, 
+                subset = (no_kids > 4))
+rma_2_t1 <- felm(fm_a2_t1, data = gt2_sample, 
+                subset = (no_kids > 4))
+rma_3_t1 <- felm(fm_a3_t1, data = gt2_sample, 
+                subset = (no_kids > 4))
+rma_4_t1 <- felm(fm_a4_t1, data = gt2_sample, 
+                subset = (no_kids > 4))
+
+stargazer(
+  rma_1_t1, rma_2_t1, rma_3_t1, rma_4_t1,
+  keep = c("twins_2"),
+  type = "text",
+  keep.stat = c("n","rsq")
+)
+
+
+fm_b1_t1 <- make_formula_frst_stg("educ_attain", "twins_3")
+fm_b2_t1 <- make_formula_frst_stg("behind", "twins_3")
+fm_b3_t1 <- make_formula_frst_stg("private_school", "twins_3")
+fm_b4_t1 <- make_formula_frst_stg("moth_inlf", "twins_3")
+
+rmb_1_t1 <- felm(fm_b1_t1, data = gt3_sample, 
+                 subset = (no_kids > 4))
+rmb_2_t1 <- felm(fm_b2_t1, data = gt3_sample, 
+                 subset = (no_kids > 4))
+rmb_3_t1 <- felm(fm_b3_t1, data = gt3_sample, 
+                 subset = (no_kids > 4))
+rmb_4_t1 <- felm(fm_b4_t1, data = gt3_sample, 
+                 subset = (no_kids > 4))
+
+stargazer(
+  rmb_1_t1, rmb_2_t1, rmb_3_t1, rmb_4_t1,
+  keep = c("twins_3"),
+  type = "text",
+  keep.stat = c("n","rsq")
+)
+
+# all as expected. what a relief!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
