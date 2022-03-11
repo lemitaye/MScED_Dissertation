@@ -22,6 +22,8 @@ library(broom)
 library(car)
 library(lfe)
 library(starpolishr)
+library(fastDummies)
+library(xtable)
 
 theme_set(theme_light())
 

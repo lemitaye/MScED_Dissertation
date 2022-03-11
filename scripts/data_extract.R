@@ -101,8 +101,8 @@ data <- kids %>%
 #   left_join(fathers, by = "fath_no")
 
 # free-up some memory
-rm(list = c("mothers", "kids", "all_persons"))
-gc()
+# rm(list = c("mothers", "kids", "all_persons"))
+# gc()
 
 # The following function enables us to extract first- and second-borns
 dobs <- function(tbl = data, n) {
@@ -327,8 +327,34 @@ data <- data %>%
 
 data <- data %>% 
   mutate(
-    moth_age_fstbr = interval(moth_dob, firstborn_dob) %/% years(1)
+    moth_age_fstbr = interval(moth_dob, firstborn_dob) %/% years(1),
+    moth_age_scndbr = interval(moth_dob, secondborn_dob) %/% years(1)
   )
+
+
+# data to construct graph of multiple births by year:
+
+all_births <- all_persons %>%
+  select(sn, dob)  %>% 
+  mutate(year = year(dob)) %>% 
+  count(year, name = "all")
+
+uni_mults <- all_persons %>%
+  select(sn, dob) %>% 
+  group_by(sn) %>% 
+  filter(duplicated(dob)) %>% 
+  ungroup() %>% 
+  distinct(mults, sn ,dob) %>% 
+  mutate(year = year(dob))
+
+uni_mults <- uni_mults %>% 
+  count(year, name = "mult") %>%  
+  left_join(all_births, by = "year") %>% 
+  mutate(prop = (mult/all)*1000)
+
 
 # save data ####
 write_csv(data, file = "data/kids_data.csv")
+write_csv(uni_mults, file = "data/uni_mults.csv")
+
+
