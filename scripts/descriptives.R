@@ -424,15 +424,27 @@ all_births %>%
 uni_mults <- read_csv("data/uni_mults.csv")
 
 uni_mults %>% 
-  filter(year %>% between(1970, 2011)) %>%
-  mutate(prop = (mult/all)*1000) %>% 
-  ggplot(aes(year, prop)) +
-  geom_line() +
+  # filter(pop_group != "Other") %>%
+  ggplot(aes(year, prop, color = pop_group)) +
+  geom_line(size = 0.85) +
   labs(
     title = "Multiple Births Per 1000 Live Births",
     x = "Year", 
-    y = ""
+    y = "",
+    color = "Population Group"
     )
+
+uni_mults %>% 
+  filter(pop_group != "Other") %>% 
+  filter(year %>% between(1970, 2011)) %>%
+  ggplot(aes(year, prop)) +
+  geom_area(aes(fill = pop_group), position = position_stack(reverse = T)) +
+  labs(
+    title = "Multiple Births Per 1000 Live Births",
+    x = "Year", 
+    y = "",
+    fill = "Population Group"
+  )
 
 ## Comparison of twins birth by pp. group and educ. level ####
 
@@ -495,10 +507,14 @@ gt2_sample %>%
   count(twins_2)
 
 # mother's starting birth at a younger age are likely to have more kids
-# gt2_sample %>% 
-#   filter(moth_age_fstbr %>% between(14, 35)) %>% 
-#   ggplot(aes(moth_age_fstbr, no_kids)) +
-#   geom_smooth()
+gt2_sample %>%
+  filter(moth_age_fstbr %>% between(14, 35)) %>%
+  ggplot(aes(moth_age_fstbr, no_kids)) +
+  geom_smooth()
+
+gt2_sample %>% count(spacing)
+  ggplot(aes(spacing, no_kids)) +
+  geom_smooth()
 
 gt2_sample %>%
   filter(moth_age_fstbr %>% between(14, 38)) %>%
@@ -508,6 +524,32 @@ gt2_sample %>%
   geom_col() +
   scale_y_continuous(label = percent)
 
+
+gt2_sample %>%
+  filter(moth_educ != "Other") %>% 
+  group_by(moth_educ) %>%
+  summarize(avg_kids = mean(no_kids)) %>%
+  mutate(
+    moth_educ = fct_reorder(moth_educ, avg_kids) 
+  ) %>% 
+  ggplot(aes(moth_educ, avg_kids)) +
+  geom_col() +
+  coord_flip()
+
+gt2_sample %>%
+  filter(moth_educ != "Other") %>% 
+  # mutate(
+  #   moth_educ = fct_reorder(moth_educ, avg_kids) 
+  # ) %>% 
+  ggplot(aes(moth_educ, no_kids)) +
+  geom_boxplot() 
+
+gt2_sample %>% 
+  # filter(moth_pp_group != "Other") %>%
+  group_by(moth_pp_group) %>%
+  summarize(avg_kids = mean(no_kids)) %>%
+  ggplot(aes(moth_pp_group, avg_kids)) +
+  geom_col() 
 
 
 

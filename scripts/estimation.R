@@ -352,48 +352,78 @@ stargazer(
 
 ## Sub-sample analysis ####
 
+### Whites vs. Non-whites ####
+
+# First stages:
+ma_SS_W1 <- felm(
+  fm_a1, data = gt2_sample, subset = (moth_pp_group == "White")
+  )
+
+ma_SS_NW1 <- felm(
+  fm_a1, data = gt2_sample, subset = (moth_pp_group != "White")
+)
+
+mb_SS_W1 <- felm(
+  fm_b1, data = gt3_sample, subset = (moth_pp_group == "White")
+)
+
+mb_SS_NW1 <- felm(
+  fm_b1, data = gt3_sample, subset = (moth_pp_group != "White")
+)
+
+stargazer(
+  ma_SS_W1, ma_SS_NW1, mb_SS_W1, mb_SS_NW1,
+  keep = c(
+    "twins_2", "twins_3"
+  ),
+  type = "text",
+  keep.stat = c("n","rsq")
+)
+
+fOLS_A4 <- make_formula_gt2("behind")
+fIV_A13 <- make_formula_gt2("behind", "twins_2")
+
 ### Educational attainment ####
 
-# OLS_SS_B1 <- felm(fOLS_A1,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# IV_SS_B1 <- felm(fIV_A1,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# IV_SS_B3 <- felm(fIV_A3,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# IV_SS_B4 <- felm(fIV_A4,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# 
-# OLS_SS_NB1 <- felm(fOLS_A1,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# IV_SS_NB1 <- felm(fIV_A1,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# IV_SS_NB3 <- felm(fIV_A3,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# IV_SS_NB4 <- felm(fIV_A4,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# 
-# stargazer(
-#   OLS_SS_B1, IV_SS_B1, IV_SS_B3, IV_SS_B4, OLS_SS_NB1, IV_SS_NB3, IV_SS_NB4,
-#   keep = c("no_kids"),
-#   type = "text",
-#   keep.stat = c("n", "rsq")
-# )
+# OLS and IVs for Whites
+
+# 2+
+OLS_SS_AW1 <- felm( fOLS_A1, data = gt2_sample,
+                   subset = (moth_pp_group == "White") )
+
+IV_SS_AW1 <- felm( fIV_A1, data = gt2_sample, 
+                   subset = (moth_pp_group == "White") )
+
+# 3+
+OLS_SS_BW1 <- felm( fOLS_B1, data = gt3_sample, 
+                    subset = (moth_pp_group == "White") )
+
+IV_SS_BW1 <- felm( fIV_B1, data = gt3_sample, 
+                   subset = (moth_pp_group == "White") )
+
+# OLS and IVs for Non-Whites
+
+# 2+
+OLS_SS_ANW1 <- felm( fOLS_A1, data = gt2_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_ANW1 <- felm( fIV_A1, data = gt2_sample, 
+                    subset = (moth_pp_group != "White") )
+
+# 3+
+OLS_SS_BNW1 <- felm( fOLS_B1, data = gt3_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_BNW1 <- felm( fIV_B1, data = gt3_sample, 
+                    subset = (moth_pp_group != "White") )
+
+stargazer(
+  OLS_SS_AW1, IV_SS_AW1, OLS_SS_ANW1, IV_SS_ANW1,
+  OLS_SS_BW1, IV_SS_BW1, OLS_SS_BNW1, IV_SS_BNW1,
+  keep = c("no_kids"),
+  type = "text",
+  keep.stat = c("n", "rsq")
+)
 # 
 # 
 # ### Left Behind ####
@@ -442,20 +472,21 @@ stargazer(
 ## Analysis of no-first stage sample ####
 
 gt2_sample %>% 
-  count(spacing)
+  count(moth_age_fstbr)
+
+fm_a1 <- make_formula_frst_stg("no_kids", "twins_2")
+fm_a2 <- make_formula_frst_stg("no_kids", "same_sex_12")
+fm_a3 <- make_formula_frst_stg("no_kids", "boy_12 + girl_12")
+fm_a4 <- make_formula_frst_stg("no_kids", "twins_2 + boy_12 + girl_12")
 
 ma_1_t1 <- felm(fm_a1, data = gt2_sample, 
-                subset = (no_kids > 4))
-mb_2_t1 <- felm(fm_b1, data = gt3_sample, 
-                subset = (no_kids > 4))
-
-ma_3_t1 <- felm(fm_a3, data = gt2_sample, 
-                subset = (no_kids > 4))
-ma_4_t1 <- felm(fm_a4, data = gt2_sample, 
-                subset = (no_kids > 4))
+                subset = 
+                  (no_kids >= 3) & (spacing < 2) 
+                  )
 
 stargazer(
-  ma_1_t1, mb_2_t1,
+  ma_1_t1, 
+  # mb_2_t1,
   # ma_2_t1, ma_3_t1, ma_4_t1,
   keep = c(
     "same_sex_12", "boy_12", "girl_12", "twins_2", "twins_3"
@@ -466,22 +497,32 @@ stargazer(
 
 # Reduced form first stage
 
-fm_a1_t1 <- make_formula_frst_stg("educ_attain", "twins_2")
-fm_a2_t1 <- make_formula_frst_stg("behind", "twins_2")
-fm_a3_t1 <- make_formula_frst_stg("private_school", "twins_2")
-fm_a4_t1 <- make_formula_frst_stg("moth_inlf", "twins_2")
+fm_a1_t1 <- make_formula_frst_stg("educ_attain", "twins_2 + no_kids")
+fm_a2_t1 <- make_formula_frst_stg("behind", "twins_2 + no_kids")
+fm_a3_t1 <- make_formula_frst_stg("private_school", "twins_2 + no_kids")
+fm_a4_t1 <- make_formula_frst_stg("moth_inlf", "twins_2 + no_kids")
 
 rma_1_t1 <- felm(fm_a1_t1, data = gt2_sample, 
-                subset = (no_kids > 4))
+                subset = 
+                  (no_kids >= 3) & (spacing < 2) 
+                  )
+
 rma_2_t1 <- felm(fm_a2_t1, data = gt2_sample, 
-                subset = (no_kids > 4))
+                subset = 
+                  (no_kids >= 3) & (spacing < 2) 
+                  )
 rma_3_t1 <- felm(fm_a3_t1, data = gt2_sample, 
-                subset = (no_kids > 4))
+                subset = 
+                  (no_kids >= 3) & (spacing < 2) 
+                )
 rma_4_t1 <- felm(fm_a4_t1, data = gt2_sample, 
-                subset = (no_kids > 4))
+                subset = 
+                  (no_kids >= 3) & (spacing < 2) 
+                  )
 
 stargazer(
-  rma_1_t1, rma_2_t1, rma_3_t1, rma_4_t1,
+  rma_1_t1, 
+  rma_2_t1, rma_3_t1, rma_4_t1,
   keep = c("twins_2"),
   type = "text",
   keep.stat = c("n","rsq")
@@ -494,7 +535,12 @@ fm_b3_t1 <- make_formula_frst_stg("private_school", "twins_3")
 fm_b4_t1 <- make_formula_frst_stg("moth_inlf", "twins_3")
 
 rmb_1_t1 <- felm(fm_b1_t1, data = gt3_sample, 
-                 subset = (no_kids > 4))
+                 subset = 
+                   (moth_educ %in% c("No schooling") ) &
+                   # (moth_pp_group %in% c("Black African", "Coloured", "Other")) &
+                   # (moth_age_fstbr < 21) &
+                   (spacing <= 2)
+                   )
 rmb_2_t1 <- felm(fm_b2_t1, data = gt3_sample, 
                  subset = (no_kids > 4))
 rmb_3_t1 <- felm(fm_b3_t1, data = gt3_sample, 

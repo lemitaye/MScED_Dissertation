@@ -332,25 +332,36 @@ data <- data %>%
   )
 
 
-# data to construct graph of multiple births by year:
+# data to construct graph of multiple births by year: ####
 
-all_births <- all_persons %>%
-  select(sn, dob)  %>% 
-  mutate(year = year(dob)) %>% 
-  count(year, name = "all")
+dobs_pp_group <- all_persons %>%
+  select(sn, dob, pop_group = p05_pop_group)  %>% 
+  mutate(
+    year = year(dob),
+    pop_group =
+      case_when(
+        pop_group == 1 ~ "Black African",
+        pop_group == 2 ~ "Coloured",
+        pop_group == 3 ~ "Indian or Asian",
+        pop_group == 4 ~ "White",
+        pop_group == 5 ~ "Other",
+      ) %>% factor() %>% fct_lump(n = 3)
+  )
 
-uni_mults <- all_persons %>%
-  select(sn, dob) %>% 
+all_births <- dobs_pp_group %>% 
+  count(year, pop_group, name = "all")
+
+uni_mults_tbl <- dobs_pp_group %>% 
   group_by(sn) %>% 
   filter(duplicated(dob)) %>% 
   ungroup() %>% 
-  distinct(sn ,dob) %>% 
-  mutate(year = year(dob))
+  distinct(sn, dob, .keep_all = TRUE) 
 
-uni_mults <- uni_mults %>% 
-  count(year, name = "mult") %>%  
-  left_join(all_births, by = "year") %>% 
-  mutate(prop = (mult/all)*1000)
+uni_mults <- uni_mults_tbl %>% 
+  count(year, pop_group, name = "mult") %>%  
+  left_join(all_births, by = c("year", "pop_group")) %>% 
+  mutate(prop = (mult/all)*1000) %>% 
+  filter(year >= 1970)
 
 
 # save data ####
