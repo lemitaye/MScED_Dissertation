@@ -354,7 +354,7 @@ stargazer(
 
 ### Whites vs. Non-whites ####
 
-# First stages:
+#### First stages #####
 ma_SS_W1 <- felm(
   fm_a1, data = gt2_sample, subset = (moth_pp_group == "White")
   )
@@ -380,10 +380,8 @@ stargazer(
   keep.stat = c("n","rsq")
 )
 
-fOLS_A4 <- make_formula_gt2("behind")
-fIV_A13 <- make_formula_gt2("behind", "twins_2")
 
-### Educational attainment ####
+#### Educational attainment ####
 
 # OLS and IVs for Whites
 
@@ -424,50 +422,131 @@ stargazer(
   type = "text",
   keep.stat = c("n", "rsq")
 )
-# 
-# 
-# ### Left Behind ####
-# 
-# OLS_SS_B2 <- felm(fOLS_A4,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# IV_SS_B5 <- felm(fIV_A13,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# IV_SS_B6 <- felm(fIV_A15,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# IV_SS_B7 <- felm(fIV_A16,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group == "Black African")
-# )
-# 
-# OLS_SS_NB2 <- felm(fOLS_A4,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# IV_SS_NB5 <- felm(fIV_A13,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# IV_SS_NB6 <- felm(fIV_A15,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# IV_SS_NB7 <- felm(fIV_A16,
-#   data = gt2_sample,
-#   subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-# )
-# 
-# stargazer(
-#   OLS_SS_B2, IV_SS_B5, IV_SS_B6, IV_SS_B7, OLS_SS_NB2, IV_SS_NB5, IV_SS_NB6, IV_SS_NB7,
-#   keep = c("no_kids"),
-#   type = "text",
-#   keep.stat = c("n", "rsq")
-# )
+
+
+#### Left Behind ####
+
+# 2+
+OLS_SS_AW4 <- felm( fOLS_A4, data = gt2_sample,
+                    subset = (moth_pp_group == "White") )
+
+IV_SS_AW13 <- felm( fIV_A13, data = gt2_sample, 
+                   subset = (moth_pp_group == "White") )
+
+# 3+
+OLS_SS_BW4 <- felm( fOLS_B4, data = gt3_sample, 
+                    subset = (moth_pp_group == "White") )
+
+IV_SS_BW13 <- felm( fIV_B13, data = gt3_sample, 
+                   subset = (moth_pp_group == "White") )
+
+# OLS and IVs for Non-Whites
+
+# 2+
+OLS_SS_ANW4 <- felm( fOLS_A4, data = gt2_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_ANW13 <- felm( fIV_A13, data = gt2_sample, 
+                    subset = (moth_pp_group != "White") )
+
+# 3+
+OLS_SS_BNW4 <- felm( fOLS_B4, data = gt3_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_BNW13 <- felm( fIV_B13, data = gt3_sample, 
+                    subset = (moth_pp_group != "White") )
+
+stargazer(
+  OLS_SS_AW4, IV_SS_AW13, OLS_SS_BW4, IV_SS_BW13,
+  OLS_SS_ANW4, IV_SS_ANW13, OLS_SS_BNW4, IV_SS_BNW13,
+  keep = c("no_kids"),
+  type = "text",
+  keep.stat = c("n", "rsq")
+)
+
+
+#### Private School Attendance ####
+
+# 2+
+OLS_SS_AW2 <- felm( fOLS_A2, data = gt2_sample,
+                    subset = (moth_pp_group == "White") )
+
+IV_SS_AW5 <- felm( fIV_A5, data = gt2_sample, 
+                    subset = (moth_pp_group == "White") )
+
+# 3+
+OLS_SS_BW2 <- felm( fOLS_B2, data = gt3_sample, 
+                    subset = (moth_pp_group == "White") )
+
+IV_SS_BW5 <- felm( fIV_B5, data = gt3_sample, 
+                    subset = (moth_pp_group == "White") )
+
+# OLS and IVs for Non-Whites
+
+# 2+
+OLS_SS_ANW2 <- felm( fOLS_A2, data = gt2_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_ANW5 <- felm( fIV_A5, data = gt2_sample, 
+                     subset = (moth_pp_group != "White") )
+
+# 3+
+OLS_SS_BNW2 <- felm( fOLS_B2, data = gt3_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_BNW5 <- felm( fIV_B5, data = gt3_sample, 
+                     subset = (moth_pp_group != "White") )
+
+stargazer(
+  OLS_SS_AW2, IV_SS_AW5, OLS_SS_BW2, IV_SS_BW5,
+  OLS_SS_ANW2, IV_SS_ANW5, OLS_SS_BNW2, IV_SS_BNW5,
+  keep = c("no_kids"),
+  type = "text",
+  keep.stat = c("n", "rsq")
+)
+
+
+
+#### Mothers' LFP ####
+
+# 2+
+OLS_SS_AW3 <- felm( fOLS_A3, data = gt2_sample,
+                    subset = (moth_pp_group == "White") )
+
+IV_SS_AW9 <- felm( fIV_A9, data = gt2_sample, 
+                   subset = (moth_pp_group == "White") )
+
+# 3+
+OLS_SS_BW3 <- felm( fOLS_B3, data = gt3_sample, 
+                    subset = (moth_pp_group == "White") )
+
+IV_SS_BW9 <- felm( fIV_B9, data = gt3_sample, 
+                   subset = (moth_pp_group == "White") )
+
+# OLS and IVs for Non-Whites
+
+# 2+
+OLS_SS_ANW3 <- felm( fOLS_A3, data = gt2_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_ANW9 <- felm( fIV_A9, data = gt2_sample, 
+                    subset = (moth_pp_group != "White") )
+
+# 3+
+OLS_SS_BNW3 <- felm( fOLS_B3, data = gt3_sample, 
+                     subset = (moth_pp_group != "White") )
+
+IV_SS_BNW9 <- felm( fIV_B9, data = gt3_sample, 
+                    subset = (moth_pp_group != "White") )
+
+stargazer(
+  OLS_SS_AW3, IV_SS_AW9, OLS_SS_BW3, IV_SS_BW9,
+  OLS_SS_ANW3, IV_SS_ANW9, OLS_SS_BNW3, IV_SS_BNW9,
+  keep = c("no_kids"),
+  type = "text",
+  keep.stat = c("n", "rsq")
+)
+
 
 ## Analysis of no-first stage sample ####
 
