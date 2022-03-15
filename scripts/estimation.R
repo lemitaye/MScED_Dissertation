@@ -169,11 +169,11 @@ fIV_A2 <- make_formula_gt2("educ_attain", "same_sex_12")
 fIV_A3 <- make_formula_gt2("educ_attain", "boy_12 + girl_12")
 fIV_A4 <- make_formula_gt2("educ_attain", "twins_2 + boy_12 + girl_12")
 
-OLS_A1 <- felm(fOLS_A1, data = gt2_sample, subset = (moth_pp_group == "White"))
-IV_A1 <- felm(fIV_A1, data = gt2_sample, subset = (moth_pp_group == "White"))
-IV_A2 <- felm(fIV_A2, data = gt2_sample, subset = (moth_pp_group == "White"))
-IV_A3 <- felm(fIV_A3, data = gt2_sample, subset = (moth_pp_group == "White"))
-IV_A4 <- felm(fIV_A4, data = gt2_sample, subset = (moth_pp_group == "White"))
+OLS_A1 <- felm(fOLS_A1, data = gt2_sample)
+IV_A1 <- felm(fIV_A1, data = gt2_sample)
+IV_A2 <- felm(fIV_A2, data = gt2_sample)
+IV_A3 <- felm(fIV_A3, data = gt2_sample)
+IV_A4 <- felm(fIV_A4, data = gt2_sample)
 
 stargazer(
   OLS_A1, IV_A1, IV_A2, IV_A3, IV_A4,
@@ -191,11 +191,11 @@ fIV_A14 <- make_formula_gt2("behind", "same_sex_12")
 fIV_A15 <- make_formula_gt2("behind", "boy_12 + girl_12")
 fIV_A16 <- make_formula_gt2("behind", "twins_2 + boy_12 + girl_12")
 
-OLS_A4 <- felm(fOLS_A4, data = gt2_sample, subset = (moth_pp_group != "White"))
-IV_A13 <- felm(fIV_A13, data = gt2_sample, subset = (moth_pp_group != "White"))
-IV_A14 <- felm(fIV_A14, data = gt2_sample, subset = (moth_pp_group != "White"))
-IV_A15 <- felm(fIV_A15, data = gt2_sample, subset = (moth_pp_group != "White"))
-IV_A16 <- felm(fIV_A16, data = gt2_sample, subset = (moth_pp_group != "White"))
+OLS_A4 <- felm(fOLS_A4, data = gt2_sample)
+IV_A13 <- felm(fIV_A13, data = gt2_sample)
+IV_A14 <- felm(fIV_A14, data = gt2_sample)
+IV_A15 <- felm(fIV_A15, data = gt2_sample)
+IV_A16 <- felm(fIV_A16, data = gt2_sample)
 
 stargazer(
   OLS_A4, IV_A13, IV_A14, IV_A15, IV_A16,
@@ -212,11 +212,11 @@ fIV_A6 <- make_formula_gt2("private_school", "same_sex_12")
 fIV_A7 <- make_formula_gt2("private_school", "boy_12 + girl_12")
 fIV_A8 <- make_formula_gt2("private_school", "twins_2 + boy_12 + girl_12")
 
-OLS_A2 <- felm(fOLS_A2, data = gt2_sample, subset = (child_age_year > 9))
-IV_A5 <- felm(fIV_A5, data = gt2_sample, subset = (child_age_year > 9))
-IV_A6 <- felm(fIV_A6, data = gt2_sample, subset = (child_age_year > 9))
-IV_A7 <- felm(fIV_A7, data = gt2_sample, subset = (child_age_year > 9))
-IV_A8 <- felm(fIV_A8, data = gt2_sample, subset = (child_age_year > 9))
+OLS_A2 <- felm(fOLS_A2, data = gt2_sample)
+IV_A5 <- felm(fIV_A5, data = gt2_sample)
+IV_A6 <- felm(fIV_A6, data = gt2_sample)
+IV_A7 <- felm(fIV_A7, data = gt2_sample)
+IV_A8 <- felm(fIV_A8, data = gt2_sample)
 
 stargazer(
   OLS_A2, IV_A5, IV_A6, IV_A7, IV_A8,
@@ -234,11 +234,11 @@ fIV_A10 <- make_formula_gt2("moth_inlf", "same_sex_12")
 fIV_A11 <- make_formula_gt2("moth_inlf", "boy_12 + girl_12")
 fIV_A12 <- make_formula_gt2("moth_inlf", "twins_2 + boy_12 + girl_12")
 
-OLS_A3 <- felm(fOLS_A3, data = gt2_sample, subset = (child_age_year > 9))
-IV_A9 <- felm(fIV_A9, data = gt2_sample, subset = (child_age_year > 9))
-IV_A10 <- felm(fIV_A10, data = gt2_sample, subset = (child_age_year > 9))
-IV_A11 <- felm(fIV_A11, data = gt2_sample, subset = (child_age_year > 9))
-IV_A12 <- felm(fIV_A12, data = gt2_sample, subset = (child_age_year > 9))
+OLS_A3 <- felm(fOLS_A3, data = gt2_sample)
+IV_A9 <- felm(fIV_A9, data = gt2_sample)
+IV_A10 <- felm(fIV_A10, data = gt2_sample)
+IV_A11 <- felm(fIV_A11, data = gt2_sample)
+IV_A12 <- felm(fIV_A12, data = gt2_sample)
 
 stargazer(
   OLS_A3, IV_A9, IV_A10, IV_A11, IV_A12,
@@ -258,11 +258,11 @@ fIV_B2 <- make_formula_gt3("educ_attain", "same_sex_123")
 fIV_B3 <- make_formula_gt3("educ_attain", "boy_123 + girl_123")
 fIV_B4 <- make_formula_gt3("educ_attain", "twins_3 + boy_123 + girl_123")
 
-OLS_B1 <- felm(fOLS_B1, data = gt3_sample, subset = (child_age_year > 9))
-IV_B1 <- felm(fIV_B1, data = gt3_sample, subset = (child_age_year > 9))
-IV_B2 <- felm(fIV_B2, data = gt3_sample, subset = (child_age_year > 9))
-IV_B3 <- felm(fIV_B3, data = gt3_sample, subset = (child_age_year > 9))
-IV_B4 <- felm(fIV_B4, data = gt3_sample, subset = (child_age_year > 9))
+OLS_B1 <- felm(fOLS_B1, data = gt3_sample)
+IV_B1 <- felm(fIV_B1, data = gt3_sample)
+IV_B2 <- felm(fIV_B2, data = gt3_sample)
+IV_B3 <- felm(fIV_B3, data = gt3_sample)
+IV_B4 <- felm(fIV_B4, data = gt3_sample)
 
 stargazer(
   OLS_B1, IV_B1, IV_B2, IV_B3, IV_B4,
@@ -279,11 +279,11 @@ fIV_B14 <- make_formula_gt3("behind", "same_sex_123")
 fIV_B15 <- make_formula_gt3("behind", "boy_123 + girl_123")
 fIV_B16 <- make_formula_gt3("behind", "twins_3 + boy_123 + girl_123")
 
-OLS_B4 <- felm(fOLS_B4, data = gt3_sample, subset = (child_age_year > 9))
-IV_B13 <- felm(fIV_B13, data = gt3_sample, subset = (child_age_year > 9))
-IV_B14 <- felm(fIV_B14, data = gt3_sample, subset = (child_age_year > 9))
-IV_B15 <- felm(fIV_B15, data = gt3_sample, subset = (child_age_year > 9))
-IV_B16 <- felm(fIV_B16, data = gt3_sample, subset = (child_age_year > 9))
+OLS_B4 <- felm(fOLS_B4, data = gt3_sample)
+IV_B13 <- felm(fIV_B13, data = gt3_sample)
+IV_B14 <- felm(fIV_B14, data = gt3_sample)
+IV_B15 <- felm(fIV_B15, data = gt3_sample)
+IV_B16 <- felm(fIV_B16, data = gt3_sample)
 
 stargazer(
   OLS_B4, IV_B13, IV_B14, IV_B15, IV_B16,
@@ -301,26 +301,11 @@ fIV_B6 <- make_formula_gt3("private_school", "same_sex_123")
 fIV_B7 <- make_formula_gt3("private_school", "boy_123 + girl_123")
 fIV_B8 <- make_formula_gt3("private_school", "twins_3 + boy_123 + girl_123")
 
-OLS_B2 <- felm(fOLS_B2,
-  data = gt3_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_B5 <- felm(fIV_B5,
-  data = gt3_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_B6 <- felm(fIV_B6,
-  data = gt3_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_B7 <- felm(fIV_B7,
-  data = gt3_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
-IV_B8 <- felm(fIV_B8,
-  data = gt3_sample,
-  subset = (child_age_year > 9) & (moth_pp_group != "Black African")
-)
+OLS_B2 <- felm(fOLS_B2, data = gt3_sample)
+IV_B5 <- felm(fIV_B5, data = gt3_sample)
+IV_B6 <- felm(fIV_B6, data = gt3_sample)
+IV_B7 <- felm(fIV_B7, data = gt3_sample)
+IV_B8 <- felm(fIV_B8, data = gt3_sample)
 
 stargazer(
   OLS_B2, IV_B5, IV_B6, IV_B7, IV_B8,
@@ -457,8 +442,8 @@ IV_SS_BNW13 <- felm( fIV_B13, data = gt3_sample,
                     subset = (moth_pp_group != "White") )
 
 stargazer(
-  OLS_SS_AW4, IV_SS_AW13, OLS_SS_BW4, IV_SS_BW13,
-  OLS_SS_ANW4, IV_SS_ANW13, OLS_SS_BNW4, IV_SS_BNW13,
+  OLS_SS_AW4, IV_SS_AW13, OLS_SS_ANW4, IV_SS_ANW13, 
+  OLS_SS_BW4, IV_SS_BW13, OLS_SS_BNW4, IV_SS_BNW13,
   keep = c("no_kids"),
   type = "text",
   keep.stat = c("n", "rsq")
@@ -498,8 +483,8 @@ IV_SS_BNW5 <- felm( fIV_B5, data = gt3_sample,
                      subset = (moth_pp_group != "White") )
 
 stargazer(
-  OLS_SS_AW2, IV_SS_AW5, OLS_SS_BW2, IV_SS_BW5,
-  OLS_SS_ANW2, IV_SS_ANW5, OLS_SS_BNW2, IV_SS_BNW5,
+  OLS_SS_AW2, IV_SS_AW5, OLS_SS_ANW2, IV_SS_ANW5,
+  OLS_SS_BW2, IV_SS_BW5, OLS_SS_BNW2, IV_SS_BNW5,
   keep = c("no_kids"),
   type = "text",
   keep.stat = c("n", "rsq")
@@ -540,8 +525,8 @@ IV_SS_BNW9 <- felm( fIV_B9, data = gt3_sample,
                     subset = (moth_pp_group != "White") )
 
 stargazer(
-  OLS_SS_AW3, IV_SS_AW9, OLS_SS_BW3, IV_SS_BW9,
-  OLS_SS_ANW3, IV_SS_ANW9, OLS_SS_BNW3, IV_SS_BNW9,
+  OLS_SS_AW3, IV_SS_AW9, OLS_SS_ANW3, IV_SS_ANW9, 
+  OLS_SS_BW3, IV_SS_BW9, OLS_SS_BNW3, IV_SS_BNW9,
   keep = c("no_kids"),
   type = "text",
   keep.stat = c("n", "rsq")
