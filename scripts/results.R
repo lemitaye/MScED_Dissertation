@@ -41,13 +41,13 @@ for (i in seq_along(models)) {
   for (j in seq_along(models[[i]])) {
     # The first and sixth models are OLS; needed robust s.e.
     if (i == 1 | i == 5) { # Toggle this when removing columns
-      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,1]
-      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,2]
-      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))[1,4]
+      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))["no_kids", 1]
+      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))["no_kids", 2]
+      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]], robust = TRUE))["no_kids", 4]
     } else {
-      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,1]
-      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,2]
-      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))[5,4]
+      coef_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))["`no_kids(fit)`", 1]
+      se_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))["`no_kids(fit)`", 2]
+      p_list[[i]][[j]] <- coef(summary(models[[i]][[j]]))["`no_kids(fit)`", 4]
     }
   }
 }
@@ -111,10 +111,11 @@ Covariates for all models include age (in months) and sex of child, mother's edu
 dummies for mother's population group and income range, dummies for districts, and a dummy for whether the father resides in the household. 
 The regressions for the 3+ sample are clustered by mother's ID."
 
-star_sidewaystable(star.out) %>% 
+star.out %>% 
 star_notes_tex(
-  note.type = "caption", #Use the latex 'caption' package for notes
+  note.type = "threeparttable", #Use the latex 'caption' package for notes
   note = long_note) %>% 
+  star_sidewaystable() %>% 
   star_tex_write(
     file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
   )
@@ -194,40 +195,196 @@ star_tex_write(
 )
 
 
+# Sub-Sample Analysis - I: Whites vs. Non-Whites ######
+
+models_ssI <- list(
+  ols_2W = list(OLS_SS_AW1, OLS_SS_AW4, OLS_SS_AW2, OLS_SS_AW3), 
+  iv_2W = list(IV_SS_AW1, IV_SS_AW13, IV_SS_AW5, IV_SS_AW9),
+  ols_2NW = list(OLS_SS_ANW1, OLS_SS_ANW4, OLS_SS_ANW2, OLS_SS_ANW3), 
+  iv_2NW = list(IV_SS_ANW1, IV_SS_ANW13, IV_SS_ANW5, IV_SS_ANW9),
+  ols_3W = list(OLS_SS_BW1, OLS_SS_BW4, OLS_SS_BW2, OLS_SS_BW3), 
+  iv_3W = list(IV_SS_BW1, IV_SS_BW13, IV_SS_BW5, IV_SS_BW9),
+  ols_3NW = list(OLS_SS_BNW1, OLS_SS_BNW4, OLS_SS_BNW2, OLS_SS_BNW3), 
+  iv_3NW = list(IV_SS_BNW1, IV_SS_BNW13, IV_SS_BNW5, IV_SS_BNW9)
+)
+
+# Create empty lists
+make_list_ssI <- function() {
+  x <- list(
+    ols_2W = double(4), iv_2W = double(4), 
+    ols_2NW = double(4), iv_2NW = double(4),
+    ols_3W = double(4), iv_3W = double(4), 
+    ols_3NW = double(4), iv_3NW = double(4)
+  ) 
+  
+  return(x)
+}
+
+coef_list_ssI <- make_list_ssI()
+se_list_ssI <- make_list_ssI()
+p_list_ssI <- make_list_ssI()
+
+# Collect coefficients, standard errors, and p-values
+for (i in seq_along(models_ssI)) {
+  for (j in seq_along(models_ssI[[i]])) {
+    # Odd numbered models are OLS; needed robust s.e.
+    if (i %in% c(1, 3, 5, 7)) { # Toggle this when removing columns
+      # use the row name "no_kids" to be safe
+      coef_list_ssI[[i]][[j]] <- coef(summary(models_ssI[[i]][[j]], robust = TRUE))["no_kids",1]
+      se_list_ssI[[i]][[j]] <- coef(summary(models_ssI[[i]][[j]], robust = TRUE))["no_kids", 2]
+      p_list_ssI[[i]][[j]] <- coef(summary(models_ssI[[i]][[j]], robust = TRUE))["no_kids", 4]
+    } else {
+      # use the row name "`no_kids(fit)`" to be safe
+      coef_list_ssI[[i]][[j]] <- coef(summary(models_ssI[[i]][[j]]))["`no_kids(fit)`", 1]
+      se_list_ssI[[i]][[j]] <- coef(summary(models_ssI[[i]][[j]]))["`no_kids(fit)`", 2]
+      p_list_ssI[[i]][[j]] <- coef(summary(models_ssI[[i]][[j]]))["`no_kids(fit)`", 4]
+    }
+  }
+}
+
+# Prepare the pieces
+labels_ss_I <- c(
+  "Educational Attainment",
+  "Left Behind",
+  "Private School",
+  "Mothers LFP"
+)
+
+nobs_wrap <- function(mod) {
+  paste0("\\multicolumn{2}{c}{", nobs(mod), "}" )
+}
+
+last_lines_ss = c(
+    " $ N $ ", nobs_wrap(OLS_SS_AW1), nobs_wrap(OLS_SS_ANW1), 
+    nobs_wrap(OLS_SS_BW1), nobs_wrap(OLS_SS_BNW1)
+    )
+
+last_lines_ss <- paste( paste(last_lines_ss, collapse = " & "), "\\\\" )
+
+header <- c(
+  " & \\multicolumn{4}{c}{2+ Sample} & \\multicolumn{4}{c}{3+ Sample} \\\\",
+  "\\cline{2-5}  \\cline{6-9} \\\\",
+  " & \\multicolumn{2}{c}{Whites} & \\multicolumn{2}{c}{Non-Whites} & 
+    \\multicolumn{2}{c}{Whites} & \\multicolumn{2}{c}{Non-Whites} \\\\",
+  "\\cline{2-3}  \\cline{4-5} \\cline{6-7} \\cline{8-9} \\\\[-1.8ex]" #,
+  # "\\hline \\\\[-1.8ex] "
+)
+
+long_note_ssI = "*** Significant at 0.1\\%, ** Significant at 1\\%, * Significant at 5\\%. \\\\[-1.8ex] 
+
+$ \\dag $ Columns 1-4 have the coefficients for the Twins2
+instrument (in the 2+ sample) and in columns 5-8 are the coefficients for the
+Twins3 instrument (3+ sample). The regressions were run using the same set 
+of controls as in Table ?. Robust standard errors are in parentheses and the numbers 
+in square brackets below the s.e. are F stats for the exclusion of the Twins2 or
+the Twins 3 variable from the model. \\\\[-1.8ex]
+ 
+$ \\ddag $ The regressions control for the same set of covariates as in Table ? (see notes there). 
+The regressions for the 3+ sample are clustered by mother's ID. 
+"
+
+f_wrap <- function(mod, sample = 2) {
+  if (sample == 2) {
+    x <- paste0("\\multicolumn{2}{c}{ [", 
+                sprintf( waldtest(mod, ~ twins_2)[["F"]], fmt='%#.4g'), 
+                "] }" )
+  } else if (sample == 3) {
+    x <- paste0("\\multicolumn{2}{c}{ [", 
+                sprintf( waldtest(mod, ~ twins_3)[["F"]], fmt='%#.4g'), 
+                "] }" )
+  }
+  
+}
+
+f_line_ssI <- c(
+  " \\multicolumn{1}{c}{$F$} ", f_wrap(ma_SS_W1, 2), f_wrap(ma_SS_NW1, 2), 
+  f_wrap(mb_SS_W1, 3), f_wrap(mb_SS_NW1, 3)
+)
+
+f_line_ssI <- paste( paste(f_line_ssI, collapse = " & "), "\\\\" )
+
 #####
 
+# Upper Table
+star_trial <- stargazer(
+  ma_SS_W1, ols, ma_SS_NW1, ols, mb_SS_W1, ols, mb_SS_NW1, ols,
+  keep = c(
+    "twins_2", "twins_3" 
+  ),
+  # type = "text",
+  omit.stat = "all",
+  dep.var.caption  = "",
+  dep.var.labels.include = FALSE,
+  header = FALSE,
+  model.names = FALSE,
+  column.sep.width = "8pt",
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  title = "Heterogeneity by Mother's Population Group (Whites vs. Non-Whites)"
+) 
 
+star_trial[5] <- "\\begin{tabular}{@{\\extracolsep{8pt}}lcc@{\\hskip 0.3in}cc@{\\hskip 0.3in}cc@{\\hskip 0.3in}cc} "
 
-##latex example
+star_trial[10:12] <- c(
+  " Twins2/ & \\multicolumn{2}{c}{ 0.942$^{***}$ }  & \\multicolumn{2}{c}{ 0.809$^{***}$ } 
+  &  \\multicolumn{2}{c}{ 0.861$^{***}$ }  &  \\multicolumn{2}{c}{ 0.756$^{***}$ }  \\\\ ",
+  " Twins3 & \\multicolumn{2}{c}{ (0.044) }  & \\multicolumn{2}{c}{ (0.030) } 
+  &  \\multicolumn{2}{c}{ (0.068) }  &  \\multicolumn{2}{c}{ (0.037) }  \\\\ ",
+  f_line_ssI
+) 
 
-data(mtcars)
-mod.mtcars.1 <- lm(mpg ~ hp + wt, mtcars)
-mod.mtcars.2 <- lm(mpg ~ hp + wt + cyl, mtcars)
-mod.mtcars.3 <- lm(hp ~ wt + cyl, mtcars)
+# star_trial <- star_trial %>% 
+#   star_rhs_names(pattern = "Twins", line1 = "Twins2/", line2 = "Twins3")
 
-stargazer(
-  mod.mtcars.1, mod.mtcars.2, mod.mtcars.3, 
-  type = "latex",
-  keep.stat = c("n", "rsq"),
-  add
+# Bottom Table
+star_ssI <- stargazer(
+  ols, iv, ols, iv, ols, iv, ols, iv, 
+  coef = coef_list_ssI,
+  se = se_list_ssI,
+  p = p_list_ssI,
+  # type = "text",
+  omit.stat = "all",
+  # style = "aer",
+  dep.var.caption  = "",
+  covariate.labels = labels_ss_I,
+  column.labels   = c("OLS", "IV", "OLS", "IV", "OLS", "IV", "OLS", "IV"),
+  dep.var.labels.include = FALSE,
+  model.names = FALSE,
+  star.cutoffs = c(0.05, 0.01, 0.001),
+  notes = NULL,
+  header = FALSE
+)
+
+# Putting the everything together
+star_print <- star_panel(
+  star_trial, star_ssI,
+  same.summary.stats = FALSE, 
+  panel.label.fontface = "bold",
+  panel.names = c("First Stage$^{\\dag}$", "OLS \\& 2SLS$^{\\ddag}$")
 ) %>% 
-star_insert_row(
-  c("Controls? & No & No & No \\\\",
-              "Linear Model? & Yes & Yes & Yes \\\\"),
-                insert.after = c(29)
+  star_insert_row(
+    header,
+    insert.after = c(7)
   ) %>% 
+  star_notes_tex(
+    note.type = "threeparttable",
+    note = long_note_ssI
+  ) 
+ 
+star_print <- star_print %>% 
+  star_insert_row(
+    c(
+      " & OLS & IV & OLS & IV & OLS & IV & OLS & IV \\\\",
+      " \\hline \\\\",
+      last_lines_ss
+    ),
+    insert.after = c(26, 26, 41)
+  ) 
+
+star_print <- star_print[-c(19:24, 41:42)]
+
+star_sidewaystable(star_print) %>% 
   star_tex_write(
-    file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table6.tex"
-    )
-  
-
-
-
-data(mtcars)
-star.out <- stargazer(mtcars)
-star_sidewaystable(star.out) %>% 
-  star_tex_write(
-    file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table9noh.tex"
+    file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table12.tex"
   )
 
 
