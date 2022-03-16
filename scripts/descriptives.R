@@ -552,17 +552,36 @@ gt2_sample %>%
   geom_col() 
 
 
+# Error bar plot by mother's age
+
+age_range <- 21:38
+
+age_data <- vector("list", length = length(age_range))
+
+for (age in age_range) {
+  # create a list contaning all the data
+  index <- which(21:38 == age)
+  age_data[[index]] <- filter(gt2_sample, moth_age_year >= age)
+}
+
+# loop through the tibbles in the list applying "model_ols" to each
+models_ols <- map( age_data, model_ols )
+tidy_list <- map(models_ols, tidy, conf.int = TRUE) %>% 
+  map( ~filter( . , term ==  "no_kids") )
+
+# collapse the list to create a tibble
+mod_res_ols <- bind_rows(tidy_list) %>% 
+  mutate(term = str_c("\u2265", age_range))
 
 
-
-
-
-
-
-
-
-
-
-
+ggcoef(mod_res, errorbar_height = .2, color = "blue", 
+       errorbar_color = "red") +
+  geom_line(aes(y = estimate)) +
+  geom_ribbon(
+    aes(
+      ymin = estimate - conf.low, ymax = estimate + conf.high,
+    ), fill = "grey70") +
+  coord_flip() +
+  labs(x = "", y = "Mother's Age", title = "Coefficient Estimate and Std. Error")
 
 
