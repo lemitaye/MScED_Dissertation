@@ -6,7 +6,7 @@
 
 rm(list = ls())
 
-# Load saved data
+# Load saved data ####
 gt2_sample <- read_csv("data/gt2_sample.csv")
 gt3_sample <- read_csv("data/gt3_sample.csv")
 
@@ -28,7 +28,7 @@ gt3_sample <- gt3_sample %>%
   )
 
 
-# Reg. for each age group
+# Plotting Regression by Mother's Age ####
 
 make_formula_gt2 <- function(dep_var, instrument = 0) {
   # Define a vector of covariates
@@ -50,19 +50,120 @@ make_formula_gt2 <- function(dep_var, instrument = 0) {
 fOLS_A1 <- make_formula_gt2("educ_attain")
 fIV_A1 <- make_formula_gt2("educ_attain", "twins_2")
 
-model_ols <- function(tbl) {
-  felm(fOLS_A1, data = tbl)
+fOLS_A4 <- make_formula_gt2("behind")
+fIV_A13 <- make_formula_gt2("behind", "twins_2")
+
+fOLS_A2 <- make_formula_gt2("private_school")
+fIV_A5 <- make_formula_gt2("private_school", "twins_2")
+
+fOLS_A3 <- make_formula_gt2("moth_inlf")
+fIV_A9 <- make_formula_gt2("moth_inlf", "twins_2")
+
+# specify the age range here:
+age_range <- 21:40
+# create an empty list to store data sets
+age_data <- vector("list", length = length(age_range))
+
+for (age in age_range) {
+  # create a list containing all the data
+  index <- which(age_range == age)
+  age_data[[index]] <- filter(gt2_sample, moth_age_year >= age)
 }
 
-model_twins <- function(tbl) {
-  felm(fIV_A1, data = tbl)
+# loop through the tibbles running the appropriate model 
+ols_educ <- map( age_data, ~felm(fOLS_A1, data = .) )
+iv_educ <- map( age_data, ~felm(fIV_A1, data = .) )
+
+ols_behind <- map( age_data, ~felm(fOLS_A4, data = .) )
+iv_behind <- map( age_data, ~felm(fIV_A13, data = .) )
+
+ols_private <- map( age_data, ~felm(fOLS_A2, data = .) )
+iv_private <- map( age_data, ~felm(fIV_A5, data = .) )
+
+ols_lfp <- map( age_data, ~felm(fOLS_A3, data = .) )
+iv_lfp <- map( age_data, ~felm(fIV_A9, data = .) )
+
+# Tidy and collect results
+tidy_model <- function(model, name) {
+  
+  tidy <- map(model, tidy, conf.int = TRUE) %>% 
+    map( ~filter( . , term %in% c("no_kids", "`no_kids(fit)`") ) ) %>% 
+    bind_rows() %>% 
+    mutate( term = str_c(age_range, "+"), type = name )
+  
+  return(tidy)
+  
 }
 
-get_confs <- function(mod) {
-  confint(mod) %>% 
-    as_tibble()
+mods_list <- list(
+  ols_educ = ols_educ, iv_educ = iv_educ, ols_behind = ols_behind,
+  iv_behind = iv_behind, ols_private = ols_private,
+  iv_private = iv_private, ols_lfp = ols_lfp, iv_lfp = iv_lfp
+)
+
+mod_all <- tibble()
+
+for (i in seq_along(mods_list)) {
+  
+  tidy_data <- tidy_model(mods_list[[i]], names(mods_list)[i])
+
+  mod_all <- bind_rows(mod_all, tidy_data)
+  
 }
 
+mod_all <- mod_all %>% 
+  arrange(term) %>% 
+  mutate( 
+    type = factor(
+      type, levels = c(
+        "ols_educ", "iv_educ", "ols_behind", "iv_behind",
+        "ols_private", "iv_private", "ols_lfp", "iv_lfp"
+        ) 
+      ) 
+    )
+
+# Plotes
+
+to_string <- as_labeller(
+  c(
+    "ols_educ" = "Educational Attainment: OLS",
+    "iv_educ" = "Educational Attainment: IV (Twins2)",
+    "ols_behind" = "Left Behind: OLS", "iv_behind" = "Left Behind: IV (Twins2)",
+    "ols_private" = "Private School: OLS", "iv_private" = "Private School: IV (Twins2)",
+    "ols_lfp" = "Mother's LFP: OLS", "iv_lfp" = "Mother's LFP: IV (Twins2)"
+  )
+  )
+
+p <- mod_all %>%   
+  ggplot(aes(term, estimate)) + 
+  geom_point(color = "blue") +
+  geom_line(aes(group = 1)) +
+  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
+  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
+  geom_hline(aes(yintercept = 0), color = "red", size = .65) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
+              fill = "grey", alpha = .3) +
+  facet_wrap( ~ type, scale = "free_y", nrow = 4, labeller = to_string) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 60, hjust = 1)
+    ) +
+  labs(
+    x = "Mother's Age", 
+    y = "", 
+    title = "Plot of Coefficient Estimates and 95% CI (2+ Sample)")
+
+ggsave(
+  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/age_mods.pdf",
+  plot = p,
+  device = cairo_pdf,
+  width = 210,
+  height = 297,
+  units = "mm"
+)
+
+
+# Regression by child's age #### 
 data_model_ols <- gt2_sample %>%
   filter(child_age_year > 7) %>% 
   group_by(child_age_year) %>% 
@@ -552,36 +653,21 @@ gt2_sample %>%
   geom_col() 
 
 
-# Error bar plot by mother's age
-
-age_range <- 21:38
-
-age_data <- vector("list", length = length(age_range))
-
-for (age in age_range) {
-  # create a list contaning all the data
-  index <- which(21:38 == age)
-  age_data[[index]] <- filter(gt2_sample, moth_age_year >= age)
-}
-
-# loop through the tibbles in the list applying "model_ols" to each
-models_ols <- map( age_data, model_ols )
-tidy_list <- map(models_ols, tidy, conf.int = TRUE) %>% 
-  map( ~filter( . , term ==  "no_kids") )
-
-# collapse the list to create a tibble
-mod_res_ols <- bind_rows(tidy_list) %>% 
-  mutate(term = str_c("\u2265", age_range))
 
 
-ggcoef(mod_res, errorbar_height = .2, color = "blue", 
-       errorbar_color = "red") +
-  geom_line(aes(y = estimate)) +
-  geom_ribbon(
-    aes(
-      ymin = estimate - conf.low, ymax = estimate + conf.high,
-    ), fill = "grey70") +
-  coord_flip() +
-  labs(x = "", y = "Mother's Age", title = "Coefficient Estimate and Std. Error")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
