@@ -122,7 +122,7 @@ star_notes_tex(
 
 # First Stages ####
 
-# 3+ sample
+## 2+ sample ####
 fa1 <- waldtest(ma_1, ~ twins_2)[["F"]]
 fa2 <- waldtest(ma_2, ~ same_sex_12)[["F"]]
 fa3 <- waldtest(ma_3, ~ boy_12 | girl_12)[["F"]]
@@ -140,14 +140,14 @@ frst_stg2 <- stargazer(
   ),
   # type = "text",
   keep.stat = c("rsq", "n"),
-  star.cutoffs = c(0.05, 0.01, 0.001),
+  # star.cutoffs = c(0.05, 0.01, 0.001),
   add.lines = F_line_a,
   title = "First Stage Regressions",
   dep.var.labels = "Number of Children",
   covariate.labels = c("Twins2", "SameSex12", "Boy12", "Girl12")
 )
 
-# 3+ sample
+## 3+ sample ####
 fb1 <- waldtest(mb_1, ~ twins_3)[["F"]]
 fb2 <- waldtest(mb_2, ~ same_sex_123)[["F"]]
 fb3 <- waldtest(mb_3, ~ boy_123 | girl_123)[["F"]]
@@ -165,7 +165,7 @@ frst_stg3 <- stargazer(
   ),
   # type = "text",
   keep.stat = c("rsq", "n"),
-  star.cutoffs = c(0.05, 0.01, 0.001),
+  # star.cutoffs = c(0.05, 0.01, 0.001),
   add.lines = F_line_b,
   covariate.labels = c("Twins3", "SameSex123", "Boy123", "Girl123")
 )
@@ -175,13 +175,13 @@ mother's characteristics, dummies for districts, and a dummy for whether the fat
 The regressisons for the 3+ sample in addition include dummies for birth order. F statistics are from the Wald 
 test for exclusion restrictions of the relevant instrument(s) from the regression. Robust standard errors 
 (for the 2+ sample) and cluster robust standard errors (for the 3+ sample; clustered by mother's ID) are in parenthesis. 
-*** Significant at 0.1\\%, ** Significant at 1\\%, * Significant at 5\\%."
+*** Significant at 1\\%, ** Significant at 5\\%, * Significant at 10\\%."
 
 
 frst_panel <- star_panel(
   frst_stg2, frst_stg3,
   same.summary.stats = FALSE, 
-  panel.label.fontface = "bold.italic",
+  panel.label.fontface = "bold",
   panel.names = c("2+ Sample", "3+ Sample")
 ) %>% 
   star_notes_tex(
@@ -303,7 +303,7 @@ f_line_ssI <- c(
 
 f_line_ssI <- paste( paste(f_line_ssI, collapse = " & "), "\\\\" )
 
-#####
+## Run the below #####
 
 # Upper Table
 star_trial <- stargazer(
@@ -386,6 +386,101 @@ star_sidewaystable(star_print) %>%
   star_tex_write(
     file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table12.tex"
   )
+
+
+# No First Stages Samples #####
+
+models_nofrst <- list(
+  twins_ls2 = list(rma_1_t1, rma_2_t1, rma_3_t1, rma_4_t1), 
+  twins_nosch = list(rma_1_t2, rma_2_t2, rma_3_t2, rma_4_t2),
+  boy_ls2 = list(rmb_1_t1, rmb_2_t1, rmb_3_t1, rmb_4_t1),
+  boy_nosch = list(rmb_1_t2, rmb_2_t2, rmb_3_t2, rmb_4_t2)
+)
+
+# Create empty lists
+make_list_nofrst <- function() {
+  x <- list(
+    twins_ls2 = double(4), twins_nosch = double(4), 
+    boy_ls2 = double(4), boy_nosch = double(4)
+  ) 
+  
+  return(x)
+}
+
+coef_list_nofrst <- make_list_nofrst()
+se_list_nofrst <- make_list_nofrst()
+p_list_nofrst <- make_list_nofrst()
+
+
+# Collect coefficients, standard errors, and p-values
+for (i in seq_along(models_nofrst)) {
+  for (j in seq_along(models_nofrst[[i]])) {
+    # The first and second models are for twins, the last two are for boy12
+    if (i == 1 | i == 2) { # Toggle this when removing columns
+      coef_list_nofrst[[i]][[j]] <- coef(summary(models_nofrst[[i]][[j]], robust = TRUE))["twins_2", 1]
+      se_list_nofrst[[i]][[j]] <- coef(summary(models_nofrst[[i]][[j]], robust = TRUE))["twins_2", 2]
+      p_list_nofrst[[i]][[j]] <- coef(summary(models_nofrst[[i]][[j]], robust = TRUE))["twins_2", 4]
+    } else if (i == 3 | i == 4) {
+      coef_list_nofrst[[i]][[j]] <- coef(summary(models_nofrst[[i]][[j]], robust = TRUE))["boy_12", 1]
+      se_list_nofrst[[i]][[j]] <- coef(summary(models_nofrst[[i]][[j]], robust = TRUE))["boy_12", 2]
+      p_list_nofrst[[i]][[j]] <- coef(summary(models_nofrst[[i]][[j]], robust = TRUE))["boy_12", 4]
+    }
+  }
+}
+
+# The bottom table
+nofrst_bottom <- stargazer(
+  ols, ols, ols, ols,
+  coef = coef_list_nofrst,
+  se = se_list_nofrst,
+  p = p_list_nofrst,
+  # type = "text",
+  keep.stat = c("n"),
+  # style = "aer",
+  dep.var.caption  = "",
+  covariate.labels = labels,
+  dep.var.labels.include = FALSE,
+  model.names = FALSE
+  # star.cutoffs = c(0.05, 0.01, 0.001),
+  # add.lines = last_lines,
+  # notes = NULL
+)
+
+
+# The top table
+
+mb_t1 <- star_change_felm_rhs_names(
+  mb_t1, old = "boy_12", new = "twins_2"
+  )
+
+mb_t2 <- star_change_felm_rhs_names(
+  mb_t2, old = "boy_12", new = "twins_2"
+)
+
+nofrst_top <- stargazer(
+  ma_t1, ma_t2, mb_t1, mb_t2,
+  # type = "text",
+  omit.stat = "all",
+  keep = c("twins_2", "boy_12"),
+  covariate.labels = "No. Children",
+  header = FALSE,
+  dep.var.caption  = "",
+  dep.var.labels.include = FALSE
+)
+
+
+nofrst_panel <- star_panel(
+  nofrst_top, nofrst_bottom,
+  same.summary.stats = TRUE, 
+  # panel.label.fontface = "bold",
+  panel.names = c("First Stage", "Reduced Form")
+) 
+
+star_tex_write(
+  nofrst_panel, 
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table13.tex"
+)
+
 
 
 
