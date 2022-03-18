@@ -219,11 +219,11 @@ gt3_sample <- gt3_sample %>%
 
 # Filter unknowns and NAs
 gt2_sample <- gt2_sample %>%
-  filter(moth_income != "Unspecified") %>% 
+  filter(moth_income != "Unspecified", moth_educ != "Other") %>% 
   filter(complete.cases(.)) 
 
 gt3_sample <- gt3_sample %>%
-  filter(moth_income != "Unspecified") %>% 
+  filter(moth_income != "Unspecified", moth_educ != "Other") %>% 
   filter(complete.cases(.))
 
 
