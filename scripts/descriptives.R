@@ -494,63 +494,81 @@ TukeyHSD(aov_educ_3)
 # => Occurence of twins is higher among older mothers and 
 # whites
 
-library("ggpubr")
-ggline(gt2_sample, x = "moth_pp_group", y = "twins_2", 
-       add = c("mean_se", "jitter"), 
-       # order = c("ctrl", "trt1", "trt2"),
-       ylab = "Twins2", xlab = "Mother's Population Group")
-
-
-all_births <- all_persons %>%
-  select(sn, dob)  %>% 
-  mutate(year = year(dob)) %>% 
-  count(year, name = "all")
-
-uni_mults <- all_persons %>%
-  select(sn, dob) %>% 
-  group_by(sn) %>% 
-  filter(duplicated(dob)) %>% 
-  ungroup() %>% 
-  distinct(mults, sn ,dob) %>% 
-  mutate(year = year(dob))
-
-uni_mults %>% 
-  count(year) %>% 
-  filter(year > 1970) %>% 
-  ggplot( aes(year, n) ) + 
-  geom_line()
-
-all_births %>% 
-  filter(year > 1950) %>% 
-  ggplot( aes(year, n) ) + 
-  geom_line()
+# Line Graph ####
 
 uni_mults <- read_csv("data/uni_mults.csv")
 
-uni_mults %>% 
-  # filter(pop_group != "Other") %>%
-  ggplot(aes(year, prop, color = pop_group)) +
-  geom_line(size = 0.85) +
+line_gr <- uni_mults %>% 
+  mutate(pop_group = factor( pop_group,
+    levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
+    )) %>%
+  ggplot(aes(year, prop,linetype = pop_group, color = pop_group)) +
+  geom_line(size = 0.8) +
+  # scale_colour_brewer(palette = "Set1") +
+  theme_bw() +
+  theme(legend.position = "top") +
   labs(
-    title = "Multiple Births Per 1000 Live Births",
+    # title = "Multiple Births Per 1000 Live Births",
     x = "Year", 
-    y = "",
-    color = "Population Group"
-    )
-
-uni_mults %>% 
-  filter(pop_group != "Other") %>% 
-  filter(year %>% between(1970, 2011)) %>%
-  ggplot(aes(year, prop)) +
-  geom_area(aes(fill = pop_group), position = position_stack(reverse = T)) +
-  labs(
-    title = "Multiple Births Per 1000 Live Births",
-    x = "Year", 
-    y = "",
-    fill = "Population Group"
+    y = "Multiple Births Per 1000 Live Births",
+    color = "",
+    linetype = ""
   )
 
-## Comparison of twins birth by pp. group and educ. level ####
+ggsave(
+  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/line_pp.pdf",
+  plot = line_gr,
+  device = cairo_pdf,
+  width = 160,
+  height = 130,
+  units = "mm"
+)
+
+
+
+# Histogram of Educ. Attainment Index ####
+
+hist2 <- gt2_sample %>% 
+  mutate(samp = "2+ Sample") %>% 
+  filter(educ_attain <= 1.75) %>%
+  ggplot(aes(x = educ_attain)) +
+  geom_histogram(color="darkblue", fill="lightblue") +
+  geom_vline(aes(xintercept = mean(educ_attain)),
+             color="red", linetype="dashed", size=1) +
+  facet_wrap(~ samp) +
+  theme_bw() +
+  labs(x = "", y = "")
+
+hist3 <- gt3_sample %>% 
+  mutate(samp = "3+ Sample") %>% 
+  filter(educ_attain <= 1.75) %>%
+  ggplot(aes(x = educ_attain)) +
+  geom_histogram(color="darkblue", fill="lightblue") +
+  geom_vline(aes(xintercept = mean(educ_attain)),
+             color="red", linetype="dashed", size=1) +
+  facet_wrap(~ samp) +
+  theme_bw() +
+  labs(x = "", y = "")
+
+figure <- ggarrange(hist2, hist3, ncol = 2) 
+  
+figure_annon <- annotate_figure( 
+  figure, 
+  # bottom = "Educational Attainment Index",
+  left = "Count"
+  )
+
+ggsave(
+  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/hists.pdf",
+  plot = figure_annon,
+  device = cairo_pdf,
+  width = 210,
+  height = 90,
+  units = "mm"
+)
+
+
+# Comparison of twins birth by pp. group and educ. level ####
 
 gt2_sample %>%
   filter(moth_pp_group != "Other") %>% 
