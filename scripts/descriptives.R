@@ -373,7 +373,10 @@ row.names(z) <- NULL  # reset the rownames
 # names <- c("Number of Kids", "Male", "Age in years", "Age in months")
 
 
-xtab <- xtable(z, caption = "Summary Statistics") 
+xtab <- xtable(
+  z, display = c("s", "s", "s", "g", "g", "s", "g", "g", "s", "g", "g"),
+  digits = 4, caption = "Summary Statistics", label = "tab:01"
+  ) 
 
 # align(xtab) <- "rllccp{0.5cm}cc" {rllrrlrrlrr}
 # digits(xtab) <- 3
@@ -422,12 +425,10 @@ addtorow$command <- c(
   comm
   )
 
-display(xtab) <- c("s", "s", "s", "g", "g", "s", "g", "g", "s", "g", "g")
-digits(xtab) <- 4
 
 print(
   xtab, add.to.row = addtorow,
-  include.rownames = FALSE, include.colnames = FALSE,
+  include.rownames = FALSE, include.colnames = FALSE, 
   booktabs = TRUE, caption.placement = "top", hline.after = c(-1, 0),
   file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table10.tex" )
 
