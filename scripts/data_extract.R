@@ -341,11 +341,13 @@ dobs_pp_group <- all_persons %>%
     pop_group =
       case_when(
         pop_group == 1 ~ "Black African",
-        pop_group == 2 ~ "Coloured",
-        pop_group == 3 ~ "Indian or Asian",
+        # pop_group == 2 ~ "Coloured",
+        # pop_group == 3 ~ "Indian or Asian",
         pop_group == 4 ~ "White",
-        pop_group == 5 ~ "Other",
-      ) %>% factor() %>% fct_lump(n = 3)
+        # pop_group == 5 ~ "Other",
+        pop_group %in% c(2, 3, 5) ~ "Coloured, Indian or Asian, and Other"
+      ) %>% factor() 
+    # %>% fct_lump(n = 3)
   )
 
 all_births <- dobs_pp_group %>% 
