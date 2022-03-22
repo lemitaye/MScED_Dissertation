@@ -122,7 +122,14 @@ mod_all <- mod_all %>%
       ) 
     )
 
-# Plotes
+# save estimates:
+write_csv(mod_all, file = "data/ests_moth_age.csv")
+
+
+# Plots
+
+mod_all <- read_csv("data/ests_moth_age.csv")
+
 
 to_string <- as_labeller(
   c(
@@ -148,10 +155,7 @@ p <- mod_all %>%
   theme(
     axis.text.x = element_text(angle = 60, hjust = 1)
     ) +
-  labs(
-    x = "Mother's Age", 
-    y = "", 
-    title = "Plot of Coefficient Estimates and 95% CI (2+ Sample)")
+  labs( x = "Mother's Age", y = "" )
 
 ggsave(
   filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/age_mods.pdf",
@@ -530,7 +534,7 @@ ggsave(
 
 hist2 <- gt2_sample %>% 
   mutate(samp = "2+ Sample") %>% 
-  filter(educ_attain <= 1.75) %>%
+  # filter(educ_attain <= 1.75) %>%
   ggplot(aes(x = educ_attain)) +
   geom_histogram(color="darkblue", fill="lightblue") +
   geom_vline(aes(xintercept = mean(educ_attain)),
@@ -541,7 +545,7 @@ hist2 <- gt2_sample %>%
 
 hist3 <- gt3_sample %>% 
   mutate(samp = "3+ Sample") %>% 
-  filter(educ_attain <= 1.75) %>%
+  # filter(educ_attain <= 1.75) %>%
   ggplot(aes(x = educ_attain)) +
   geom_histogram(color="darkblue", fill="lightblue") +
   geom_vline(aes(xintercept = mean(educ_attain)),
@@ -562,7 +566,7 @@ ggsave(
   filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/hists.pdf",
   plot = figure_annon,
   device = cairo_pdf,
-  width = 210,
+  width = 220,
   height = 90,
   units = "mm"
 )
@@ -674,7 +678,9 @@ gt2_sample %>%
   geom_col() 
 
 
-
+gt2_sample %>% 
+  ggplot(aes(x = educ_attain)) +
+  geom_boxplot()
 
 
 
