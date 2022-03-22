@@ -87,6 +87,22 @@ last_lines = list(
     " ", " ", "Girl123", "Girl123")
 )
 
+header_main <- c(
+  " & \\multicolumn{4}{c}{2+ Sample} & \\multicolumn{4}{c}{3+ Sample} \\\\",
+  "\\cline{2-5}  \\cline{6-9} \\\\",
+  "\\cline{3-5}  \\cline{7-9} \\\\[-1.8ex]" #,
+  # "\\hline \\\\[-1.8ex] "
+)
+
+long_note = "*** Significant at 1\\%, ** Significant at 5\\%, * Significant at 10\\%. 
+Robust standard errors are in parentheses. Covariates for all models include age 
+(in months) and sex of child, mother's education, dummies for mother's population 
+group and income range, dummies for districts, and a dummy for whether the father 
+resides in the household. The regressions for the 3+ sample are clustered by mother's ID.
+The regressions using the SameSex12 and SameSex123 instruments were excluded for reasons 
+of space. The results are qualitatively similar to the ones in columns 3 and 7, 
+respectively, and are available upon request."
+
 star.out <- stargazer(
   ols, iv, iv, iv, ols, iv, iv, iv, 
   coef = coef_list,
@@ -94,30 +110,30 @@ star.out <- stargazer(
   p = p_list,
   # type = "text",
   omit.stat = "all",
-  # style = "aer",
   dep.var.caption  = "",
   covariate.labels = labels,
   column.labels   = c("OLS", "IV", "OLS", "IV"),
   column.separate = c(1, 3, 1, 3),
   dep.var.labels.include = FALSE,
   model.names = FALSE,
-  star.cutoffs = c(0.05, 0.01, 0.001),
+  # star.cutoffs = c(0.05, 0.01, 0.001),
   add.lines = last_lines,
-  notes = NULL
+  title = "OLS and 2SLS Estimates of The Effect of The Number of Children",
+  label = "tab:03"
 )
 
-long_note = "*** Significant at 0.1\\%, ** Significant at 1\\%, * Significant at 5\\%. Robust standard errors are in parentheses.  
-Covariates for all models include age (in months) and sex of child, mother's education, 
-dummies for mother's population group and income range, dummies for districts, and a dummy for whether the father resides in the household. 
-The regressions for the 3+ sample are clustered by mother's ID."
+star.out <- star.out %>% 
+  star_insert_row(
+    header_main,
+    insert.after = c(9, 9, 10)
+  ) %>% star_notes_tex(
+    note.type = "threeparttable", #Use the latex 'caption' package for notes
+    note = long_note) %>% 
+  star_sidewaystable()
 
-star.out %>% 
-star_notes_tex(
-  note.type = "threeparttable", #Use the latex 'caption' package for notes
-  note = long_note) %>% 
-  star_sidewaystable() %>% 
-  star_tex_write(
-    file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
+star_tex_write(
+  star.out, 
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
   )
 
 # First Stages ####
@@ -143,6 +159,7 @@ frst_stg2 <- stargazer(
   # star.cutoffs = c(0.05, 0.01, 0.001),
   add.lines = F_line_a,
   title = "First Stage Regressions",
+  label = "tab:02",
   dep.var.labels = "Number of Children",
   covariate.labels = c("Twins2", "SameSex12", "Boy12", "Girl12")
 )
@@ -251,7 +268,7 @@ labels_ss_I <- c(
 )
 
 nobs_wrap <- function(mod) {
-  paste0("\\multicolumn{2}{c}{", nobs(mod), "}" )
+  paste0("\\multicolumn{2}{c}{", comma( nobs(mod) ), "}" )
 }
 
 last_lines_ss = c(
@@ -270,16 +287,16 @@ header <- c(
   # "\\hline \\\\[-1.8ex] "
 )
 
-long_note_ssI = "*** Significant at 0.1\\%, ** Significant at 1\\%, * Significant at 5\\%. \\\\[-1.8ex] 
+long_note_ssI = "*** Significant at 1\\%, ** Significant at 5\\%, * Significant at 10\\%. \\\\[-1.8ex] 
 
 $ \\dag $ Columns 1-4 have the coefficients for the Twins2
 instrument (in the 2+ sample) and in columns 5-8 are the coefficients for the
 Twins3 instrument (3+ sample). The regressions were run using the same set 
-of controls as in Table ?. Robust standard errors are in parentheses and the numbers 
+of controls as in \\autoref{tab:03}. Robust standard errors are in parentheses and the numbers 
 in square brackets below the s.e. are F stats for the exclusion of the Twins2 or
 the Twins 3 variable from the model. \\\\[-1.8ex]
  
-$ \\ddag $ The regressions control for the same set of covariates as in Table ? (see notes there). 
+$ \\ddag $ The regressions control for the same set of covariates as in \\autoref{tab:03} (see notes there). 
 The regressions for the 3+ sample are clustered by mother's ID. 
 "
 
@@ -318,8 +335,9 @@ star_trial <- stargazer(
   header = FALSE,
   model.names = FALSE,
   column.sep.width = "8pt",
-  star.cutoffs = c(0.05, 0.01, 0.001),
-  title = "Heterogeneity by Mother's Population Group (Whites vs. Non-Whites)"
+  # star.cutoffs = c(0.05, 0.01, 0.001),
+  title = "Heterogeneity by Mother's Population Group (Whites vs. Non-Whites)",
+  label = "tab:04"
 ) 
 
 star_trial[5] <- "\\begin{tabular}{@{\\extracolsep{8pt}}lcc@{\\hskip 0.3in}cc@{\\hskip 0.3in}cc@{\\hskip 0.3in}cc} "
@@ -428,14 +446,44 @@ for (i in seq_along(models_nofrst)) {
   }
 }
 
+# Important Pieces
+
+header_nofrst <- c(
+  " & \\multicolumn{2}{c}{Twins2$^{\\dag}$} & \\multicolumn{2}{c}{Boy12$^{\\ddag}$} \\\\",
+  " \\cline{2-3} \\cline{4-5} \\\\",
+  " & Spacing & No & Spacing & No \\\\",
+  " & $<$ 2 & Schooling & $<$ 2 & Schooling \\\\"
+)
+
+obs_nofrst = c(
+  " $ N $ ", comma(nrow(subsamp_twins1)), comma(nrow(subsamp_twins2)), 
+  comma(nrow(subsamp_boy1)), comma(nrow(subsamp_boy2))
+)
+
+obs_nofrst <- paste( paste(obs_nofrst, collapse = " & "), "\\\\" )
+
+notes_nofrst <- "*** Significant at 1\\%, ** Significant at 5\\%, * Significant at 10\\%. 
+The same set of covariates as in \\autoref{tab:03} were included in all regressions. Robust standard
+errors in parentheses.
+\\\\[-1.8ex]
+
+$ \\dag $ The subsamples are restricted to firstborns from families with at least three children.
+
+$ \\ddag $ Subsamples includes only firstborn boys.
+
+$ \\S $ In addition to the covariates used in \\autoref{tab:03}, the reduced form regressions control for 
+the number of children in the family."
+
+
 # The bottom table
+
 nofrst_bottom <- stargazer(
   ols, ols, ols, ols,
   coef = coef_list_nofrst,
   se = se_list_nofrst,
   p = p_list_nofrst,
   # type = "text",
-  keep.stat = c("n"),
+  omit.stat = "all",
   # style = "aer",
   dep.var.caption  = "",
   covariate.labels = labels,
@@ -462,18 +510,29 @@ nofrst_top <- stargazer(
   # type = "text",
   omit.stat = "all",
   keep = c("twins_2", "boy_12"),
-  covariate.labels = "No. Children",
+  covariate.labels = "No. of children",
   header = FALSE,
   dep.var.caption  = "",
-  dep.var.labels.include = FALSE
+  dep.var.labels.include = FALSE,
+  title = "Reduced Form Effects in No-First-Stage Samples",
+  label = "tab:05"
 )
-
 
 nofrst_panel <- star_panel(
   nofrst_top, nofrst_bottom,
   same.summary.stats = TRUE, 
-  # panel.label.fontface = "bold",
-  panel.names = c("First Stage", "Reduced Form")
+  panel.label.fontface = "bold",
+  panel.names = c("First Stage", "Reduced Form$^{\\S}$")
+) 
+  
+nofrst_panel <- star_insert_row(
+  nofrst_panel,
+  c( header_nofrst,
+  obs_nofrst ),
+  insert.after = c(7, 7, 7, 7, 28)
+) %>% star_notes_tex(
+  note.type = "threeparttable",
+  note = notes_nofrst
 ) 
 
 star_tex_write(
