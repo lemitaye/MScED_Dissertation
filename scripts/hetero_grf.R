@@ -81,11 +81,12 @@ X.pred <- as_tibble(X.pred) %>%
 
 # Predict on the tesing sample
 tau.hat <- predict(tau.forest, X.pred, estimate.variance = TRUE)
-sigma.hat <- sqrt(tau.hat$variance.estimates)
+# sigma.hat <- sqrt(tau.hat$variance.estimates)
 
 final <- X.pred %>% 
   as_tibble() %>% 
-  select(contains("moth_pp_group"), moth_age_fstbr) %>% 
+  mutate(moth_pp_group = comb$moth_pp_group) %>% 
+  select(moth_age_fstbr, contains("moth_pp_group")) %>% 
   bind_cols(tau.hat) %>% 
   mutate(
     sigma.hat = sqrt(variance.estimates),
@@ -94,15 +95,16 @@ final <- X.pred %>%
   )
 
 final %>% 
-  filter(predictions < 200) %>% 
-  filter(between(moth_age_fstbr, 16, 37)) %>% 
   ggplot(aes(moth_age_fstbr, predictions)) +
-  geom_line(aes(group = 1)) #+
-# geom_line(aes(y = upper, group = 1), linetype = "dashed") +
-# geom_line(aes(y = lower, group = 1), linetype = "dashed")
+  geom_line(aes(group = 1)) +
+  geom_line(aes(y = upper, group = 1), linetype = "dashed") +
+  geom_line(aes(y = lower, group = 1), linetype = "dashed") +
+  geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
+  facet_wrap(~ moth_pp_group)
+
 
 final %>% 
-  filter(predictions < 100) %>% 
+  # filter(predictions < 100) %>% 
   ggplot(aes(predictions)) +
   geom_histogram()
 
