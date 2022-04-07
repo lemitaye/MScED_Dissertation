@@ -23,6 +23,16 @@ X <- gt2_sample %>%
     mode_educ_agg, twins_2, district, boy_12, girl_12, same_sex_12,
     private_school, birth_month, educ_attain, behind, child_pop_group
   )) %>% 
+  mutate(
+    moth_pp_group =
+      case_when(
+        moth_pp_group == "Black African" ~ "Black African",
+        moth_pp_group == "White" ~ "White",
+        moth_pp_group %in% c("Coloured", "Indian or Asian", "Other") 
+        ~ "Coloured, Indian or Asian, and Other"
+      ) %>% factor(),
+    moth_income = fct_lump(factor(moth_income), 8),
+  ) %>% 
   dummy_cols(
     c("child_sex", "child_private", "province", "moth_pp_group", 
       "moth_educ", "moth_marital", "moth_employ", "moth_income")
@@ -32,35 +42,42 @@ X <- gt2_sample %>%
        moth_marital, moth_employ, moth_income)
   )
 
-W <- gt2_sample$no_kids[train]
-Z <- gt2_sample$twins_2[train]
+X %>% glimpse()
 
-Y1 <- gt2_sample$educ_attain[train]
-Y2 <- gt2_sample$behind[train]
+W <- gt2_sample$no_kids
+Z <- gt2_sample$twins_2
 
-tau.forest <- instrumental_forest(X.train, Y1, W, Z, num.trees = 500)
+Y1 <- gt2_sample$educ_attain
+Y2 <- gt2_sample$behind
 
-# Mother's population group and Mother's age at first birth
+tau.forest <- instrumental_forest(X, Y1, W, Z, num.trees = 200, mtry = 7)
 
-median <- map_dbl(as_tibble(X.test), median)
+# Vary Mother's population group and Mother's age at first birth
 
-X.pred <- matrix(nrow = nrow(X.test), ncol = ncol(X.test))
+comb <- expand.grid(
+  moth_age_fstbr = 16:34, 
+  moth_pp_group = c(
+    "Black African", "White", "Coloured, Indian or Asian, and Other"
+    )) %>% 
+  dummy_cols("moth_pp_group")
+
+median <- map_dbl(X, median)
+
+X.pred <- matrix(nrow = nrow(comb), ncol = ncol(X)) 
 colnames(X.pred) <- names(median)
 
-for (i in 1:nrow(X.test)) {
+for (i in 1:nrow(comb)) {
   X.pred[i, ] <- median
 }
 
-X.pred <- X.pred %>% 
-  as_tibble() %>% 
+X.pred <- as_tibble(X.pred) %>% 
   mutate(
-    moth_age_fstbr = X.test[,"moth_age_fstbr"],
-    moth_pp_groupColoured = X.test[,"moth_pp_groupColoured"],
-    "moth_pp_groupIndian or Asian" = X.test[,"moth_pp_groupIndian or Asian"],
-    moth_pp_groupOther = X.test[,"moth_pp_groupOther"],
-    moth_pp_groupWhite = X.test[,"moth_pp_groupWhite"]
-  ) %>% 
-  as.matrix() 
+    moth_age_fstbr = comb$moth_age_fstbr,
+    `moth_pp_group_Black African` = comb$`moth_pp_group_Black African`,
+    moth_pp_group_White = comb$moth_pp_group_White,
+    `moth_pp_group_Coloured, Indian or Asian, and Other` = 
+      comb$`moth_pp_group_Coloured, Indian or Asian, and Other`
+  )
 
 # Predict on the tesing sample
 tau.hat <- predict(tau.forest, X.pred, estimate.variance = TRUE)
