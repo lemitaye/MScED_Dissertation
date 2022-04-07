@@ -32,14 +32,6 @@ X <- gt2_sample %>%
        moth_marital, moth_employ, moth_income)
   )
 
-X <- model.matrix(~ ., data = X)
-head(X)
-
-set.seed (1212)
-train <- sample(nrow(X), round(0.6*nrow(X))) # use 60% for training
-X.train <- X[train, ]
-X.test <- X[-train, ]
-
 W <- gt2_sample$no_kids[train]
 Z <- gt2_sample$twins_2[train]
 
