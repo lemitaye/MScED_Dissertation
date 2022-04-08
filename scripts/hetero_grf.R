@@ -148,7 +148,7 @@ final.1 <- X.pred.1 %>%
   )
 
 plot_out <- function(pred_outcome, upper, lower) {
-  final %>% 
+  final.1 %>% 
     ggplot(aes(moth_age_fstbr, {{pred_outcome}})) +
     geom_line(aes(group = 1)) +
     geom_line(aes(y = {{upper}}, group = 1), linetype = "dashed") +
@@ -201,23 +201,16 @@ final.2 <- X.pred.2 %>%
 
 # plot
 final.2 %>% 
-  ggplot(aes(moth_educ, pred_educ, color = moth_pp_group)) +
-  geom_point(size = 1.75, position = position_dodge(width = 0.9)) +
-  geom_errorbar(aes(ymin = lower_educ, ymax = upper_educ), 
-                width = .2, position = position_dodge(width = 0.9)) +
+  ggplot(aes(moth_educ, pred, color = moth_pp_group)) +
+  geom_point(size = 1.75, position = position_dodge(width = 0.75)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), 
+                width = .2, position = position_dodge(width = 0.75)) +
   geom_hline(aes(yintercept = 0), color = "red", 
              linetype = "dashed") +
-  coord_flip()
-# facet_wrap(~moth_pp_group)
-
-
-
-
-
-
-
-
-
+  scale_x_discrete(expand=c(.1, 0)) +
+  coord_flip() +
+  theme(legend.position = "top") +
+  facet_wrap(~outcome) 
 
 
 

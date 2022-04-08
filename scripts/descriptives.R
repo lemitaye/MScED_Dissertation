@@ -406,7 +406,7 @@ comm <- paste0(" \n \\\\[-1.8ex] \\multicolumn{10}{l}",
 
 
 addtorow <- list()
-addtorow$pos <- list(0, 0, 0, 0, 0, 0, 0, 20, 25, 31, 37, 37, 37, 37)
+addtorow$pos <- list(0, 0, 0, 0, 0, 0, 0, 0, 20, 25, 31, 37, 37, 37, 37)
 addtorow$command <- c(
   " \\\\[-1.8ex]",
   " & & \\multicolumn{2}{c}{2+ Sample} & & \\multicolumn{5}{c}{3+ Sample}  \\\\[0.2ex]",
@@ -416,6 +416,9 @@ addtorow$command <- c(
   "\\cline{3-4}  \\cline{6-7} \\cline{9-10}  \\\\[-1.2ex]" ,
   " & & \\multicolumn{1}{c}{Mean} & \\multicolumn{1}{c}{sd} & & \\multicolumn{1}{c}{Mean} & \\multicolumn{1}{c}{sd} & & 
   \\multicolumn{1}{c}{Mean} & \\multicolumn{1}{c}{sd} \\\\",
+  " \\\\[-1.8ex] &  & \\multicolumn{1}{c}{(1)} & \\multicolumn{1}{c}{(2)} &  & 
+  \\multicolumn{1}{c}{(3)} & \\multicolumn{1}{c}{(4)} &  & 
+  \\multicolumn{1}{c}{(5)} & \\multicolumn{1}{c}{(6)}  \\\\ ",
   "\\multicolumn{2}{l}{Mother's Population Group} &  &  &  & & & & \\\\",
   "\\multicolumn{2}{l}{Mother's Level of Education} &  &  &  & & & & \\\\",
   "\\multicolumn{2}{l}{Mother's Marital Status} &  &  &  & & & & \\\\",
@@ -430,74 +433,9 @@ print(
   xtab, add.to.row = addtorow,
   include.rownames = FALSE, include.colnames = FALSE, 
   booktabs = TRUE, caption.placement = "top", hline.after = c(-1, 0),
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table10.tex" )
-
-
-
-# Statistically significant d/ce in mean in the 2+ sample
-t.test(moth_age_fstbr ~ twins_2, data = gt2_sample) %>% tidy()
-
-gt3_sample %>% 
-  group_by(twins_3) %>% 
-  summarise(
-    n = n(),
-    mean_age_frstbr = mean(moth_age_fstbr_gen),
-    sd_age_frstbr = sd(moth_age_fstbr_gen)        
+  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table10.tex" 
   )
 
-# Not that much robust in the 3+ sample
-t.test(moth_age_fstbr_gen ~ twins_3, data = gt3_sample) %>% tidy()
-
-# Test if twinning is correlated with other demographics
-# E.g., population group, socio-economic status
-
-gt2_sample %>% 
-  group_by(moth_income) %>% 
-  summarise(
-    twins = mean(twins_2), sd = sd(twins_2), n = n()
-  )
-
-gt3_sample %>% 
-  group_by(moth_pp_group) %>% 
-  summarise(
-    twins = mean(twins_3), sd = sd(twins_3), n = n()
-  )
-
-# 2+ sample
-# Some d/ce in population groups
-aov_pp_2 <- aov(twins_2 ~ moth_pp_group, data = gt2_sample)
-summary(aov_pp_2)
-TukeyHSD(aov_pp_2)
-
-# No d/ce in income group
-aov_inc_2 <- aov(twins_2 ~ moth_income, data = gt2_sample)
-summary(aov_inc_2)
-TukeyHSD(aov_inc_2)
-
-# Some d/ce in mother's education
-aov_educ_2 <- aov(twins_2 ~ moth_educ, 
-                  data = gt2_sample %>% filter(moth_pp_group != "White"))
-summary(aov_educ_2)
-TukeyHSD(aov_educ_2)
-
-# 3+ sample
-# No d/ce in population groups
-aov_pp_3 <- aov(twins_3 ~ moth_pp_group, data = gt3_sample)
-summary(aov_pp_3)
-TukeyHSD(aov_pp_3)
-
-# No d/ce in income group
-aov_inc_3 <- aov(twins_3 ~ moth_income, data = gt3_sample)
-summary(aov_inc_3)
-TukeyHSD(aov_inc_3)
-
-# Some d/ce in mother's education
-aov_educ_3 <- aov(twins_3 ~ moth_educ, data = gt3_sample)
-summary(aov_educ_3)
-TukeyHSD(aov_educ_3)
-
-# => Occurence of twins is higher among older mothers and 
-# whites
 
 # Line Graph ####
 
@@ -684,7 +622,70 @@ gt2_sample %>%
   geom_boxplot()
 
 
+# Statistically significant d/ce in mean in the 2+ sample
+t.test(moth_age_fstbr ~ twins_2, data = gt2_sample) %>% tidy()
 
+gt3_sample %>% 
+  group_by(twins_3) %>% 
+  summarise(
+    n = n(),
+    mean_age_frstbr = mean(moth_age_fstbr_gen),
+    sd_age_frstbr = sd(moth_age_fstbr_gen)        
+  )
+
+# Not that much robust in the 3+ sample
+t.test(moth_age_fstbr_gen ~ twins_3, data = gt3_sample) %>% tidy()
+
+# Test if twinning is correlated with other demographics
+# E.g., population group, socio-economic status
+
+gt2_sample %>% 
+  group_by(moth_income) %>% 
+  summarise(
+    twins = mean(twins_2), sd = sd(twins_2), n = n()
+  )
+
+gt3_sample %>% 
+  group_by(moth_pp_group) %>% 
+  summarise(
+    twins = mean(twins_3), sd = sd(twins_3), n = n()
+  )
+
+# 2+ sample
+# Some d/ce in population groups
+aov_pp_2 <- aov(twins_2 ~ moth_pp_group, data = gt2_sample)
+summary(aov_pp_2)
+TukeyHSD(aov_pp_2)
+
+# No d/ce in income group
+aov_inc_2 <- aov(twins_2 ~ moth_income, data = gt2_sample)
+summary(aov_inc_2)
+TukeyHSD(aov_inc_2)
+
+# Some d/ce in mother's education
+aov_educ_2 <- aov(twins_2 ~ moth_educ, 
+                  data = gt2_sample %>% filter(moth_pp_group != "White"))
+summary(aov_educ_2)
+TukeyHSD(aov_educ_2)
+
+# 3+ sample
+# No d/ce in population groups
+aov_pp_3 <- aov(twins_3 ~ moth_pp_group, data = gt3_sample)
+summary(aov_pp_3)
+TukeyHSD(aov_pp_3)
+
+# No d/ce in income group
+aov_inc_3 <- aov(twins_3 ~ moth_income, data = gt3_sample)
+summary(aov_inc_3)
+TukeyHSD(aov_inc_3)
+
+# Some d/ce in mother's education
+aov_educ_3 <- aov(twins_3 ~ moth_educ, data = gt3_sample)
+summary(aov_educ_3)
+TukeyHSD(aov_educ_3)
+
+# => Occurence of twins is higher among older mothers and 
+# whites
 
 
 
