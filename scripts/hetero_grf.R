@@ -135,20 +135,6 @@ final %>%
 
 
 
-# An alternative approach using integers for factors
-
-X <- gt2_sample %>% 
-  select(-c(
-    child_no, moth_no, child_dob, boy, birth_order, boy_1, boy_2, 
-    twins_1, child_age_year, child_sch_attend, municip, moth_age_month, 
-    moth_dob, moth_ceb, moth_age_scndbr, child_educ_gen, mean_educ_agg, 
-    mode_educ_agg, twins_2, district, boy_12, girl_12, same_sex_12,
-    private_school, birth_month, educ_attain, behind, child_pop_group
-  )) 
-  
-X <- X %>% 
-  mutate_if(is.character, as.factor) %>% 
-  mutate_if(is.factor, as.numeric) 
 
 
 
