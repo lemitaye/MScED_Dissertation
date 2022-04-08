@@ -59,23 +59,41 @@ tau.private_school <- instrumental_forest(X, Y3, W, Z, num.trees = 100, mtry = 7
 
 # Vary Mother's population group and Mother's age at first birth
 
-comb <- expand.grid(
+comb.1 <- expand.grid(
   moth_age_fstbr = 16:34, 
   moth_pp_group = c(
     "Black African", "White", "Coloured, Indian or Asian, and Other"
     )) %>% 
   dummy_cols("moth_pp_group")
 
+
+moth_educ <- gt2_sample %>% count(moth_educ) %>% pull(moth_educ)
+
+comb.2 <- expand.grid(
+  moth_educ = moth_educ, 
+  moth_pp_group = c(
+    "Black African", "White", "Coloured, Indian or Asian, and Other"
+  )) %>% 
+  dummy_cols(c("moth_educ", "moth_pp_group"))
+
+
 median <- map_dbl(X, median)
 
-X.pred <- matrix(nrow = nrow(comb), ncol = ncol(X)) 
-colnames(X.pred) <- names(median)
+X.pred.1 <- matrix(nrow = nrow(comb.1), ncol = ncol(X)) 
+colnames(X.pred.1) <- names(median)
 
-for (i in 1:nrow(comb)) {
-  X.pred[i, ] <- median
+X.pred.2 <- matrix(nrow = nrow(comb.2), ncol = ncol(X)) 
+colnames(X.pred.2) <- names(median)
+
+for (i in 1:nrow(comb.1)) {
+  X.pred.1[i, ] <- median
 }
 
-X.pred <- as_tibble(X.pred) %>% 
+for (i in 1:nrow(comb.2)) {
+  X.pred.2[i, ] <- median
+}
+
+X.pred.1 <- as_tibble(X.pred.1) %>% 
   mutate(
     moth_age_fstbr = comb$moth_age_fstbr,
     `moth_pp_group_Black African` = comb$`moth_pp_group_Black African`,
@@ -84,25 +102,39 @@ X.pred <- as_tibble(X.pred) %>%
       comb$`moth_pp_group_Coloured, Indian or Asian, and Other`
   )
 
-# Predict on the tesing sample
-pred.educ_attain <- predict(tau.educ_attain, X.pred, estimate.variance = TRUE)
-pred.behind <- predict(tau.behind, X.pred, estimate.variance = TRUE)
-pred.private_school <- predict(tau.private_school, X.pred, estimate.variance = TRUE)
+X.pred.2 <- as_tibble(X.pred.2) %>% 
+  mutate(
+    `moth_pp_group_Black African` = comb.2$`moth_pp_group_Black African`,
+    moth_pp_group_White = comb.2$moth_pp_group_White,
+    `moth_pp_group_Coloured, Indian or Asian, and Other` = 
+      comb.2$`moth_pp_group_Coloured, Indian or Asian, and Other`,
+    `moth_educ_No schooling` = comb.2$`moth_educ_No schooling`,
+    `moth_educ_Some primary` = comb.2$`moth_educ_Some primary`,
+    `moth_educ_Completed primary` = comb.2$`moth_educ_Completed primary`,
+    `moth_educ_Some secondary` = comb.2$`moth_educ_Some secondary`,
+    `moth_educ_Grade 12/Std 10` = comb.2$`moth_educ_Grade 12/Std 10`,
+    moth_educ_Higher = comb.2$moth_educ_Higher,
+  )
 
-pred.educ_attain <- pred.educ_attain %>% 
+# Predict on the tesing sample along the first dimensions of hetero.
+pred.educ_attain.1 <- predict(tau.educ_attain, X.pred.1, estimate.variance = TRUE)
+pred.behind.1 <- predict(tau.behind, X.pred.1, estimate.variance = TRUE)
+pred.private_school.1 <- predict(tau.private_school, X.pred.1, estimate.variance = TRUE)
+
+pred.educ_attain.1 <- pred.educ_attain.1 %>% 
   rename(pred_educ = "predictions", var_educ = "variance.estimates")
 
-pred.behind <- pred.behind %>% 
+pred.behind.1 <- pred.behind.1 %>% 
   rename(pred_behind = "predictions", var_behind = "variance.estimates")
 
-pred.private_school <- pred.private_school %>% 
+pred.private_school.1 <- pred.private_school.1 %>% 
   rename(pred_private = "predictions", var_private = "variance.estimates")
 
-final <- X.pred %>% 
+final.1 <- X.pred.1 %>% 
   as_tibble() %>% 
   mutate(moth_pp_group = comb$moth_pp_group) %>% 
   select(moth_age_fstbr, contains("moth_pp_group")) %>% 
-  bind_cols(pred.educ_attain, pred.behind, pred.private_school) %>% 
+  bind_cols(pred.educ_attain.1, pred.behind.1, pred.private_school.1) %>% 
   mutate(
     sigma.hat_educ = sqrt(var_educ),
     sigma.hat_behind = sqrt(var_behind),
@@ -129,13 +161,64 @@ plot_out(pred_educ, upper_educ, lower_educ)
 plot_out(pred_behind, upper_behind, lower_behind)
 plot_out(pred_private, upper_private, lower_private)
 
-final %>% 
-  ggplot(aes(moth_age_fstbr, pred_educ)) +
-  geom_line(aes(group = 1)) +
-  geom_line(aes(y = upper_educ, group = 1), linetype = "dashed") +
-  geom_line(aes(y = lower_educ, group = 1), linetype = "dashed") +
-  geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
-  facet_wrap(~ moth_pp_group)
+# Predict on the tesing sample along the second dimensions of hetero.
+
+pred.educ_attain.2 <- predict(tau.educ_attain, X.pred.2, estimate.variance = TRUE)
+pred.behind.2 <- predict(tau.behind, X.pred.2, estimate.variance = TRUE)
+pred.private_school.2 <- predict(tau.private_school, X.pred.2, estimate.variance = TRUE)
+
+pred.educ_attain.2 <- pred.educ_attain.2 %>% 
+  rename(pred_educ = "predictions", var_educ = "variance.estimates")
+
+pred.behind.2 <- pred.behind.2 %>% 
+  rename(pred_behind = "predictions", var_behind = "variance.estimates")
+
+pred.private_school.2 <- pred.private_school.2 %>% 
+  rename(pred_private = "predictions", var_private = "variance.estimates")
+
+
+final.2 <- X.pred.2 %>% 
+  as_tibble() %>% 
+  mutate(moth_pp_group = comb.2$moth_pp_group, moth_educ = comb.2$moth_educ) %>% 
+  select(contains("moth_educ"), contains("moth_pp_group")) %>% 
+  select(
+    -c(`moth_educ_Completed primary`:`moth_educ_Some secondary`),
+    -c(`moth_pp_group_Black African`:moth_pp_group_White),
+    -contains(c("var_", "sigma.hat"))
+    ) %>% 
+  bind_cols(pred.educ_attain.2, pred.behind.2, pred.private_school.2) %>% 
+  pivot_longer(
+    pred_educ:var_private, 
+    names_to = c("type" ,"outcome"),
+    names_sep = "_",
+    values_to = "value"
+    ) %>% 
+  pivot_wider(names_from = type, values_from = value) %>% 
+  mutate(
+    upper = pred + 1.96 * sqrt(var),
+    lower = pred - 1.96 * sqrt(var),
+  )
+
+# plot
+final.2 %>% 
+  ggplot(aes(moth_educ, pred_educ, color = moth_pp_group)) +
+  geom_point(size = 1.75, position = position_dodge(width = 0.9)) +
+  geom_errorbar(aes(ymin = lower_educ, ymax = upper_educ), 
+                width = .2, position = position_dodge(width = 0.9)) +
+  geom_hline(aes(yintercept = 0), color = "red", 
+             linetype = "dashed") +
+  coord_flip()
+# facet_wrap(~moth_pp_group)
+
+
+
+
+
+
+
+
+
+
 
 
 
