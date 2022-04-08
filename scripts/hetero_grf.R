@@ -124,8 +124,50 @@ final %>%
   geom_line(aes(y = mean_lower, group = 1), linetype = "dashed")
 
 # we are making some progress
-# issues to fix: X.train needs to include dummies for all cats., facet plot
-# by mother's population group. Out-of-bag predictions?
-# reduce "mtry" to 7 or lower, min. leaf size = ?
-# variable importance plot 
-# Think of how to extend this to 2SLS.
+# issues to fix: 
+# * X.train needs to include dummies for all cats., (x)
+# * facet plot by mother's population group. (x)
+# * Out-of-bag predictions?
+# * reduce "mtry" to 7 or lower (x)
+# * Tuning; e.g., min. leaf size ?
+# * variable importance plot 
+# Think of how to extend this to 2SLS using same sex instruments
+
+
+
+# An alternative approach using integers for factors
+
+X <- gt2_sample %>% 
+  select(-c(
+    child_no, moth_no, child_dob, boy, birth_order, boy_1, boy_2, 
+    twins_1, child_age_year, child_sch_attend, municip, moth_age_month, 
+    moth_dob, moth_ceb, moth_age_scndbr, child_educ_gen, mean_educ_agg, 
+    mode_educ_agg, twins_2, district, boy_12, girl_12, same_sex_12,
+    private_school, birth_month, educ_attain, behind, child_pop_group
+  )) 
+  
+X <- X %>% 
+  mutate_if(is.character, as.factor) %>% 
+  mutate_if(is.factor, as.numeric) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
