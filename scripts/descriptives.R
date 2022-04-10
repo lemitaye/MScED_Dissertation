@@ -60,15 +60,16 @@ fOLS_A3 <- make_formula_gt2("moth_inlf")
 fIV_A9 <- make_formula_gt2("moth_inlf", "twins_2")
 
 # specify the age range here:
-age_range <- 21:40
-# create an empty list to store data sets
-age_data <- vector("list", length = length(age_range))
+# age_range <- 21:40
+# # create an empty list to store data sets
+# age_data <- vector("list", length = length(age_range))
 
-for (age in age_range) {
-  # create a list containing all the data
-  index <- which(age_range == age)
-  age_data[[index]] <- filter(gt2_sample, moth_age_year >= age)
-}
+# for (age in age_range) {
+#   # create a list containing all the data
+#   index <- which(age_range == age)
+#   age_data[[index]] <- filter(gt2_sample, moth_age_year >= age)
+# }
+
 
 # loop through the tibbles running the appropriate model 
 ols_educ <- map( age_data, ~felm(fOLS_A1, data = .) )
