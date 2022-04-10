@@ -46,19 +46,28 @@ X <- gt2_sample %>%
 X %>% glimpse()
 
 W <- gt2_sample$no_kids
-Z <- gt2_sample$twins_2
+Z1 <- gt2_sample$twins_2
+Z2 <- gt2_sample$same_sex_12
 
+# Outcomes
 Y1 <- gt2_sample$educ_attain
 Y2 <- gt2_sample$behind
 Y3 <- gt2_sample$private_school
 
-tau.educ_attain <- instrumental_forest(X, Y1, W, Z, num.trees = 100, mtry = 7)
-tau.behind <- instrumental_forest(X, Y2, W, Z, num.trees = 100, mtry = 7)
-tau.private_school <- instrumental_forest(X, Y3, W, Z, num.trees = 100, mtry = 7)
+# Train instrumental forest using twins instrument (Z1)
+tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 100, mtry = 7)
+tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 100, mtry = 7)
+tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 100, mtry = 7)
 
+# Train instrumental forest using same sex instrument (Z2)
+tau.educ.samesx <- instrumental_forest(X, Y1, W, Z2, num.trees = 100, mtry = 7)
+tau.behind.samesx <- instrumental_forest(X, Y2, W, Z2, num.trees = 100, mtry = 7)
+tau.private.samesx <- instrumental_forest(X, Y3, W, Z2, num.trees = 100, mtry = 7)
+
+
+# Prepare prediction data:
 
 # Vary Mother's population group and Mother's age at first birth
-
 comb.1 <- expand.grid(
   moth_age_fstbr = 16:34, 
   moth_pp_group = c(
@@ -66,7 +75,7 @@ comb.1 <- expand.grid(
     )) %>% 
   dummy_cols("moth_pp_group")
 
-
+# Vary Mother's population group and mother's level of education
 moth_educ <- gt2_sample %>% count(moth_educ) %>% pull(moth_educ)
 
 comb.2 <- expand.grid(
@@ -76,7 +85,7 @@ comb.2 <- expand.grid(
   )) %>% 
   dummy_cols(c("moth_educ", "moth_pp_group"))
 
-
+# compute the median value for all predictors:
 median <- map_dbl(X, median)
 
 X.pred.1 <- matrix(nrow = nrow(comb.1), ncol = ncol(X)) 
@@ -85,6 +94,7 @@ colnames(X.pred.1) <- names(median)
 X.pred.2 <- matrix(nrow = nrow(comb.2), ncol = ncol(X)) 
 colnames(X.pred.2) <- names(median)
 
+# Fill all rows with median values
 for (i in 1:nrow(comb.1)) {
   X.pred.1[i, ] <- median
 }
@@ -93,6 +103,7 @@ for (i in 1:nrow(comb.2)) {
   X.pred.2[i, ] <- median
 }
 
+# Data with 1st dimenstion of hetero. (Moth pp group & Age at first birth)
 X.pred.1 <- as_tibble(X.pred.1) %>% 
   mutate(
     moth_age_fstbr = comb.1$moth_age_fstbr,
@@ -102,6 +113,7 @@ X.pred.1 <- as_tibble(X.pred.1) %>%
       comb.1$`moth_pp_group_Coloured, Indian or Asian, and Other`
   )
 
+# Data with second dimension of hetero. (Moth pp group & Moth educ.)
 X.pred.2 <- as_tibble(X.pred.2) %>% 
   mutate(
     `moth_pp_group_Black African` = comb.2$`moth_pp_group_Black African`,
@@ -116,93 +128,174 @@ X.pred.2 <- as_tibble(X.pred.2) %>%
     moth_educ_Higher = comb.2$moth_educ_Higher,
   )
 
-# Predict on the tesing sample along the first dimensions of hetero.
-pred.educ_attain.1 <- predict(tau.educ_attain, X.pred.1, estimate.variance = TRUE)
-pred.behind.1 <- predict(tau.behind, X.pred.1, estimate.variance = TRUE)
-pred.private_school.1 <- predict(tau.private_school, X.pred.1, estimate.variance = TRUE)
 
-pred.educ_attain.1 <- pred.educ_attain.1 %>% 
+# Start prediction:
+
+# Predict along the first dimensions of hetero. (i.e., X.pred.1) using twins instr.
+pred.educ.twins.1 <- predict(tau.educ.twins, X.pred.1, estimate.variance = TRUE)
+pred.behind.twins.1 <- predict(tau.behind.twins, X.pred.1, estimate.variance = TRUE)
+pred.private.twins.1 <- predict(tau.private.twins, X.pred.1, estimate.variance = TRUE)
+
+pred.educ.twins.1 <- pred.educ.twins.1 %>% 
   rename(pred_educ = "predictions", var_educ = "variance.estimates")
 
-pred.behind.1 <- pred.behind.1 %>% 
+pred.behind.twins.1 <- pred.behind.twins.1 %>% 
   rename(pred_behind = "predictions", var_behind = "variance.estimates")
 
-pred.private_school.1 <- pred.private_school.1 %>% 
+pred.private.twins.1 <- pred.private.twins.1 %>% 
   rename(pred_private = "predictions", var_private = "variance.estimates")
 
-final.1 <- X.pred.1 %>% 
-  as_tibble() %>% 
-  mutate(moth_pp_group = comb.1$moth_pp_group) %>% 
-  select(
-    moth_age_fstbr, contains("moth_pp_group"), 
-    -c(`moth_pp_group_Black African`:moth_pp_group_White)
-  ) %>% 
-  bind_cols(pred.educ_attain.1, pred.behind.1, pred.private_school.1) %>% 
-  pivot_longer(
-    pred_educ:var_private, 
-    names_to = c("type" ,"outcome"),
-    names_sep = "_",
-    values_to = "value"
-  ) %>% 
-  pivot_wider(names_from = type, values_from = value) %>% 
-  mutate(
-    upper = pred + 1.96 * sqrt(var),
-    lower = pred - 1.96 * sqrt(var),
-  )
+# Predict along the first dimensions of hetero. (i.e., X.pred.1) using same sex instr.
+pred.educ.samesx.1 <- predict(tau.educ.samesx, X.pred.1, estimate.variance = TRUE)
+pred.behind.samesx.1 <- predict(tau.behind.samesx, X.pred.1, estimate.variance = TRUE)
+pred.private.samesx.1 <- predict(tau.private.samesx, X.pred.1, estimate.variance = TRUE)
 
-plot_out(pred_educ, upper_educ, lower_educ)
-plot_out(pred_behind, upper_behind, lower_behind)
-plot_out(pred_private, upper_private, lower_private)
-
-# Predict on the tesing sample along the second dimensions of hetero.
-
-pred.educ_attain.2 <- predict(tau.educ_attain, X.pred.2, estimate.variance = TRUE)
-pred.behind.2 <- predict(tau.behind, X.pred.2, estimate.variance = TRUE)
-pred.private_school.2 <- predict(tau.private_school, X.pred.2, estimate.variance = TRUE)
-
-pred.educ_attain.2 <- pred.educ_attain.2 %>% 
+pred.educ.samesx.1 <- pred.educ.samesx.1 %>% 
   rename(pred_educ = "predictions", var_educ = "variance.estimates")
 
-pred.behind.2 <- pred.behind.2 %>% 
+pred.behind.samesx.1 <- pred.behind.samesx.1 %>% 
   rename(pred_behind = "predictions", var_behind = "variance.estimates")
 
-pred.private_school.2 <- pred.private_school.2 %>% 
+pred.private.samesx.1 <- pred.private.samesx.1 %>% 
+  rename(pred_private = "predictions", var_private = "variance.estimates")
+
+# Function to construct a data frame of predictions
+final_res_1 <- function(first, second, third) {
+  
+  final <- X.pred.1 %>% 
+    as_tibble() %>% 
+    mutate(moth_pp_group = comb.1$moth_pp_group) %>% 
+    select(
+      moth_age_fstbr, contains("moth_pp_group"), 
+      -c(`moth_pp_group_Black African`:moth_pp_group_White)
+    ) %>% 
+    bind_cols(first, second, third) %>% 
+    pivot_longer(
+      pred_educ:var_private, 
+      names_to = c("type" ,"outcome"),
+      names_sep = "_",
+      values_to = "value"
+    ) %>% 
+    pivot_wider(names_from = type, values_from = value) %>% 
+    mutate(
+      upper = pred + 1.96 * sqrt(var),
+      lower = pred - 1.96 * sqrt(var),
+    )
+  
+  return(final)
+}
+
+final.twins.1 <- final_res_1(
+  pred.educ.twins.1, pred.behind.twins.1, pred.private.twins.1
+  )
+
+final.samesx.1 <- final_res_1(
+  pred.educ.samesx.1, pred.behind.samesx.1, pred.private.samesx.1
+  )
+
+# Function to plot from the two data frames above
+plot_1 <- function( tbl ) {
+  
+  p <- tbl %>% 
+    ggplot(aes(moth_age_fstbr, pred)) +
+    geom_line(aes(group = 1)) +
+    geom_line(aes(y = upper, group = 1), linetype = "dashed") +
+    geom_line(aes(y = lower, group = 1), linetype = "dashed") +
+    geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
+    facet_grid(moth_pp_group ~ outcome, scales = "free_y")
+  
+  return(p)
+}
+
+plot_1(final.twins.1)
+plot_1(final.samesx.1)
+
+
+# Predict along the second dimensions of hetero. (i.e., X.pred.2) using twins instr.
+pred.educ.twins.2 <- predict(tau.educ.twins, X.pred.2, estimate.variance = TRUE)
+pred.behind.twins.2 <- predict(tau.behind.twins, X.pred.2, estimate.variance = TRUE)
+pred.private.twins.2 <- predict(tau.private.twins, X.pred.2, estimate.variance = TRUE)
+
+pred.educ.twins.2 <- pred.educ.twins.2 %>% 
+  rename(pred_educ = "predictions", var_educ = "variance.estimates")
+
+pred.behind.twins.2 <- pred.behind.twins.2 %>% 
+  rename(pred_behind = "predictions", var_behind = "variance.estimates")
+
+pred.private.twins.2 <- pred.private.twins.2 %>% 
   rename(pred_private = "predictions", var_private = "variance.estimates")
 
 
-final.2 <- X.pred.2 %>% 
-  as_tibble() %>% 
-  mutate(moth_pp_group = comb.2$moth_pp_group, moth_educ = comb.2$moth_educ) %>% 
-  select(contains("moth_educ"), contains("moth_pp_group")) %>% 
-  select(
-    -c(`moth_educ_Completed primary`:`moth_educ_Some secondary`),
-    -c(`moth_pp_group_Black African`:moth_pp_group_White)
+# Predict along the second dimensions of hetero. (i.e., X.pred.2) using twins instr.
+pred.educ.samesx.2 <- predict(tau.educ.samesx, X.pred.2, estimate.variance = TRUE)
+pred.behind.samesx.2 <- predict(tau.behind.samesx, X.pred.2, estimate.variance = TRUE)
+pred.private.samesx.2 <- predict(tau.private.samesx, X.pred.2, estimate.variance = TRUE)
+
+pred.educ.samesx.2 <- pred.educ.samesx.2 %>% 
+  rename(pred_educ = "predictions", var_educ = "variance.estimates")
+
+pred.behind.samesx.2 <- pred.behind.samesx.2 %>% 
+  rename(pred_behind = "predictions", var_behind = "variance.estimates")
+
+pred.private.samesx.2 <- pred.private.samesx.2 %>% 
+  rename(pred_private = "predictions", var_private = "variance.estimates")
+
+
+# A similar function:
+final_res_2 <- function(first, second, third) {
+  
+  final <- X.pred.2 %>% 
+    as_tibble() %>% 
+    mutate(moth_pp_group = comb.2$moth_pp_group, moth_educ = comb.2$moth_educ) %>% 
+    select(contains("moth_educ"), contains("moth_pp_group")) %>% 
+    select(
+      -c(`moth_educ_Completed primary`:`moth_educ_Some secondary`),
+      -c(`moth_pp_group_Black African`:moth_pp_group_White)
     ) %>% 
-  bind_cols(pred.educ_attain.2, pred.behind.2, pred.private_school.2) %>% 
-  pivot_longer(
-    pred_educ:var_private, 
-    names_to = c("type" ,"outcome"),
-    names_sep = "_",
-    values_to = "value"
+    bind_cols(first, second, third) %>% 
+    pivot_longer(
+      pred_educ:var_private, 
+      names_to = c("type" ,"outcome"),
+      names_sep = "_",
+      values_to = "value"
     ) %>% 
-  pivot_wider(names_from = type, values_from = value) %>% 
-  mutate(
-    upper = pred + 1.96 * sqrt(var),
-    lower = pred - 1.96 * sqrt(var),
-  )
+    pivot_wider(names_from = type, values_from = value) %>% 
+    mutate(
+      upper = pred + 1.96 * sqrt(var),
+      lower = pred - 1.96 * sqrt(var),
+    )
+  
+  return(final)
+}
+
+final.twins.2 <- final_res_2(
+  pred.educ.twins.2, pred.behind.twins.2, pred.private.twins.2
+)
+
+final.samesx.2 <- final_res_2(
+  pred.educ.samesx.2, pred.behind.samesx.2, pred.private.samesx.2
+)
 
 # plot
-final.2 %>% 
-  ggplot(aes(moth_educ, pred, color = moth_pp_group)) +
-  geom_point(size = 1.75, position = position_dodge(width = 0.75)) +
-  geom_errorbar(aes(ymin = lower, ymax = upper), 
-                width = .2, position = position_dodge(width = 0.75)) +
-  geom_hline(aes(yintercept = 0), color = "red", 
-             linetype = "dashed") +
-  scale_x_discrete(expand=c(.1, 0)) +
-  coord_flip() +
-  theme(legend.position = "top") +
-  facet_wrap(~outcome) 
+plot_2 <- function( tbl ) {
+  p <- tbl %>% 
+    ggplot(aes(moth_educ, pred, color = moth_pp_group)) +
+    geom_point(size = 1.75, position = position_dodge(width = 0.75)) +
+    geom_errorbar(aes(ymin = lower, ymax = upper), 
+                  width = .2, position = position_dodge(width = 0.75)) +
+    geom_hline(aes(yintercept = 0), color = "red", 
+               linetype = "dashed") +
+    scale_x_discrete(expand=c(.1, 0)) +
+    coord_flip() +
+    theme(legend.position = "top") +
+    facet_wrap(~outcome, scales = "free_x") 
+  
+  return(p)
+}
+
+plot_2(final.twins.2)
+plot_2(final.samesx.2)
+
 
 
 
@@ -218,7 +311,7 @@ final.2 %>%
 # * variable importance plot 
 # * look at more dimensions of heterogeneity and more outcomes
 #   - Education of the mother and population group (X)
-# Think of how to extend this to 2SLS using same sex instruments
+# Think of how to extend this to 2SLS using same sex instruments (X)
 
 
 
