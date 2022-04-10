@@ -95,11 +95,11 @@ for (i in 1:nrow(comb.2)) {
 
 X.pred.1 <- as_tibble(X.pred.1) %>% 
   mutate(
-    moth_age_fstbr = comb$moth_age_fstbr,
-    `moth_pp_group_Black African` = comb$`moth_pp_group_Black African`,
-    moth_pp_group_White = comb$moth_pp_group_White,
+    moth_age_fstbr = comb.1$moth_age_fstbr,
+    `moth_pp_group_Black African` = comb.1$`moth_pp_group_Black African`,
+    moth_pp_group_White = comb.1$moth_pp_group_White,
     `moth_pp_group_Coloured, Indian or Asian, and Other` = 
-      comb$`moth_pp_group_Coloured, Indian or Asian, and Other`
+      comb.1$`moth_pp_group_Coloured, Indian or Asian, and Other`
   )
 
 X.pred.2 <- as_tibble(X.pred.2) %>% 
@@ -132,30 +132,23 @@ pred.private_school.1 <- pred.private_school.1 %>%
 
 final.1 <- X.pred.1 %>% 
   as_tibble() %>% 
-  mutate(moth_pp_group = comb$moth_pp_group) %>% 
-  select(moth_age_fstbr, contains("moth_pp_group")) %>% 
+  mutate(moth_pp_group = comb.1$moth_pp_group) %>% 
+  select(
+    moth_age_fstbr, contains("moth_pp_group"), 
+    -c(`moth_pp_group_Black African`:moth_pp_group_White)
+  ) %>% 
   bind_cols(pred.educ_attain.1, pred.behind.1, pred.private_school.1) %>% 
+  pivot_longer(
+    pred_educ:var_private, 
+    names_to = c("type" ,"outcome"),
+    names_sep = "_",
+    values_to = "value"
+  ) %>% 
+  pivot_wider(names_from = type, values_from = value) %>% 
   mutate(
-    sigma.hat_educ = sqrt(var_educ),
-    sigma.hat_behind = sqrt(var_behind),
-    sigma.hat_private = sqrt(var_private),
-    upper_educ = pred_educ + 1.96 * sigma.hat_educ,
-    lower_educ = pred_educ - 1.96 * sigma.hat_educ,
-    upper_behind = pred_behind + 1.96 * sigma.hat_behind,
-    lower_behind = pred_behind - 1.96 * sigma.hat_behind,
-    upper_private = pred_private + 1.96 * sigma.hat_private,
-    lower_private = pred_private - 1.96 * sigma.hat_private,
+    upper = pred + 1.96 * sqrt(var),
+    lower = pred - 1.96 * sqrt(var),
   )
-
-plot_out <- function(pred_outcome, upper, lower) {
-  final.1 %>% 
-    ggplot(aes(moth_age_fstbr, {{pred_outcome}})) +
-    geom_line(aes(group = 1)) +
-    geom_line(aes(y = {{upper}}, group = 1), linetype = "dashed") +
-    geom_line(aes(y = {{lower}}, group = 1), linetype = "dashed") +
-    geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
-    facet_wrap(~ moth_pp_group, scales = "free_y")
-}
 
 plot_out(pred_educ, upper_educ, lower_educ)
 plot_out(pred_behind, upper_behind, lower_behind)
@@ -183,8 +176,7 @@ final.2 <- X.pred.2 %>%
   select(contains("moth_educ"), contains("moth_pp_group")) %>% 
   select(
     -c(`moth_educ_Completed primary`:`moth_educ_Some secondary`),
-    -c(`moth_pp_group_Black African`:moth_pp_group_White),
-    -contains(c("var_", "sigma.hat"))
+    -c(`moth_pp_group_Black African`:moth_pp_group_White)
     ) %>% 
   bind_cols(pred.educ_attain.2, pred.behind.2, pred.private_school.2) %>% 
   pivot_longer(
@@ -225,7 +217,7 @@ final.2 %>%
 # * Tuning; e.g., min. leaf size ?
 # * variable importance plot 
 # * look at more dimensions of heterogeneity and more outcomes
-#   - Education of the mother and population group
+#   - Education of the mother and population group (X)
 # Think of how to extend this to 2SLS using same sex instruments
 
 
