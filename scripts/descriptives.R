@@ -70,6 +70,13 @@ fIV_A9 <- make_formula_gt2("moth_inlf", "twins_2")
 #   age_data[[index]] <- filter(gt2_sample, moth_age_year >= age)
 # }
 
+age_data <- list(
+  filter(gt2_sample, moth_age_fstbr %>% between(15, 20)),
+  filter(gt2_sample, moth_age_fstbr %>% between(21, 25)),
+  filter(gt2_sample, moth_age_fstbr %>% between(26, 30)),
+  filter(gt2_sample, moth_age_fstbr >= 31)
+)
+
 
 # loop through the tibbles running the appropriate model 
 ols_educ <- map( age_data, ~felm(fOLS_A1, data = .) )
@@ -90,7 +97,10 @@ tidy_model <- function(model, name) {
   tidy <- map(model, tidy, conf.int = TRUE) %>% 
     map( ~filter( . , term %in% c("no_kids", "`no_kids(fit)`") ) ) %>% 
     bind_rows() %>% 
-    mutate( term = str_c(age_range, "+"), type = name )
+    mutate( 
+      term = c("15 - 20", "21 - 25", "26 - 30", "31 +"), 
+      type = name 
+      )
   
   return(tidy)
   
@@ -124,12 +134,12 @@ mod_all <- mod_all %>%
     )
 
 # save estimates:
-write_csv(mod_all, file = "data/ests_moth_age.csv")
+# write_csv(mod_all, file = "data/ests_moth_age.csv")
 
 
 # Plots
 
-mod_all <- read_csv("data/ests_moth_age.csv")
+# mod_all <- read_csv("data/ests_moth_age.csv")
 
 
 to_string <- as_labeller(
