@@ -158,15 +158,16 @@ p <- mod_all %>%
   geom_line(aes(group = 1)) +
   geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
   geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
-  geom_hline(aes(yintercept = 0), color = "red", size = .65) +
+  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
               fill = "grey", alpha = .3) +
   facet_wrap( ~ type, scale = "free_y", nrow = 4, labeller = to_string) +
   theme_bw() +
   theme(
-    axis.text.x = element_text(angle = 60, hjust = 1)
+    axis.text.x = element_text(size = 13, vjust = 2),
+    axis.title = element_text(size = 15, vjust = 2) # vertical distance of axis label?
     ) +
-  labs( x = "Mother's Age", y = "" )
+  labs( x = "Mother's Age at First Birth", y = "" )
 
 ggsave(
   filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/age_mods.pdf",
