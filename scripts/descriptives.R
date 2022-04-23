@@ -179,6 +179,9 @@ ggsave(
 )
 
 
+# New Figure
+mod_all <- separate(mod_all, type, c("model", "var"), "_")
+
 # Regression by child's age #### 
 data_model_ols <- gt2_sample %>%
   filter(child_age_year > 7) %>% 
