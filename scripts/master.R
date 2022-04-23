@@ -25,7 +25,7 @@ library(starpolishr)
 library(fastDummies)
 library(xtable)
 library(ggpubr)
-# library(GGally)
+library(GGally)  # contains "ggcoef()" to plot reg. coefs.
 # library(broom.helpers)
 
 theme_set(theme_light())
