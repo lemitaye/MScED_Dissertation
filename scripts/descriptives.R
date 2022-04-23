@@ -182,6 +182,54 @@ ggsave(
 # New Figure
 mod_all <- separate(mod_all, type, c("model", "var"), "_")
 
+mod_all %>%   
+  ggplot(aes(term, estimate, color = model)) + 
+  geom_point() +
+  geom_line(aes(group = 1)) +
+  # geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
+  # geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
+  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
+  # geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
+              # fill = "grey", alpha = .3) +
+  facet_wrap( ~ var, scale = "free_y", nrow = 2) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(size = 12, vjust = 2),
+    axis.title = element_text(size = 15, vjust = 2) # vertical distance of axis label?
+  ) +
+  labs( x = "Mother's Age at First Birth", y = "" )
+
+
+jtools::plot_summs(ols_educ, iv_educ, scale = TRUE)
+
+mod_all %>% 
+  ggcoef() +
+  geom_point(aes(color = model), position = position_dodge(width = .2)) +
+  facet_wrap( ~ var, scale = "free_y", nrow = 2) +
+  coord_flip() 
+
+ggcoef(mod_all %>% filter(model == "ols")) +
+  facet_wrap( ~ var, scale = "free_y", nrow = 2) +
+  coord_flip() 
+
+
+mod_all %>% 
+  ggplot(aes(term, estimate, color = model)) +
+  geom_point(position = position_dodge(width = .25), aes(shape = model)) +
+  geom_errorbar(
+    aes(ymin = conf.low, ymax = conf.high), 
+    position = position_dodge(width = .25),
+    width = 0
+    ) +
+  geom_hline(
+    aes(yintercept = 0), color = "gray50", 
+    size = 1, linetype = "dotted"
+    ) +
+  facet_wrap( ~ var, scale = "free_y", nrow = 2) +
+  scale_shape_manual(values = c(15, 16)) +
+  labs( x = "Mother's Age at First Birth", y = "" )
+
+
 # Regression by child's age #### 
 data_model_ols <- gt2_sample %>%
   filter(child_age_year > 7) %>% 
