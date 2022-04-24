@@ -659,7 +659,42 @@ stargazer(
 # * Mother's population group
 # * Mother's education level
 
-gt2_sample %>% 
+
+# see the spec. for "fm_a2" above
+formula_frst_stg_samesex <- function(dep_var, instrument, clus = FALSE) {
+  # Define a vector of covariates
+  covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
+  covar2 <- c("district", "moth_income", "moth_marital")
+  covar <- paste(
+    paste(covar1, collapse = "+"), "|",
+    paste(covar2, collapse = "+")
+  )
+  
+  if (clus) {
+    f <- as.formula(paste(
+      dep_var, " ~ ", instrument, " + ", covar,
+      " | 0 | moth_no"
+    ))
+  } else {
+    f <- as.formula(paste(dep_var, " ~ ", instrument, " + ", covar))
+  }
+  
+  return(f)
+}
+
+fm_a2_monot <- formula_frst_stg_samesex("no_kids", "same_sex_12")
+
+model_frst_stg <- function(tbl) {
+  # if_else( nrow(tbl) > 300, felm(fm_a2_monot, data = tbl), NULL ) 
+  lm(no_kids ~ same_sex_12, data = tbl)
+}
+
+get_confs <- function(mod) {
+  confint(mod) %>% 
+    as_tibble()
+}
+
+nested <- gt2_sample %>% 
   mutate(
     
     pop_group =
@@ -671,14 +706,41 @@ gt2_sample %>%
     
     age_frst_br = 
       case_when(
-         between(moth_age_fstbr, 15, 20) ~ "15 - 20",
-         between(moth_age_fstbr, 21, 25) ~ "21 - 25",
-         between(moth_age_fstbr, 26, 30) ~ "26 - 30",
-         moth_age_fstbr >= 31 ~ "31 +"
-      ) %>% factor()
+        between(moth_age_fstbr, 15, 20) ~ "15 - 20",
+        between(moth_age_fstbr, 21, 25) ~ "21 - 25",
+        between(moth_age_fstbr, 26, 30) ~ "26 - 30",
+        moth_age_fstbr >= 31 ~ "31 +"
+      ) %>% factor(),
+    
+    moth_educ = fct_lump(moth_educ, n=3) %>% 
+      fct_recode("Primary or Less" = "Other")
   ) %>% 
   filter(!is.na(age_frst_br)) %>% 
-  count(pop_group, age_frst_br, moth_educ)
+  group_by(pop_group, age_frst_br, moth_educ) %>% 
+  select(pop_group, moth_educ, age_frst_br, everything()) %>% 
+  arrange(pop_group, moth_educ, age_frst_br) %>% 
+  nest()
+
+samesex_frst <- nested %>% 
+  mutate(
+    model = map(data, model_frst_stg), 
+    summaries = map(model, tidy), 
+    conf_ints = map(model, get_confs)
+  ) %>% 
+  unnest(c(summaries, conf_ints)) %>% 
+  select(-data, -model) %>% 
+  filter(term == "same_sex_12") %>% 
+  rename("conf_low" = `2.5 %`, "conf_high" = `97.5 %`) 
+
+samesex_coefs <- samesex_frst %>% 
+  
+
+ggcoef(samesex_frst)
+
+gt2_sample %>% 
+  mutate(moth_educ = fct_lump(moth_educ, n=3) %>% 
+           fct_recode("Primary or Less" = "Other")) %>% 
+  count(moth_educ, sort = TRUE)
 
 
 # Consider removing those whose age at first birth is less than 15
