@@ -122,65 +122,23 @@ for (i in seq_along(mods_list)) {
   
 }
 
+# New Figure
+
 mod_all <- mod_all %>% 
   arrange(term) %>% 
+  separate(type, c("model", "var"), "_") %>% 
   mutate( 
-    type = factor(
-      type, levels = c(
-        "ols_educ", "iv_educ", "ols_behind", "iv_behind",
-        "ols_private", "iv_private", "ols_lfp", "iv_lfp"
-        ) 
-      ) 
-    )
-
-# save estimates:
-# write_csv(mod_all, file = "data/ests_moth_age.csv")
-
-
-# Plots
-
-# mod_all <- read_csv("data/ests_moth_age.csv")
-
+    var = factor(var, levels = c("educ", "behind", "private", "lfp")) 
+  )
 
 to_string <- as_labeller(
   c(
-    "ols_educ" = "Educational Attainment: OLS",
-    "iv_educ" = "Educational Attainment: IV (Twins2)",
-    "ols_behind" = "Left Behind: OLS", "iv_behind" = "Left Behind: IV (Twins2)",
-    "ols_private" = "Private School: OLS", "iv_private" = "Private School: IV (Twins2)",
-    "ols_lfp" = "Mother's LFP: OLS", "iv_lfp" = "Mother's LFP: IV (Twins2)"
+    "educ" = "Educational Attainment",
+    "behind" = "Left Behind", 
+    "private" = "Private School", 
+    "lfp" = "Mother's LFP"
   )
-  )
-
-p <- mod_all %>%   
-  ggplot(aes(term, estimate)) + 
-  geom_point(color = "blue") +
-  geom_line(aes(group = 1)) +
-  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
-  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
-  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
-              fill = "grey", alpha = .3) +
-  facet_wrap( ~ type, scale = "free_y", nrow = 4, labeller = to_string) +
-  theme_bw() +
-  theme(
-    axis.text.x = element_text(size = 13, vjust = 2),
-    axis.title = element_text(size = 15, vjust = 2) # vertical distance of axis label?
-    ) +
-  labs( x = "Mother's Age at First Birth", y = "" )
-
-ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/age_mods.pdf",
-  plot = p,
-  device = cairo_pdf,
-  width = 210,
-  height = 297,
-  units = "mm"
 )
-
-
-# New Figure
-mod_all <- separate(mod_all, type, c("model", "var"), "_")
 
 mod_all %>% 
   ggplot(aes(term, estimate, color = model)) +
@@ -194,9 +152,18 @@ mod_all %>%
     aes(yintercept = 0), color = "gray50", 
     size = 1, linetype = "dotted"
     ) +
-  facet_wrap( ~ var, scale = "free_y", nrow = 2) +
+  facet_wrap( ~ var, scale = "free_y", nrow = 2, labeller = to_string) +
   scale_shape_manual(values = c(15, 16)) +
   labs( x = "Mother's Age at First Birth", y = "" )
+
+ggsave(
+  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/age_mods.pdf",
+  plot = p,
+  device = cairo_pdf,
+  width = 210,
+  height = 297,
+  units = "mm"
+)
 
 
 # Regression by child's age #### 
