@@ -652,12 +652,36 @@ stargazer(
 )
 
 
+# A Partial Check on the Monotonicity of Same Sex Instrument ####
+
+# Variables to group by:
+# * Age at first birth (intervals)
+# * Mother's population group
+# * Mother's education level
+
+gt2_sample %>% 
+  mutate(
+    
+    pop_group =
+      case_when(
+        moth_pp_group == "Black African" ~ "Black African",
+        moth_pp_group == "White" ~ "White",
+        TRUE ~ "Coloured, Indian or Asian, and Other"
+      ) %>% factor(),
+    
+    age_frst_br = 
+      case_when(
+         between(moth_age_fstbr, 15, 20) ~ "15 - 20",
+         between(moth_age_fstbr, 21, 25) ~ "21 - 25",
+         between(moth_age_fstbr, 26, 30) ~ "26 - 30",
+         moth_age_fstbr >= 31 ~ "31 +"
+      ) %>% factor()
+  ) %>% 
+  filter(!is.na(age_frst_br)) %>% 
+  count(pop_group, age_frst_br, moth_educ)
 
 
-
-
-
-
+# Consider removing those whose age at first birth is less than 15
 
 
 
