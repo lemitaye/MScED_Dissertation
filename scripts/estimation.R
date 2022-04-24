@@ -715,8 +715,9 @@ nested <- gt2_sample %>%
     moth_educ = fct_lump(moth_educ, n=3) %>% 
       fct_recode("Primary or Less" = "Other")
   ) %>% 
-  filter(!is.na(age_frst_br)) %>% 
   group_by(pop_group, age_frst_br, moth_educ) %>% 
+  mutate(n = n()) %>% 
+  filter(!is.na(age_frst_br), n >= 50) %>% 
   select(pop_group, moth_educ, age_frst_br, everything()) %>% 
   arrange(pop_group, moth_educ, age_frst_br) %>% 
   nest()
@@ -729,13 +730,16 @@ samesex_frst <- nested %>%
   ) %>% 
   unnest(c(summaries, conf_ints)) %>% 
   select(-data, -model) %>% 
-  filter(term == "same_sex_12") %>% 
-  rename("conf_low" = `2.5 %`, "conf_high" = `97.5 %`) 
+  filter(term == "same_sex_12") 
 
 samesex_coefs <- samesex_frst %>% 
-  
+  mutate(term = str_c(pop_group, moth_educ, age_frst_br, sep = "_")) %>% 
+  rename("conf.low" = `2.5 %`, "conf.high" = `97.5 %`) %>% 
+  ungroup() %>% 
+  select(-c(pop_group, moth_educ, age_frst_br))
 
-ggcoef(samesex_frst)
+
+ggcoef(samesex_coefs, color = "blue", sort = "ascending")
 
 gt2_sample %>% 
   mutate(moth_educ = fct_lump(moth_educ, n=3) %>% 
