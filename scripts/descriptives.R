@@ -71,10 +71,10 @@ fIV_A9 <- make_formula_gt2("moth_inlf", "twins_2")
 # }
 
 age_data <- list(
-  filter(gt2_sample, moth_age_fstbr %>% between(15, 20)),
-  filter(gt2_sample, moth_age_fstbr %>% between(21, 25)),
-  filter(gt2_sample, moth_age_fstbr %>% between(26, 30)),
-  filter(gt2_sample, moth_age_fstbr >= 31)
+  filter(gt2_sample, moth_age_fstbr %>% between(15, 19)),
+  filter(gt2_sample, moth_age_fstbr %>% between(20, 24)),
+  filter(gt2_sample, moth_age_fstbr %>% between(25, 29)),
+  filter(gt2_sample, moth_age_fstbr >= 30)
 )
 
 
@@ -98,7 +98,7 @@ tidy_model <- function(model, name) {
     map( ~filter( . , term %in% c("no_kids", "`no_kids(fit)`") ) ) %>% 
     bind_rows() %>% 
     mutate( 
-      term = c("15-20", "21-25", "26-30", "31+"), 
+      term = c("15-19", "20-24", "25-29", "30+"), 
       type = name 
       )
   
@@ -141,6 +141,10 @@ to_string <- as_labeller(
 )
 
 mod_all %>% 
+  mutate(model = case_when(
+    model == "ols" ~ "OLS", model == "iv" ~ "IV: Twins2"
+  ) %>% factor(levels = c("IV: Twins2", "OLS"))
+    ) %>% 
   ggplot(aes(term, estimate, color = model)) +
   geom_point(position = position_dodge(width = .25), aes(shape = model)) +
   geom_errorbar(
@@ -152,9 +156,10 @@ mod_all %>%
     aes(yintercept = 0), color = "gray50", 
     size = 1, linetype = "dotted"
     ) +
+  theme(legend.position = "top") +
   facet_wrap( ~ var, scale = "free_y", nrow = 2, labeller = to_string) +
   scale_shape_manual(values = c(15, 16)) +
-  labs( x = "Mother's Age at First Birth", y = "" )
+  labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" )
 
 ggsave(
   filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/age_mods.pdf",

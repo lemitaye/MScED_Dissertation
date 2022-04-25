@@ -660,7 +660,6 @@ stargazer(
 # * Mother's education level
 
 
-# see the spec. for "fm_a2" above
 formula_frst_stg_samesex <- function(dep_var, instrument, clus = FALSE) {
   # Define a vector of covariates
   covar1 <- c("child_age_month", "boy", "moth_age_year", "fath_inhh")
@@ -749,13 +748,78 @@ gt2_sample %>%
 
 # Consider removing those whose age at first birth is less than 15
 
+# First stage effects at different parities ####
+
+first_gt2 <- gt2_sample %>% 
+  mutate(
+    d_3 = (no_kids >= 3), d_4 = (no_kids >= 4),
+    d_5 = (no_kids >= 5), d_6 = (no_kids >= 6),
+    d_7 = (no_kids >= 7), d_8 = (no_kids >= 8)
+    ) %>%
+  select(d_3:d_8, twins_2 )
+
+first_gt3 <- gt3_sample %>% 
+  mutate(
+    d_4 = (no_kids >= 4), d_5 = (no_kids >= 5), 
+    d_6 = (no_kids >= 6), d_7 = (no_kids >= 7), 
+    d_8 = (no_kids >= 8)
+  ) %>%
+  select(d_4:d_8, twins_3)
+
+models_gt2 <- list(); models_gt3 <- list()
+
+deps_gt2 <- c("d_3", "d_4", "d_5", "d_6", "d_7", "d_8")
+deps_gt3 <- c("d_4", "d_5", "d_6", "d_7", "d_8")
 
 
+for (var in deps_gt2) {
+  mod <- lm(as.formula(paste(var, "~ twins_2")), data = first_gt2)
+  
+  models_gt2 <- append(models_gt2, list(mod))
+}
 
+for (var in deps_gt3) {
+  mod <- lm(as.formula(paste(var, "~ twins_3")), data = first_gt3)
+  
+  models_gt3 <- append(models_gt3, list(mod))
+}
 
+tidy_modelII <- function(model, dep) {
+  
+  tidy <- map(model, tidy, conf.int = TRUE) %>% 
+    map( ~filter( . , term %in% c("twins_2", "twins_3") ) ) %>% 
+    bind_rows() %>% 
+    mutate( 
+      term = dep
+    )
+  
+  return(tidy)
+  
+}
 
+acr_2 <- tidy_modelII(models_gt2, 
+                      dep = c("3+", "4+", "5+", "6+", "7+", "8+")) %>% 
+  mutate(iv = "twins_2")
 
+acr_3 <- tidy_modelII(models_gt3, 
+                      dep = c("4+", "5+", "6+", "7+", "8+")) %>% 
+  mutate(iv = "twins_3")
 
+acr <- bind_rows(acr_2, acr_3)
+
+acr %>%   
+  ggplot(aes(term, estimate)) + 
+  geom_point(color = "blue") +
+  geom_line(aes(group = 1)) +
+  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
+  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
+  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
+              fill = "grey", alpha = .3) +
+  facet_wrap( ~ iv, scale = "free_x", 
+              # nrow = 4, labeller = to_string
+              ) +
+  theme_bw()
 
 
 
