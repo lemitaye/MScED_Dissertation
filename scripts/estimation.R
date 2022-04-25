@@ -754,22 +754,22 @@ first_gt2 <- gt2_sample %>%
   mutate(
     d_3 = (no_kids >= 3), d_4 = (no_kids >= 4),
     d_5 = (no_kids >= 5), d_6 = (no_kids >= 6),
-    d_7 = (no_kids >= 7), d_8 = (no_kids >= 8)
+    d_7 = (no_kids >= 7), d_8 = (no_kids >= 8), d_9 = (no_kids >= 9)
     ) %>%
-  select(d_3:d_8, twins_2 )
+  select(d_3:d_9, twins_2, no_kids)
 
 first_gt3 <- gt3_sample %>% 
   mutate(
     d_4 = (no_kids >= 4), d_5 = (no_kids >= 5), 
     d_6 = (no_kids >= 6), d_7 = (no_kids >= 7), 
-    d_8 = (no_kids >= 8)
+    d_8 = (no_kids >= 8), d_9 = (no_kids >= 9)
   ) %>%
-  select(d_4:d_8, twins_3)
+  select(d_4:d_9, twins_3, no_kids)
 
 models_gt2 <- list(); models_gt3 <- list()
 
-deps_gt2 <- c("d_3", "d_4", "d_5", "d_6", "d_7", "d_8")
-deps_gt3 <- c("d_4", "d_5", "d_6", "d_7", "d_8")
+deps_gt2 <- c("d_3", "d_4", "d_5", "d_6", "d_7", "d_8", "d_9")
+deps_gt3 <- c("d_4", "d_5", "d_6", "d_7", "d_8", "d_9")
 
 
 for (var in deps_gt2) {
@@ -797,12 +797,16 @@ tidy_modelII <- function(model, dep) {
   
 }
 
-acr_2 <- tidy_modelII(models_gt2, 
-                      dep = c("3+", "4+", "5+", "6+", "7+", "8+")) %>% 
+acr_2 <- tidy_modelII(
+  models_gt2, 
+  dep = c("3+", "4+", "5+", "6+", "7+", "8+", "9+")
+  ) %>% 
   mutate(iv = "twins_2")
 
-acr_3 <- tidy_modelII(models_gt3, 
-                      dep = c("4+", "5+", "6+", "7+", "8+")) %>% 
+acr_3 <- tidy_modelII(
+  models_gt3, 
+  dep = c("4+", "5+", "6+", "7+", "8+", "9+")
+  ) %>% 
   mutate(iv = "twins_3")
 
 acr <- bind_rows(acr_2, acr_3)
@@ -821,6 +825,10 @@ acr %>%
               ) +
   theme_bw()
 
+# Think of a way to add the overall first stage
+lm(no_kids ~ twins_2, data = first_gt2) %>% coef()
+sum(acr_2$estimate)
 
-
+lm(no_kids ~ twins_3, data = first_gt3) %>% coef()
+sum(acr_3$estimate)
 
