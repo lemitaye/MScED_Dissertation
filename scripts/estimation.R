@@ -705,10 +705,10 @@ nested <- gt2_sample %>%
     
     age_frst_br = 
       case_when(
-        between(moth_age_fstbr, 15, 20) ~ "15 - 20",
-        between(moth_age_fstbr, 21, 25) ~ "21 - 25",
-        between(moth_age_fstbr, 26, 30) ~ "26 - 30",
-        moth_age_fstbr >= 31 ~ "31 +"
+        between(moth_age_fstbr, 15, 20) ~ "15-20",
+        between(moth_age_fstbr, 21, 25) ~ "21-25",
+        between(moth_age_fstbr, 26, 30) ~ "26-30",
+        moth_age_fstbr >= 31 ~ "31+"
       ) %>% factor(),
     
     moth_educ = fct_lump(moth_educ, n=3) %>% 
@@ -739,18 +739,35 @@ run_frst <- function(var) {
 
 samesex_frst <- bind_rows(
   run_frst("same_sex_12"), run_frst("boy_12"), run_frst("girl_12")
-  ) %>% rename(iv = "term")
+  ) %>% 
+  rename(iv = "term") %>% 
+  ungroup() 
   
 samesex_coefs <- samesex_frst %>% 
-  rename(iv = "term") %>% 
-  mutate(term = str_c(pop_group, moth_educ, age_frst_br, sep = "_")) %>% 
+  mutate(term = str_c(
+    str_sub(pop_group, 1, 1), str_sub(moth_educ, 1, 1), age_frst_br, 
+    sep = "_")) %>% 
   rename("conf.low" = `2.5 %`, "conf.high" = `97.5 %`) %>% 
-  ungroup() %>% 
   select(-c(pop_group, moth_educ, age_frst_br))
 
 samesex_coefs %>% 
-  filter(iv == "girl_12") %>% 
+  filter(iv == "girl_12") %>%
   ggcoef(color = "blue", sort = "ascending") 
+
+plot_frst <- function(var) {
+  p <- samesex_coefs %>% 
+    filter(iv == var) %>%
+    ggcoef(color = "blue", sort = "ascending") + 
+    facet_wrap(~ iv)
+  
+  return(p)
+}
+
+ggarrange(
+  plot_frst("same_sex_12"), plot_frst("boy_12"), 
+  plot_frst("girl_12"), 
+  ncol = 3
+  ) 
 
 gt2_sample %>% 
   mutate(moth_educ = fct_lump(moth_educ, n=3) %>% 
@@ -835,48 +852,30 @@ acr_3 <- tidy_modelII(models_gt3) %>%
 
 acr <- bind_rows(acr_2, acr_3)
 
-acr %>%   
-  ggplot(aes(parity, estimate)) + 
-  geom_point(color = "blue") +
-  geom_line(aes(group = 1)) +
-  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
-  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
-  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
-              fill = "grey", alpha = .3) +
-  facet_wrap(~term, scale = "free", nrow = 4
-              # nrow = 4, labeller = to_string
-              ) +
-  theme_bw()
+plot_acr <- function(vars, rows = 1) {
+  p <- acr %>%   
+    filter(term %in% vars) %>% 
+    ggplot(aes(parity, estimate)) + 
+    geom_point(color = "blue") +
+    geom_line(aes(group = 1)) +
+    geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
+    geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
+    geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
+    geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
+                fill = "grey", alpha = .3) +
+    facet_wrap(~term, scale = "free", nrow = rows
+               # nrow = 4, labeller = to_string
+    ) +
+    theme_bw()
+  
+  return(p)
+}
 
-acr_2 %>%   
-  ggplot(aes(parity, estimate)) + 
-  geom_point(color = "blue") +
-  geom_line(aes(group = 1)) +
-  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
-  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
-  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
-              fill = "grey", alpha = .3) +
-  facet_wrap(~term, scale = "free", 
-             # nrow = 4, labeller = to_string
-  ) +
-  theme_bw()
-
-acr_3 %>%   
-  ggplot(aes(parity, estimate)) + 
-  geom_point(color = "blue") +
-  geom_line(aes(group = 1)) +
-  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
-  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
-  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
-              fill = "grey", alpha = .3) +
-  facet_wrap(~term, scale = "free", 
-             # nrow = 4, labeller = to_string
-  ) +
-  theme_bw()
-
+plot_acr(c("twins_2", "twins_3"))
+plot_acr(c("same_sex_12", "same_sex_123"))
+plot_acr(c("boy_12", "girl_12"))
+plot_acr(c("boy_123", "girl_123"))
+         
 
 # Think of a way to add the overall first stage
 lm(no_kids ~ twins_2, data = first_gt2) %>% coef()
