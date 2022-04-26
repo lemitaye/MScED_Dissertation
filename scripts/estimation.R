@@ -721,24 +721,36 @@ nested <- gt2_sample %>%
   arrange(pop_group, moth_educ, age_frst_br) %>% 
   nest()
 
-samesex_frst <- nested %>% 
-  mutate(
-    model = map(data, model_frst_stg), 
-    summaries = map(model, tidy), 
-    conf_ints = map(model, get_confs)
-  ) %>% 
-  unnest(c(summaries, conf_ints)) %>% 
-  select(-data, -model) %>% 
-  filter(term == "same_sex_12") 
+run_frst <- function(var) {
+  tbl <- nested %>% 
+    mutate(
+      model = map(
+        data, ~lm(as.formula(paste("no_kids ~", var)), data = .)
+        ), 
+      summaries = map(model, tidy), 
+      conf_ints = map(model, get_confs)
+    ) %>% 
+    unnest(c(summaries, conf_ints)) %>% 
+    select(-data, -model) %>%
+    filter(term == as.character(var)) 
+  
+  return(tbl)
+}
 
+samesex_frst <- bind_rows(
+  run_frst("same_sex_12"), run_frst("boy_12"), run_frst("girl_12")
+  ) %>% rename(iv = "term")
+  
 samesex_coefs <- samesex_frst %>% 
+  rename(iv = "term") %>% 
   mutate(term = str_c(pop_group, moth_educ, age_frst_br, sep = "_")) %>% 
   rename("conf.low" = `2.5 %`, "conf.high" = `97.5 %`) %>% 
   ungroup() %>% 
   select(-c(pop_group, moth_educ, age_frst_br))
 
-
-ggcoef(samesex_coefs, color = "blue", sort = "ascending")
+samesex_coefs %>% 
+  filter(iv == "girl_12") %>% 
+  ggcoef(color = "blue", sort = "ascending") 
 
 gt2_sample %>% 
   mutate(moth_educ = fct_lump(moth_educ, n=3) %>% 
@@ -756,7 +768,7 @@ first_gt2 <- gt2_sample %>%
     d_5 = (no_kids >= 5), d_6 = (no_kids >= 6),
     d_7 = (no_kids >= 7), d_8 = (no_kids >= 8), d_9 = (no_kids >= 9)
     ) %>%
-  select(d_3:d_9, twins_2, no_kids)
+  select(d_3:d_9, twins_2, same_sex_12, boy_12, girl_12, no_kids)
 
 first_gt3 <- gt3_sample %>% 
   mutate(
@@ -764,55 +776,67 @@ first_gt3 <- gt3_sample %>%
     d_6 = (no_kids >= 6), d_7 = (no_kids >= 7), 
     d_8 = (no_kids >= 8), d_9 = (no_kids >= 9)
   ) %>%
-  select(d_4:d_9, twins_3, no_kids)
+  select(d_4:d_9, twins_3, same_sex_123, boy_123, girl_123, no_kids)
+
+deps_gt2 <- c("d_3", "d_4", "d_5", "d_6", "d_7", "d_8", "d_9")
+deps_gt3 <- deps_gt2[-1]
 
 models_gt2 <- list(); models_gt3 <- list()
 
-deps_gt2 <- c("d_3", "d_4", "d_5", "d_6", "d_7", "d_8", "d_9")
-deps_gt3 <- c("d_4", "d_5", "d_6", "d_7", "d_8", "d_9")
-
-
 for (var in deps_gt2) {
-  mod <- lm(as.formula(paste(var, "~ twins_2")), data = first_gt2)
+  mod1 <- lm(as.formula(paste(var, "~ twins_2")), data = first_gt2)
+  mod2 <- lm(as.formula(paste(var, "~ same_sex_12")), data = first_gt2)
+  mod3 <- lm(as.formula(paste(var, "~ boy_12")), data = first_gt2)
+  mod4 <- lm(as.formula(paste(var, "~ girl_12")), data = first_gt2)
   
-  models_gt2 <- append(models_gt2, list(mod))
+  x <- list(mod1, mod2, mod3, mod4)
+  names(x) <- rep(var, 4)
+  models_gt2 <- append(models_gt2, x)
 }
 
 for (var in deps_gt3) {
-  mod <- lm(as.formula(paste(var, "~ twins_3")), data = first_gt3)
+  mod1 <- lm(as.formula(paste(var, "~ twins_3")), data = first_gt3)
+  mod2 <- lm(as.formula(paste(var, "~ same_sex_123")), data = first_gt3)
+  mod3 <- lm(as.formula(paste(var, "~ boy_123")), data = first_gt3)
+  mod4 <- lm(as.formula(paste(var, "~ girl_123")), data = first_gt3)
   
-  models_gt3 <- append(models_gt3, list(mod))
+  x <- list(mod1, mod2, mod3, mod4)
+  names(x) <- rep(var, 4)
+  models_gt3 <- append(models_gt3, x)
 }
 
-tidy_modelII <- function(model, dep) {
-  
-  tidy <- map(model, tidy, conf.int = TRUE) %>% 
-    map( ~filter( . , term %in% c("twins_2", "twins_3") ) ) %>% 
-    bind_rows() %>% 
-    mutate( 
-      term = dep
+# Thnik of writing a function for the above two for loops.
+
+tidy_modelII <- function(model_list) {
+  tidy <- map(model_list, tidy, conf.int = TRUE) %>%
+    map(~ filter(., term != "(Intercept)")) %>%
+    bind_rows() %>%
+    mutate(
+      parity = factor(names(model_list)),
+      parity = fct_recode(parity,
+        "3+" = "d_3", "4+" = "d_4", "5+" = "d_5", "6+" = "d_6",
+        "7+" = "d_7", "8+" = "d_8", "9+" = "d_9"
+      )
     )
-  
+
   return(tidy)
-  
 }
 
-acr_2 <- tidy_modelII(
-  models_gt2, 
-  dep = c("3+", "4+", "5+", "6+", "7+", "8+", "9+")
-  ) %>% 
-  mutate(iv = "twins_2")
 
-acr_3 <- tidy_modelII(
-  models_gt3, 
-  dep = c("4+", "5+", "6+", "7+", "8+", "9+")
-  ) %>% 
-  mutate(iv = "twins_3")
+
+acr_2 <- tidy_modelII(models_gt2) %>% 
+  mutate(sample = "gt2") %>% 
+  select(sample, parity, term, everything())
+
+acr_3 <- tidy_modelII(models_gt3) %>% 
+  mutate(sample = "gt3") %>% 
+  select(sample, parity, term, everything()) %>% 
+  suppressWarnings() # throws out a warning about "d_3"
 
 acr <- bind_rows(acr_2, acr_3)
 
 acr %>%   
-  ggplot(aes(term, estimate)) + 
+  ggplot(aes(parity, estimate)) + 
   geom_point(color = "blue") +
   geom_line(aes(group = 1)) +
   geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
@@ -820,10 +844,39 @@ acr %>%
   geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
               fill = "grey", alpha = .3) +
-  facet_wrap( ~ iv, scale = "free_x", 
+  facet_wrap(~term, scale = "free", nrow = 4
               # nrow = 4, labeller = to_string
               ) +
   theme_bw()
+
+acr_2 %>%   
+  ggplot(aes(parity, estimate)) + 
+  geom_point(color = "blue") +
+  geom_line(aes(group = 1)) +
+  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
+  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
+  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
+              fill = "grey", alpha = .3) +
+  facet_wrap(~term, scale = "free", 
+             # nrow = 4, labeller = to_string
+  ) +
+  theme_bw()
+
+acr_3 %>%   
+  ggplot(aes(parity, estimate)) + 
+  geom_point(color = "blue") +
+  geom_line(aes(group = 1)) +
+  geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
+  geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
+  geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
+              fill = "grey", alpha = .3) +
+  facet_wrap(~term, scale = "free", 
+             # nrow = 4, labeller = to_string
+  ) +
+  theme_bw()
+
 
 # Think of a way to add the overall first stage
 lm(no_kids ~ twins_2, data = first_gt2) %>% coef()
@@ -832,3 +885,4 @@ sum(acr_2$estimate)
 lm(no_kids ~ twins_3, data = first_gt3) %>% coef()
 sum(acr_3$estimate)
 
+# Do the same for the same sex instrument.
