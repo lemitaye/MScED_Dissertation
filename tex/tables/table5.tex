@@ -11,7 +11,7 @@
 \hline \\[-1.8ex] 
  & \multicolumn{4}{c}{2+ Sample} & \multicolumn{4}{c}{3+ Sample} \\
 \cline{2-5}  \cline{6-9} \\
- & OLS & \multicolumn{3}{c}{IV} & OLS & \multicolumn{3}{c}{IV} \\ 
+ & OLS & \multicolumn{3}{c}{2SLS} & OLS & \multicolumn{3}{c}{2SLS} \\ 
 \cline{3-5}  \cline{7-9} \\[-1.8ex]
 \\[-1.8ex] & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8)\\ 
 \hline \\[-1.8ex] 
@@ -35,14 +35,14 @@ IV used & - & Twins2 & Boy12 & Twins2, Boy12 & - & Twins3 & Boy123 & Twins3, Boy
 \end{tabular} 
 \begin{tablenotes}
 \footnotesize
-\item \textit{Notes:} *** Significant at 1\%, ** Significant at 5\%, * Significant at 10\%. 
-Robust standard errors are in parentheses. Covariates for all models include age 
+\item \textit{Notes:}  Covariates for all models include age 
 (in months) and sex of child, mother's education, dummies for mother's population 
 group and income range, dummies for districts, and a dummy for whether the father 
 resides in the household. The regressions for the 3+ sample are clustered by mother's ID.
 The regressions using the SameSex12 and SameSex123 instruments were excluded for reasons 
 of space. The results are qualitatively similar to the ones in columns 3 and 7, 
-respectively, and are available upon request.
+respectively, and are available upon request. Robust standard errors are in parentheses. *** Significant at 1\%, ** Significant at 5\%, * Significant at 10\%. 
+
 \end{tablenotes}
 \end{threeparttable}
 \end{sidewaystable} 
