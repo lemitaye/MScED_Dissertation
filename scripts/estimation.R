@@ -705,10 +705,10 @@ nested <- gt2_sample %>%
     
     age_frst_br = 
       case_when(
-        between(moth_age_fstbr, 15, 20) ~ "15-20",
-        between(moth_age_fstbr, 21, 25) ~ "21-25",
-        between(moth_age_fstbr, 26, 30) ~ "26-30",
-        moth_age_fstbr >= 31 ~ "31+"
+        between(moth_age_fstbr, 15, 19) ~ "15-19",
+        between(moth_age_fstbr, 20, 24) ~ "20-24",
+        between(moth_age_fstbr, 25, 29) ~ "25-29",
+        moth_age_fstbr >= 30 ~ "30+"
       ) %>% factor(),
     
     moth_educ = fct_lump(moth_educ, n=3) %>% 
@@ -750,29 +750,34 @@ samesex_coefs <- samesex_frst %>%
   rename("conf.low" = `2.5 %`, "conf.high" = `97.5 %`) %>% 
   select(-c(pop_group, moth_educ, age_frst_br))
 
-samesex_coefs %>% 
-  filter(iv == "girl_12") %>%
-  ggcoef(color = "blue", sort = "ascending") 
 
-plot_frst <- function(var) {
+plot_frst <- function(var, label) {
   p <- samesex_coefs %>% 
     filter(iv == var) %>%
     ggcoef(color = "blue", sort = "ascending") + 
-    facet_wrap(~ iv)
+    facet_wrap(~ iv, labeller = as_labeller(label)) +
+    labs(x = "Coefficient", y = "")
   
   return(p)
 }
 
-ggarrange(
-  plot_frst("same_sex_12"), plot_frst("boy_12"), 
-  plot_frst("girl_12"), 
+f1 <- plot_frst("same_sex_12", label = c("same_sex_12" = "SameSex12"))
+f2 <- plot_frst("boy_12", label = c("boy_12" = "Boy12"))
+f3 <- plot_frst("girl_12", label = c("girl_12" = "Girl12"))
+
+fig2 <- ggarrange(
+  f1, f2, f3, 
   ncol = 3
   ) 
 
-gt2_sample %>% 
-  mutate(moth_educ = fct_lump(moth_educ, n=3) %>% 
-           fct_recode("Primary or Less" = "Other")) %>% 
-  count(moth_educ, sort = TRUE)
+ggsave(
+  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/monot.pdf",
+  plot = fig2,
+  device = cairo_pdf,
+  width = 270,
+  height = 180,
+  units = "mm"
+)
 
 
 # Consider removing those whose age at first birth is less than 15
@@ -852,7 +857,7 @@ acr_3 <- tidy_modelII(models_gt3) %>%
 
 acr <- bind_rows(acr_2, acr_3)
 
-plot_acr <- function(vars, rows = 1) {
+plot_acr <- function(vars, rows = 1, labels) {
   p <- acr %>%   
     filter(term %in% vars) %>% 
     ggplot(aes(parity, estimate)) + 
@@ -863,21 +868,41 @@ plot_acr <- function(vars, rows = 1) {
     geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
     geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
                 fill = "grey", alpha = .3) +
-    facet_wrap(~term, scale = "free", nrow = rows
-               # nrow = 4, labeller = to_string
+    facet_wrap(~term, scale = "free", nrow = rows,
+               labeller = as_labeller(labels)
     ) +
-    theme_bw()
+    theme_bw() +
+    labs(x = "Number of Children", y = "")
   
   return(p)
 }
 
-ggarrange(
-plot_acr(c("twins_2", "twins_3")),
-plot_acr(c("boy_12", "boy_123")),
-plot_acr(c("girl_12", "girl_123")),
-labels = c("A", "B", "C"),
-nrow = 3
-)        
+r1 <- plot_acr(c("twins_2", "twins_3"), 
+               labels = c("twins_2" = "Twins2", "twins_3" = "Twins3")) 
+  
+r2 <- plot_acr(c("boy_12", "boy_123"), 
+               labels = c("boy_12" = "Boy12", "boy_123" = "Boy123"))
+
+r3 <- plot_acr(c("girl_12", "girl_123"), 
+               labels = c("girl_12" = "Girl12", "girl_123" = "Girl123")) 
+
+fig1 <- ggarrange(
+r1, NULL, r2, NULL, r3,
+labels = c("A.", "", "B.", "", "C."),
+nrow = 5, heights = c(1, 0.15, 1, 0.15, 1)
+) 
+
+ggsave(
+  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/acrs.pdf",
+  plot = fig1,
+  device = cairo_pdf,
+  width = 210,
+  height = 235,
+  units = "mm"
+)
+# %>% annotate_figure(
+#   bottom = "Number of Children"
+# )       
 
 # Think of a way to add the overall first stage
 lm(no_kids ~ twins_2, data = first_gt2) %>% coef()
@@ -886,4 +911,5 @@ sum(acr_2$estimate)
 lm(no_kids ~ twins_3, data = first_gt3) %>% coef()
 sum(acr_3$estimate)
 
-# Do the same for the same sex instrument.
+
+
