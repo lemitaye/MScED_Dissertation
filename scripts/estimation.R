@@ -871,11 +871,13 @@ plot_acr <- function(vars, rows = 1) {
   return(p)
 }
 
-plot_acr(c("twins_2", "twins_3"))
-plot_acr(c("same_sex_12", "same_sex_123"))
-plot_acr(c("boy_12", "girl_12"))
-plot_acr(c("boy_123", "girl_123"))
-         
+ggarrange(
+plot_acr(c("twins_2", "twins_3")),
+plot_acr(c("boy_12", "boy_123")),
+plot_acr(c("girl_12", "girl_123")),
+labels = c("A", "B", "C"),
+nrow = 3
+)        
 
 # Think of a way to add the overall first stage
 lm(no_kids ~ twins_2, data = first_gt2) %>% coef()
