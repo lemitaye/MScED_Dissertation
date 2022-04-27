@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+data\all_persons.csv
+tex\main-blx.bib
