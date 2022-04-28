@@ -140,7 +140,7 @@ to_string <- as_labeller(
   )
 )
 
-mod_all %>% 
+p <- mod_all %>% 
   mutate(model = case_when(
     model == "ols" ~ "OLS", model == "iv" ~ "IV: Twins2"
   ) %>% factor(levels = c("IV: Twins2", "OLS"))
@@ -162,11 +162,11 @@ mod_all %>%
   labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" )
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/age_mods.pdf",
+  filename = "tex/figures/age_mods.pdf",
   plot = p,
   device = cairo_pdf,
   width = 210,
-  height = 297,
+  height = 150,
   units = "mm"
 )
 
@@ -450,9 +450,9 @@ line_gr <- uni_mults %>%
     levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
     )) %>%
   ggplot(aes(year, prop,linetype = pop_group, color = pop_group)) +
-  geom_line(size = 0.8) +
+  geom_line(size = 0.5) +
   # scale_colour_brewer(palette = "Set1") +
-  theme_bw() +
+  # theme_bw() +
   theme(legend.position = "top") +
   labs(
     # title = "Multiple Births Per 1000 Live Births",
@@ -463,11 +463,11 @@ line_gr <- uni_mults %>%
   )
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/line_pp.pdf",
+  filename = "tex/figures/line_pp.pdf",
   plot = line_gr,
   device = cairo_pdf,
-  width = 160,
-  height = 130,
+  width = 120,
+  height = 90,
   units = "mm"
 )
 
