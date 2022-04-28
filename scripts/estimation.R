@@ -929,36 +929,98 @@ stargazer(samesex12, samesex123, type = "text", keep.stat = c("n", "rsq"))
 
 
 # Overidentification test
-resid2 <- residuals(IV_A4)
-gt2_sample$resid <- resid2
 
-fIV_A4_OR<- make_formula_frst_stg("resid", "twins_2 + boy_12 + girl_12")
+# 2+ Sample
+resid3_educ <- residuals(IV_A4)
+resid2_behind <- residuals(IV_A16)
+resid2_private <- residuals(IV_A8)
+resid2_mlfp <- residuals(IV_A12)
+
+gt2_sample$resid2_educ <- resid2_educ
+gt2_sample$resid2_behind <- resid2_behind
+gt2_sample$resid2_private <- resid2_private
+gt2_sample$resid2_mlfp <- resid2_mlfp
+
+fIV_A4_OR <- make_formula_frst_stg("resid2_educ", "twins_2 + boy_12 + girl_12")
+fIV_A16_OR <- make_formula_frst_stg("resid2_behind", "twins_2 + boy_12 + girl_12")
+fIV_A8_OR <- make_formula_frst_stg("resid2_private", "twins_2 + boy_12 + girl_12")
+fIV_A12_OR <- make_formula_frst_stg("resid2_mlfp", "twins_2 + boy_12 + girl_12")
+
 IV_A4_OR <- felm(fIV_A4_OR, data = gt2_sample)
+IV_A16_OR <- felm(fIV_A16_OR, data = gt2_sample)
+IV_A8_OR <- felm(fIV_A8_OR, data = gt2_sample)
+IV_A12_OR <- felm(fIV_A12_OR, data = gt2_sample)
 
-IV_A4_OR_test <- linearHypothesis(IV_A4_OR, 
-                 c("twins_2 = 0", "boy_12 = 0", "girl_12 = 0"), 
-                 test = "Chisq")
+IV_A4_OR_test <- linearHypothesis(IV_A4_OR,
+  c("twins_2 = 0", "boy_12 = 0", "girl_12 = 0"),
+  test = "Chisq"
+)
+IV_A16_OR_test <- linearHypothesis(IV_A16_OR,
+  c("twins_2 = 0", "boy_12 = 0", "girl_12 = 0"),
+  test = "Chisq"
+)
+IV_A8_OR_test <- linearHypothesis(IV_A8_OR,
+  c("twins_2 = 0", "boy_12 = 0", "girl_12 = 0"),
+  test = "Chisq"
+)
+IV_A12_OR_test <- linearHypothesis(IV_A12_OR,
+  c("twins_2 = 0", "boy_12 = 0", "girl_12 = 0"),
+  test = "Chisq"
+)
 
 # df = m - k, where m is the number of instruments and k is the number 
 # of endogenous regressors. Thereofre, m - k = 3 - 1 = 2
 
 pchisq(IV_A4_OR_test[2, 3], df = 2, lower.tail = FALSE)
+pchisq(IV_A16_OR_test[2, 3], df = 2, lower.tail = FALSE)
+pchisq(IV_A8_OR_test[2, 3], df = 2, lower.tail = FALSE)
+pchisq(IV_A12_OR_test[2, 3], df = 2, lower.tail = FALSE)
 
-# 3+ sample:
-resid3 <- residuals(IV_B4)
-gt3_sample$resid <- resid3
 
-fIV_B4_OR<- make_formula_frst_stg("resid", "twins_3 + boy_123 + girl_123")
+# 3+ Sample:
+resid3_educ <- residuals(IV_B4)
+resid3_behind <- residuals(IV_B16)
+resid3_private <- residuals(IV_B8)
+resid3_mlfp <- residuals(IV_B12)
+
+gt3_sample$resid3_educ <- resid3_educ
+gt3_sample$resid3_behind <- resid3_behind
+gt3_sample$resid3_private <- resid3_private
+gt3_sample$resid3_mlfp <- resid3_mlfp
+
+fIV_B4_OR <- make_formula_frst_stg("resid3_educ", "twins_3 + boy_123 + girl_123")
+fIV_B16_OR <- make_formula_frst_stg("resid3_behind", "twins_3 + boy_123 + girl_123")
+fIV_B8_OR <- make_formula_frst_stg("resid3_private", "twins_3 + boy_123 + girl_123")
+fIV_B12_OR <- make_formula_frst_stg("resid3_mlfp", "twins_3 + boy_123 + girl_123")
+
 IV_B4_OR <- felm(fIV_B4_OR, data = gt3_sample)
+IV_B16_OR <- felm(fIV_B16_OR, data = gt3_sample)
+IV_B8_OR <- felm(fIV_B8_OR, data = gt3_sample)
+IV_B12_OR <- felm(fIV_B12_OR, data = gt3_sample)
 
-IV_B4_OR_test <- linearHypothesis(IV_B4_OR, 
-                                  c("twins_3 = 0", "boy_123 = 0", "girl_123 = 0"), 
-                                  test = "Chisq")
+IV_B4_OR_test <- linearHypothesis(IV_B4_OR,
+                                  c("twins_3 = 0", "boy_123 = 0", "girl_123 = 0"),
+                                  test = "Chisq"
+)
+IV_B16_OR_test <- linearHypothesis(IV_B16_OR,
+                                   c("twins_3 = 0", "boy_123 = 0", "girl_123 = 0"),
+                                   test = "Chisq"
+)
+IV_B8_OR_test <- linearHypothesis(IV_B8_OR,
+                                  c("twins_3 = 0", "boy_123 = 0", "girl_123 = 0"),
+                                  test = "Chisq"
+)
+IV_B12_OR_test <- linearHypothesis(IV_B12_OR,
+                                   c("twins_3 = 0", "boy_123 = 0", "girl_123 = 0"),
+                                   test = "Chisq"
+)
 
 # df = m - k, where m is the number of instruments and k is the number 
 # of endogenous regressors. Thereofre, m - k = 3 - 1 = 2
 
 pchisq(IV_B4_OR_test[2, 3], df = 2, lower.tail = FALSE)
-
+pchisq(IV_B16_OR_test[2, 3], df = 2, lower.tail = FALSE)
+pchisq(IV_B8_OR_test[2, 3], df = 2, lower.tail = FALSE)
+pchisq(IV_B12_OR_test[2, 3], df = 2, lower.tail = FALSE)
 
 
