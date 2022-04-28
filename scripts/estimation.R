@@ -912,4 +912,53 @@ lm(no_kids ~ twins_3, data = first_gt3) %>% coef()
 sum(acr_3$estimate)
 
 
+# A check on the randomness of the samesex instrument
+
+samesex12 <- lm(
+  same_sex_12 ~ moth_age_year + moth_pp_group + moth_educ + moth_income + 
+    moth_inlf + fath_inhh + district + moth_marital,
+   data = gt2_sample)
+
+samesex123 <- lm(
+  same_sex_123 ~ moth_age_year + moth_pp_group + moth_educ + moth_income + 
+    moth_inlf + fath_inhh + district + moth_marital,
+  data = gt3_sample, subset = (same_sex_12 == 1 & birth_order == 1))
+
+stargazer(samesex12, samesex123, type = "text", keep.stat = c("n", "rsq"))
+
+
+
+# Overidentification test
+resid2 <- residuals(IV_A4)
+gt2_sample$resid <- resid2
+
+fIV_A4_OR<- make_formula_frst_stg("resid", "twins_2 + boy_12 + girl_12")
+IV_A4_OR <- felm(fIV_A4_OR, data = gt2_sample)
+
+IV_A4_OR_test <- linearHypothesis(IV_A4_OR, 
+                 c("twins_2 = 0", "boy_12 = 0", "girl_12 = 0"), 
+                 test = "Chisq")
+
+# df = m - k, where m is the number of instruments and k is the number 
+# of endogenous regressors. Thereofre, m - k = 3 - 1 = 2
+
+pchisq(IV_A4_OR_test[2, 3], df = 2, lower.tail = FALSE)
+
+# 3+ sample:
+resid3 <- residuals(IV_B4)
+gt3_sample$resid <- resid3
+
+fIV_B4_OR<- make_formula_frst_stg("resid", "twins_3 + boy_123 + girl_123")
+IV_B4_OR <- felm(fIV_B4_OR, data = gt3_sample)
+
+IV_B4_OR_test <- linearHypothesis(IV_B4_OR, 
+                                  c("twins_3 = 0", "boy_123 = 0", "girl_123 = 0"), 
+                                  test = "Chisq")
+
+# df = m - k, where m is the number of instruments and k is the number 
+# of endogenous regressors. Thereofre, m - k = 3 - 1 = 2
+
+pchisq(IV_B4_OR_test[2, 3], df = 2, lower.tail = FALSE)
+
+
 
