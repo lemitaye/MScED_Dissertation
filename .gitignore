@@ -4,3 +4,12 @@
 .Ruserdata
 data\all_persons.csv
 tex\main-blx.bib
+tex/main-blx.bib
+tex/main.aux
+tex/main.bbl
+tex/main.blg
+tex/main.log
+tex/main.out
+tex/main.pdf
+tex/main.run.xml
+tex/main.synctex.gz
