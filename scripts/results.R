@@ -94,14 +94,14 @@ header_main <- c(
   # "\\hline \\\\[-1.8ex] "
 )
 
-long_note = "*** Significant at 1\\%, ** Significant at 5\\%, * Significant at 10\\%. 
-Robust standard errors are in parentheses. Covariates for all models include age 
-(in months) and sex of child, mother's education, dummies for mother's population 
-group and income range, dummies for districts, and a dummy for whether the father 
+long_note = "Covariates for all models include age 
+(in months) and sex of child, mother's characteristics (education, ethnicity, age during
+census, age at first birth, and income range), dummies for districts, and a dummy for whether the father 
 resides in the household. The regressions for the 3+ sample are clustered by mother's ID.
 The regressions using the SameSex12 and SameSex123 instruments were excluded for reasons 
 of space. The results are qualitatively similar to the ones in columns 3 and 7, 
-respectively, and are available upon request."
+respectively, and are available upon request. Robust standard errors are in parentheses. 
+*** Significant at 1\\%, ** Significant at 5\\%, * Significant at 10\\%."
 
 star.out <- stargazer(
   ols, iv, iv, iv, ols, iv, iv, iv, 
@@ -112,7 +112,7 @@ star.out <- stargazer(
   omit.stat = "all",
   dep.var.caption  = "",
   covariate.labels = labels,
-  column.labels   = c("OLS", "IV", "OLS", "IV"),
+  column.labels   = c("OLS", "2SLS", "OLS", "2SLS"),
   column.separate = c(1, 3, 1, 3),
   dep.var.labels.include = FALSE,
   model.names = FALSE,
@@ -364,7 +364,7 @@ star_ssI <- stargazer(
   # style = "aer",
   dep.var.caption  = "",
   covariate.labels = labels_ss_I,
-  column.labels   = c("OLS", "IV", "OLS", "IV", "OLS", "IV", "OLS", "IV"),
+  column.labels   = c("OLS", "2SLS", "OLS", "2SLS", "OLS", "2SLS", "OLS", "2SLS"),
   dep.var.labels.include = FALSE,
   model.names = FALSE,
   star.cutoffs = c(0.05, 0.01, 0.001),
