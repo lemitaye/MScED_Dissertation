@@ -9,6 +9,7 @@
 library(tidyverse)
 library(grf)
 library(fastDummies)
+library(doParallel)
 
 gt2_sample <- read_csv("data/gt2_sample.csv")
 
@@ -39,8 +40,8 @@ X <- gt2_sample %>%
        "moth_employ", "moth_income")
   ) %>% 
   select(
-    -c(child_sex, province, moth_pp_group, moth_educ,
-       moth_marital, moth_employ, moth_income)
+    -c(child_sex, moth_pp_group, moth_educ, moth_marital, 
+       moth_employ, moth_income)
   )
 
 X %>% glimpse()
@@ -54,15 +55,32 @@ Y1 <- gt2_sample$educ_attain
 Y2 <- gt2_sample$behind
 Y3 <- gt2_sample$private_school
 
+cl <- makePSOCKcluster(4)
+registerDoParallel(cl)
+
 # Train instrumental forest using twins instrument (Z1)
-tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 100, mtry = 7)
-tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 100, mtry = 7)
-tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 100, mtry = 7)
+tau.educ.twins <- instrumental_forest(
+  X, Y1, W, Z1, num.trees = 10000, mtry = 5, sample.fraction = 0.05, 
+  min.node.size = 1000
+  )
+
+stopCluster(cl)
+
+tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 10000, mtry = 7)
+tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 10000, mtry = 7)
 
 # Train instrumental forest using same sex instrument (Z2)
-tau.educ.samesx <- instrumental_forest(X, Y1, W, Z2, num.trees = 100, mtry = 7)
-tau.behind.samesx <- instrumental_forest(X, Y2, W, Z2, num.trees = 100, mtry = 7)
-tau.private.samesx <- instrumental_forest(X, Y3, W, Z2, num.trees = 100, mtry = 7)
+tau.educ.samesx <- instrumental_forest(X, Y1, W, Z2, num.trees = 10000, mtry = 7)
+tau.behind.samesx <- instrumental_forest(X, Y2, W, Z2, num.trees = 10000, mtry = 7)
+tau.private.samesx <- instrumental_forest(X, Y3, W, Z2, num.trees = 10000, mtry = 7)
+
+# Z2 <- cbind(gt2_sample$boy_12, gt2_sample$girl_12)
+# 
+# tau.educ.samesx <- tsls_forest(X, Y1, W, Z2, Y.hat = NULL, W.hat = NULL, Z.hat = NULL, num.trees = 100, mtry = 7)
+# tau.behind.samesx <- tsls_forest(X, Y2, W, Z2, Y.hat = NULL, W.hat = NULL, Z.hat = NULL, num.trees = 100, mtry = 7)
+# tau.private.samesx <- tsls_forest(X, Y3, W, Z2, Y.hat = NULL, W.hat = NULL, Z.hat = NULL, num.trees = 100, mtry = 7)
+
+stopCluster(cl)
 
 
 # Prepare prediction data:
