@@ -22,7 +22,7 @@ X <- gt2_sample %>%
     moth_dob, moth_ceb, moth_age_scndbr, child_educ_gen, mean_educ_agg, 
     mode_educ_agg, twins_2, district, boy_12, girl_12, same_sex_12,
     private_school, birth_month, educ_attain, behind, child_pop_group,
-    child_private
+    child_private, child_educ, province, spacing, moth_inlf
   )) %>% 
   mutate(
     moth_pp_group =
@@ -35,8 +35,8 @@ X <- gt2_sample %>%
     moth_income = fct_lump(factor(moth_income), 8),
   ) %>% 
   dummy_cols(
-    c("child_sex", "province", "moth_pp_group", 
-      "moth_educ", "moth_marital", "moth_employ", "moth_income")
+    c("child_sex", "moth_pp_group", "moth_educ", "moth_marital",
+       "moth_employ", "moth_income")
   ) %>% 
   select(
     -c(child_sex, province, moth_pp_group, moth_educ,
@@ -312,26 +312,6 @@ plot_2(final.samesx.2)
 # * look at more dimensions of heterogeneity and more outcomes
 #   - Education of the mother and population group (X)
 # Think of how to extend this to 2SLS using same sex instruments (X)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
