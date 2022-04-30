@@ -55,16 +55,23 @@ Y1 <- gt2_sample$educ_attain
 Y2 <- gt2_sample$behind
 Y3 <- gt2_sample$private_school
 
+## # Train instrumental forest using twins instrument (Z1)
 cl <- makePSOCKcluster(4)
 registerDoParallel(cl)
 
-# Train instrumental forest using twins instrument (Z1)
+start.time <- proc.time()
+
 tau.educ.twins <- instrumental_forest(
-  X, Y1, W, Z1, num.trees = 10000, mtry = 5, sample.fraction = 0.05, 
-  min.node.size = 1000
+  X, Y1, W, Z1, num.trees = 10000, mtry = 6, sample.fraction = 0.1, 
+  min.node.size = 800
   )
 
+stop.time <- proc.time()
+run.time <- stop.time - start.time
+print(run.time)
+
 stopCluster(cl)
+##
 
 tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 10000, mtry = 7)
 tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 10000, mtry = 7)
