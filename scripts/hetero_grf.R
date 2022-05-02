@@ -62,11 +62,11 @@ registerDoParallel(cl)
 start.time <- proc.time()
 
 # tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 10000)
-tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 10000, tune.parameters = "all")
+tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 7000, tune.parameters = "all")
 # tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 10000)
 
 # Train instrumental forest using same sex instrument (Z2)
-tau.educ.samesx <- instrumental_forest(X, Y1, W, Z2, num.trees = 10000, tune.parameters = "all")
+tau.educ.samesx <- instrumental_forest(X, Y1, W, Z2, num.trees = 7000, tune.parameters = "all")
 # tau.behind.samesx <- instrumental_forest(X, Y2, W, Z2, num.trees = 10000)
 # tau.private.samesx <- instrumental_forest(X, Y3, W, Z2, num.trees = 10000)
 
