@@ -44,7 +44,6 @@ X <- gt2_sample %>%
        moth_employ, moth_income)
   )
 
-X %>% glimpse()
 
 W <- gt2_sample$no_kids
 Z1 <- gt2_sample$twins_2
@@ -55,35 +54,48 @@ Y1 <- gt2_sample$educ_attain
 Y2 <- gt2_sample$behind
 Y3 <- gt2_sample$private_school
 
-## # Train instrumental forest using twins instrument (Z1)
+
+# Train Instrumental Forests ####
 cl <- makePSOCKcluster(10)
 registerDoParallel(cl)
 
 start.time <- proc.time()
 
-# tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 10000)
-tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 7000, tune.parameters = "all")
-# tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 10000)
+## # Train instrumental forest using twins instrument (Z1)
+# (Tuning with the default params. is the best option)
+
+tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 5000)
+tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 5000)
+tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 5000)
 
 # Train instrumental forest using same sex instrument (Z2)
-tau.educ.samesx <- instrumental_forest(X, Y1, W, Z2, num.trees = 7000, tune.parameters = "all")
-# tau.behind.samesx <- instrumental_forest(X, Y2, W, Z2, num.trees = 10000)
-# tau.private.samesx <- instrumental_forest(X, Y3, W, Z2, num.trees = 10000)
+# (Supplied params. obtained from tuning)
+tau.educ.samesx <- instrumental_forest(
+  X, Y1, W, Z2, num.trees = 5000, sample.fraction = 0.25, mtry = 7, 
+  min.node.size = 3000, honesty.fraction = 0.537, honesty.prune.leaves = 1,
+  alpha = 0.206, imbalance.penalty = 0.548
+  )
+
+tau.behind.samesx <- instrumental_forest(
+  X, Y2, W, Z2, num.trees = 5000, sample.fraction = 0.25, mtry = 7, 
+  min.node.size = 3000, honesty.fraction = 0.537, honesty.prune.leaves = 1,
+  alpha = 0.206, imbalance.penalty = 0.548
+  )
+
+tau.private.samesx <- instrumental_forest(
+  X, Y3, W, Z2, num.trees = 5000, sample.fraction = 0.25, mtry = 7, 
+  min.node.size = 3000, honesty.fraction = 0.537, honesty.prune.leaves = 1,
+  alpha = 0.206, imbalance.penalty = 0.548
+  )
 
 stop.time <- proc.time()
 run.time <- stop.time - start.time
 print(run.time)
 
 stopCluster(cl)
-# Z2 <- cbind(gt2_sample$boy_12, gt2_sample$girl_12)
-# 
-# tau.educ.samesx <- tsls_forest(X, Y1, W, Z2, Y.hat = NULL, W.hat = NULL, Z.hat = NULL, num.trees = 100, mtry = 7)
-# tau.behind.samesx <- tsls_forest(X, Y2, W, Z2, Y.hat = NULL, W.hat = NULL, Z.hat = NULL, num.trees = 100, mtry = 7)
-# tau.private.samesx <- tsls_forest(X, Y3, W, Z2, Y.hat = NULL, W.hat = NULL, Z.hat = NULL, num.trees = 100, mtry = 7)
 
 
-
-# Prepare prediction data:
+# Prepare prediction data: ####
 
 # Vary Mother's population group and Mother's age at first birth
 comb.1 <- expand.grid(
@@ -147,7 +159,7 @@ X.pred.2 <- as_tibble(X.pred.2) %>%
   )
 
 
-# Start prediction:
+# Start prediction: ####
 
 # Predict along the first dimensions of hetero. (i.e., X.pred.1) using twins instr.
 pred.educ.twins.1 <- predict(tau.educ.twins, X.pred.1, estimate.variance = TRUE)
@@ -319,30 +331,7 @@ plot_2(final.samesx.2)
 
 
 
-# we are making some progress
-# issues to fix: 
-# * X.train needs to include dummies for all cats., (x)
-# * facet plot by mother's population group. (x)
-# * Out-of-bag predictions?
-# * reduce "mtry" to 7 or lower (x)
-# * Tuning; e.g., min. leaf size ?
-# * variable importance plot 
-# * look at more dimensions of heterogeneity and more outcomes
-#   - Education of the mother and population group (X)
-# Think of how to extend this to 2SLS using same sex instruments (X)
 
-
-# Tuning result suggests the following:
-# --
-# sample.fraction: 0.5
-# mtry: 26
-# min.node.size: 5
-# honesty.fraction: 0.5
-# honesty.prune.leaves: TRUE
-# alpha: 0.05
-# imbalance.penalty: 0
-# ---
-# Tuning result suggests the default values are optimal
 
 
 
