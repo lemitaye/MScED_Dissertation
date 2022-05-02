@@ -259,23 +259,6 @@ final.samesx.1 <- final_res_1(
   pred.educ.samesx.1, pred.behind.samesx.1, pred.private.samesx.1
   )
 
-# Function to plot from the two data frames above
-plot_1 <- function( tbl ) {
-  
-  p <- tbl %>% 
-    ggplot(aes(moth_age_fstbr, pred)) +
-    geom_line(aes(group = 1)) +
-    geom_line(aes(y = upper, group = 1), linetype = "dashed") +
-    geom_line(aes(y = lower, group = 1), linetype = "dashed") +
-    geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
-    facet_grid(moth_pp_group ~ outcome, scales = "free_y")
-  
-  return(p)
-}
-
-plot_1(final.twins.1)
-plot_1(final.samesx.1)
-
 
 # Predict along the second dimensions of hetero. (i.e., X.pred.2) using twins instr.
 pred.educ.twins.2 <- predict(tau.educ.twins, X.pred.2, estimate.variance = TRUE)
@@ -342,7 +325,38 @@ final.samesx.2 <- final_res_2(
   pred.educ.samesx.2, pred.behind.samesx.2, pred.private.samesx.2
 )
 
-# plot
+
+# Save dataframes containing predictions
+
+write_csv(final.twins.1, file = "data/final.twins.1.csv")
+write_csv(final.samesx.1, file = "data/final.samesx.1.csv")
+
+write_csv(final.twins.2, file = "data/final.twins.2.csv")
+write_csv(final.samesx.2, file = "data/final.samesx.2.csv")
+
+
+# Read saved data
+final.twins.1 <- read_csv("data/final.twins.1.csv")
+final.samesx.1 <- read_csv("data/final.samesx.1.csv")
+
+final.twins.2 <- read_csv("data/final.twins.2.csv")
+final.samesx.2 <- read_csv("data/final.samesx.2.csv")
+
+
+# Function to plot from the data frames above
+plot_1 <- function( tbl ) {
+  
+  p <- tbl %>% 
+    ggplot(aes(moth_age_fstbr, pred)) +
+    geom_line(aes(group = 1)) +
+    geom_line(aes(y = upper, group = 1), linetype = "dashed") +
+    geom_line(aes(y = lower, group = 1), linetype = "dashed") +
+    geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
+    facet_grid(moth_pp_group ~ outcome, scales = "free_y")
+  
+  return(p)
+}
+
 plot_2 <- function( tbl ) {
   p <- tbl %>% 
     ggplot(aes(moth_educ, pred, color = moth_pp_group)) +
@@ -359,18 +373,12 @@ plot_2 <- function( tbl ) {
   return(p)
 }
 
+# plots
+plot_1(final.twins.1)
+plot_1(final.samesx.1)
+
 plot_2(final.twins.2)
 plot_2(final.samesx.2)
-
-
-# Save dataframes containing predictions
-
-
-
-
-
-
-
 
 
 
