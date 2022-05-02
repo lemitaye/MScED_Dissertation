@@ -94,6 +94,25 @@ print(run.time)
 
 stopCluster(cl)
 
+# Save (expensive) results:
+saveRDS(tau.educ.twins, file = "data/tau.educ.twins.RData")
+saveRDS(tau.behind.twins, file = "data/tau.behind.twins.RData")
+saveRDS(tau.private.twins, file = "data/tau.private.twins")
+
+saveRDS(tau.educ.samesx, file = "data/tau.educ.samesx.RData")
+saveRDS(tau.behind.samesx, file = "data/tau.behind.samesx.RData")
+saveRDS(tau.private.samesx, file = "data/tau.private.samesx.RData")
+
+# Read saved results
+tau.educ.twins <- readRDS("data/tau.educ.twins.RData")
+tau.behind.twins <- readRDS("data/tau.behind.twins.RData")
+tau.private.twins <- readRDS("data/tau.private.twins")
+
+tau.educ.samesx <- readRDS("data/tau.educ.samesx.RData")
+tau.behind.samesx <- readRDS("data/tau.behind.samesx.RData")
+tau.private.samesx <- readRDS("data/tau.private.samesx.RData")
+
+
 
 # Prepare prediction data: ####
 
