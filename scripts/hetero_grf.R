@@ -345,6 +345,14 @@ plot_2(final.samesx.2)
 # Think of how to extend this to 2SLS using same sex instruments (X)
 
 
+# Tuning result suggests the following:
+# sample.fraction: 0.5
+# mtry: 26
+# min.node.size: 5
+# honesty.fraction: 0.5
+# honesty.prune.leaves: TRUE
+# alpha: 0.05
+# imbalance.penalty: 0
 
 
 
