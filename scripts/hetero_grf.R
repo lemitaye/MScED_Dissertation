@@ -61,27 +61,14 @@ registerDoParallel(cl)
 
 start.time <- proc.time()
 
-tau.educ.twins <- instrumental_forest(
-  X, Y1, W, Z1, num.trees = 10000, tune.parameters = "all"
-  )
+tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 10000)
+tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 10000)
+tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 10000)
 
-# tau.behind.twins <- instrumental_forest(
-#   X, Y2, W, Z1, num.trees = 5000, mtry = 7, sample.fraction = 0.1
-#   )
-# tau.private.twins <- instrumental_forest(
-#   X, Y3, W, Z1, num.trees = 5000, mtry = 7, sample.fraction = 0.1
-#   )
-# 
-# # Train instrumental forest using same sex instrument (Z2)
-# tau.educ.samesx <- instrumental_forest(
-#   X, Y1, W, Z2, num.trees = 5000, mtry = 7, sample.fraction = 0.1
-#   )
-# tau.behind.samesx <- instrumental_forest(
-#   X, Y2, W, Z2, num.trees = 5000, mtry = 7, sample.fraction = 0.1
-#   )
-# tau.private.samesx <- instrumental_forest(
-#   X, Y3, W, Z2, num.trees = 5000, mtry = 7, sample.fraction = 0.1
-#   )
+# Train instrumental forest using same sex instrument (Z2)
+tau.educ.samesx <- instrumental_forest(X, Y1, W, Z2, num.trees = 10000)
+tau.behind.samesx <- instrumental_forest(X, Y2, W, Z2, num.trees = 10000)
+tau.private.samesx <- instrumental_forest(X, Y3, W, Z2, num.trees = 10000)
 
 stop.time <- proc.time()
 run.time <- stop.time - start.time
@@ -345,6 +332,7 @@ plot_2(final.samesx.2)
 # Think of how to extend this to 2SLS using same sex instruments (X)
 
 
+<<<<<<< HEAD
 # Tuning result suggests the following:
 # sample.fraction: 0.5
 # mtry: 26
@@ -353,6 +341,10 @@ plot_2(final.samesx.2)
 # honesty.prune.leaves: TRUE
 # alpha: 0.05
 # imbalance.penalty: 0
+=======
+# Tuning result suggests the default values are optimal
+
+>>>>>>> 88f4313c89ed3bb0ee2c693d4d7278977f2d68a2
 
 
 
