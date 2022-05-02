@@ -342,45 +342,115 @@ final.samesx.1 <- read_csv("data/final.samesx.1.csv")
 final.twins.2 <- read_csv("data/final.twins.2.csv")
 final.samesx.2 <- read_csv("data/final.samesx.2.csv")
 
+# Prepare the data
+  
+
 
 # Function to plot from the data frames above
+
+to_string <- as_labeller(
+  c(
+    "educ" = "Education Attainment",
+    "behind" = "Left Behind", 
+    "private" = "Private School",
+    "Black African" = "Black African",
+    "Coloured, Indian or Asian, and Other" = "Coloured, Indian or\n Asian, and Other",
+    "White" = "White"
+  )
+)
+
 plot_1 <- function( tbl ) {
   
   p <- tbl %>% 
+    mutate(
+      moth_pp_group = factor(
+        moth_pp_group,
+        levels = c("Black African", "White", "Coloured, Indian or Asian, and Other")
+      ),
+      outcome = factor(outcome,
+                       levels = c("educ", "behind", "private"))
+    ) %>% 
     ggplot(aes(moth_age_fstbr, pred)) +
-    geom_line(aes(group = 1)) +
+    geom_line(aes(group = 1), color = "blue") +
     geom_line(aes(y = upper, group = 1), linetype = "dashed") +
     geom_line(aes(y = lower, group = 1), linetype = "dashed") +
     geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
-    facet_grid(moth_pp_group ~ outcome, scales = "free_y")
+    facet_grid(moth_pp_group ~ outcome, scales = "free_y", 
+               labeller = to_string) +
+    labs(
+      x = "Mother's Age at First Birth", y = ""
+    )
   
   return(p)
 }
 
 plot_2 <- function( tbl ) {
   p <- tbl %>% 
+    mutate(
+      moth_pp_group = factor(
+        moth_pp_group,
+        levels = c("Black African", "White", "Coloured, Indian or Asian, and Other")
+      ),
+      moth_educ = factor(
+        moth_educ,
+        levels = c("No schooling", "Some primary", "Completed primary", 
+                   "Some secondary", "Grade 12/Std 10", "Higher")
+      ),
+      outcome = factor(outcome,
+                       levels = c("educ", "behind", "private"))
+    ) %>% 
     ggplot(aes(moth_educ, pred, color = moth_pp_group)) +
     geom_point(size = 1.75, position = position_dodge(width = 0.75)) +
     geom_errorbar(aes(ymin = lower, ymax = upper), 
                   width = .2, position = position_dodge(width = 0.75)) +
-    geom_hline(aes(yintercept = 0), color = "red", 
-               linetype = "dashed") +
+    geom_hline(
+      aes(yintercept = 0), color = "gray50", 
+      size = 1, linetype = "dotted"
+    ) +
     scale_x_discrete(expand=c(.1, 0)) +
     coord_flip() +
     theme(legend.position = "top") +
-    facet_wrap(~outcome, scales = "free_x") 
+    facet_wrap(~outcome, scales = "free_x", labeller = to_string) +
+    labs(
+      y = "", x = "Mother's Level of Education", color = ""
+    )
   
   return(p)
 }
 
 # plots
-plot_1(final.twins.1)
-plot_1(final.samesx.1)
+a.t <- plot_1(final.twins.1)
+b.t <- plot_2(final.twins.2)
 
-plot_2(final.twins.2)
-plot_2(final.samesx.2)
+a.s <- plot_1(final.samesx.1)
+b.s <- plot_2(final.samesx.2)
 
+fig5 <- ggarrange(
+  a.t, NULL, b.t, 
+  labels = c("A.", "", "B."),
+  nrow = 3, heights = c(1, 0.05, 1)
+) 
 
+fig6 <- ggarrange(
+  a.s, NULL, b.s, 
+  labels = c("A.", "", "B."),
+  nrow = 3, heights = c(1, 0.05, 1)
+) 
 
+ggsave(
+  filename = "tex/figures/heter1.pdf",
+  plot = fig5,
+  device = cairo_pdf,
+  width = 210,
+  height = 297,
+  units = "mm"
+)
 
-
+ggsave(
+  filename = "tex/figures/heter2.pdf",
+  plot = fig6,
+  device = cairo_pdf,
+  width = 210,
+  height = 297,
+  units = "mm"
+)
