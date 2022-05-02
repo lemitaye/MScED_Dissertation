@@ -61,31 +61,48 @@ registerDoParallel(cl)
 
 start.time <- proc.time()
 
-## # Train instrumental forest using twins instrument (Z1)
+# # Train instrumental forest using twins instrument (Z1)
 # (Tuning with the default params. is the best option)
 
-tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 5000)
-tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 5000)
-tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 5000)
+# tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 5000)
+# tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 5000)
+# tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 5000)
+
 
 # Train instrumental forest using same sex instrument (Z2)
 # (Supplied params. obtained from tuning)
+
 tau.educ.samesx <- instrumental_forest(
-  X, Y1, W, Z2, num.trees = 5000, sample.fraction = 0.25, mtry = 7, 
-  min.node.size = 3000, honesty.fraction = 0.537, honesty.prune.leaves = 1,
-  alpha = 0.206, imbalance.penalty = 0.548
+  X, Y1, W, Z2, num.trees = 5000, 
+  sample.fraction = 0.253441507730167,
+  mtry = 7,
+  min.node.size = 53,
+  honesty.fraction = 0.536909526004456,
+  honesty.prune.leaves = 1,
+  alpha = 0.206129047670402,
+  imbalance.penalty = 0.548535325594362
   )
 
 tau.behind.samesx <- instrumental_forest(
-  X, Y2, W, Z2, num.trees = 5000, sample.fraction = 0.25, mtry = 7, 
-  min.node.size = 3000, honesty.fraction = 0.537, honesty.prune.leaves = 1,
-  alpha = 0.206, imbalance.penalty = 0.548
+  X, Y2, W, Z2, num.trees = 5000, 
+  sample.fraction = 0.0807964854175225,
+  mtry = 8,
+  min.node.size = 71,
+  honesty.fraction = 0.615930338646285,
+  honesty.prune.leaves = 0,
+  alpha = 0.0728798793861642,
+  imbalance.penalty = 1.26205245650895
   )
 
 tau.private.samesx <- instrumental_forest(
-  X, Y3, W, Z2, num.trees = 5000, sample.fraction = 0.25, mtry = 7, 
-  min.node.size = 3000, honesty.fraction = 0.537, honesty.prune.leaves = 1,
-  alpha = 0.206, imbalance.penalty = 0.548
+  X, Y3, W, Z2, num.trees = 5000, 
+  sample.fraction = 0.0987349107163027,
+  mtry = 9,
+  min.node.size = 83,
+  honesty.fraction = 0.623782520485111,
+  honesty.prune.leaves = 0,
+  alpha = 0.0982620577560738,
+  imbalance.penalty = 3.12435664022772
   )
 
 stop.time <- proc.time()
@@ -344,6 +361,10 @@ plot_2 <- function( tbl ) {
 
 plot_2(final.twins.2)
 plot_2(final.samesx.2)
+
+
+# Save dataframes containing predictions
+
 
 
 
