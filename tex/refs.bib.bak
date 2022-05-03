@@ -482,21 +482,4 @@
   urldate      = {2022-04-04},
 }
 
-@Article{Angrist1996,
-  author   = {Angrist, Joshua D. and Imbens, Guido W. and Rubin, Donald B.},
-  journal  = {Journal of the American Statistical Association},
-  title    = {Identification of Causal Effects Using Instrumental Variables},
-  year     = {1996},
-  issn     = {0162-1459},
-  note     = {Publisher: [American Statistical Association, Taylor \& Francis, Ltd.]},
-  number   = {434},
-  pages    = {444--455},
-  volume   = {91},
-  abstract = {We outline a framework for causal inference in settings where assignment to a binary treatment is ignorable, but compliance with the assignment is not perfect so that the receipt of treatment is nonignorable. To address the problems associated with comparing subjects by the ignorable assignment-an "intention-to-treat analysis"-we make use of instrumental variables, which have long been used by economists in the context of regression models with constant treatment effects. We show that the instrumental variables ({IV}) estimand can be embedded within the Rubin Causal Model ({RCM}) and that under some simple and easily interpretable assumptions, the {IV} estimand is the average causal effect for a subgroup of units, the compliers. Without these assumptions, the {IV} estimand is simply the ratio of intention-to-treat causal estimands with no interpretation as an average causal effect. The advantages of embedding the {IV} approach in the {RCM} are that it clarifies the nature of critical assumptions needed for a causal interpretation, and moreover allows us to consider sensitivity of the results to deviations from key assumptions in a straightforward manner. We apply our analysis to estimate the effect of veteran status in the Vietnam era on mortality, using the lottery number that assigned priority for the draft as an instrument, and we use our results to investigate the sensitivity of the conclusions to critical assumptions.},
-  doi      = {10.2307/2291629},
-  file     = {Angrist et al. - 1996 - Identification of Causal Effects Using Instrumenta.pdf:C\:\\Users\\tayel\\Zotero\\storage\\HT6AGX2L\\Angrist et al. - 1996 - Identification of Causal Effects Using Instrumenta.pdf:application/pdf},
-  url      = {https://www.jstor.org/stable/2291629},
-  urldate  = {2022-03-09},
-}
-
 @Comment{jabref-meta: databaseType:bibtex;}
