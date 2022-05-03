@@ -22,7 +22,8 @@
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage[
 backend=bibtex,  % don't use "biber"!
-style=authoryear
+style=authoryear-icomp, 
+sorting=nyt,sortcites=false
   ]{biblatex} 
 
 \addbibresource{refs.bib} 
@@ -54,14 +55,15 @@ style=authoryear
 
 \begin{figure}[h!]
 \centering
-\caption{\label{fig:02}[Some Caption]}
+\caption{\label{fig:02}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
 \includegraphics[width=\textwidth]{figures/acrs.pdf}
 \end{figure}
 
 \begin{sidewaysfigure}[ht]
 \centering
-\caption{\label{fig:03}Caption in landscape to a figure in landscape.}
+\caption{\label{fig:03}Unconditional First-Stage Estimates and 95\% CI for Various Sub-populations}
 \includegraphics[width=\textwidth]{figures/monot.pdf}
+\fnote{\textit{Notes:} Each cell is a combination of PopulationGroup\_EducationLevel\_Age. Population Group = \{ B: Black African, W: Whites, C: Coloured, Indian or Asian, and Other \}; Mother's Level of Education = \{ P: Primary or Less, S: Some secondary, G: Grade 12/Std 10, H: Higher \}; Age at first birth = \{ 15-19, 20-24, 25-29, 31+ \} }.
 \end{sidewaysfigure}
 
 \begin{figure}[h!]
@@ -79,14 +81,16 @@ style=authoryear
 
 \begin{figure}[h!]
 \centering
-\caption{\label{fig:06}[Some Caption]}
+\caption{\label{fig:06}Results of Generalized Random Forest Using Twins IV}
 \includegraphics[width=\textwidth]{figures/heter1.pdf}
+\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. Tuning results suggest the default values of the parameters as optimal for each forest. Each forest is based on 5000 trees. }
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\caption{\label{fig:07}[Some Caption]}
+\caption{\label{fig:07}Results of Generalized Random Forest Using Same-Sex IV}
 \includegraphics[width=\textwidth]{figures/heter2.pdf}
+\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation. Each forest is based on 5000 trees. }
 \end{figure}
 
 \input{tables/table10}
