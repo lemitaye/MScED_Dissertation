@@ -766,12 +766,12 @@ f2 <- plot_frst("boy_12", label = c("boy_12" = "Boy12"))
 f3 <- plot_frst("girl_12", label = c("girl_12" = "Girl12"))
 
 fig2 <- ggarrange(
-  f1, f2, f3, 
+  f1, f2, f3, labels = c("A.", "B.", "C."),
   ncol = 3
   ) 
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/monot.pdf",
+  filename = "tex/figures/monot.pdf",
   plot = fig2,
   device = cairo_pdf,
   width = 270,
@@ -893,7 +893,7 @@ nrow = 5, heights = c(1, 0.15, 1, 0.15, 1)
 ) 
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/acrs.pdf",
+  filename = "tex/figures/acrs.pdf",
   plot = fig1,
   device = cairo_pdf,
   width = 210,

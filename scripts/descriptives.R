@@ -466,8 +466,8 @@ ggsave(
   filename = "tex/figures/line_pp.pdf",
   plot = line_gr,
   device = cairo_pdf,
-  width = 120,
-  height = 90,
+  width = 160,
+  height = 130,
   units = "mm"
 )
 
@@ -506,7 +506,7 @@ figure_annon <- annotate_figure(
   )
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/hists.pdf",
+  filename = "tex/figures/hists.pdf",
   plot = figure_annon,
   device = cairo_pdf,
   width = 220,
