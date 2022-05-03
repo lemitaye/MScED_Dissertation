@@ -410,7 +410,7 @@ plot_2 <- function( tbl ) {
     scale_x_discrete(expand=c(.1, 0)) +
     coord_flip() +
     theme(legend.position = "top") +
-    facet_wrap(~outcome, scales = "free_x", labeller = to_string) +
+    facet_wrap(~outcome, labeller = to_string) +
     labs(
       y = "", x = "Mother's Level of Education", color = ""
     )
