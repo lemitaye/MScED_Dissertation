@@ -314,7 +314,7 @@ z <- full_join(x, y, by = "variable")
 z$empty0 <- NA
 z$empty1 <- NA
 z$empty2 <- NA
-z <- select(z, empty0, variable, mean_2, sd_2, empty1, mean_3_frstbrn,
+z <- select(z, variable, empty0, mean_2, sd_2, empty1, mean_3_frstbrn,
             sd_3_frstbrn, empty2, mean_3_both, sd_3_both)
 
 z <- z %>% 
@@ -372,11 +372,11 @@ cols_arrg <- c(
 z$variable <- factor(z$variable, levels = cols_arrg)
 z <- z[order(z$variable), ]
 row.names(z) <- NULL  # reset the rownames
+z$variable <- as.character( z$variable )
+z$variable[21:37] <- str_c("\\phantom{M}", as.character( z$variable[21:37] )) 
 
-# 
-# names <- c("Number of Kids", "Male", "Age in years", "Age in months")
 
-
+# Start building table
 xtab <- xtable(
   z, display = c("s", "s", "s", "g", "g", "s", "g", "g", "s", "g", "g"),
   digits = 4, caption = "Summary Statistics", label = "tab:01"
@@ -437,7 +437,8 @@ print(
   xtab, add.to.row = addtorow,
   include.rownames = FALSE, include.colnames = FALSE, 
   booktabs = TRUE, caption.placement = "top", hline.after = c(-1, 0),
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table10.tex" 
+  sanitize.text.function = identity,
+  file = "tex/tables/sum-stat.tex"
   )
 
 
