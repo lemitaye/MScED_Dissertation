@@ -879,25 +879,28 @@ plot_acr <- function(vars, rows = 1, labels) {
 
 r1 <- plot_acr(c("twins_2", "twins_3"), 
                labels = c("twins_2" = "Twins2", "twins_3" = "Twins3")) 
+
+r2 <- plot_acr(c("same_sex_12", "same_sex_123"), 
+               labels = c("same_sex_12" = "SameSex12", "same_sex_123" = "SameSex123"))
   
-r2 <- plot_acr(c("boy_12", "boy_123"), 
+r3 <- plot_acr(c("boy_12", "boy_123"), 
                labels = c("boy_12" = "Boy12", "boy_123" = "Boy123"))
 
-r3 <- plot_acr(c("girl_12", "girl_123"), 
+r4 <- plot_acr(c("girl_12", "girl_123"), 
                labels = c("girl_12" = "Girl12", "girl_123" = "Girl123")) 
 
 fig1 <- ggarrange(
-r1, NULL, r2, NULL, r3,
-labels = c("A.", "", "B.", "", "C."),
-nrow = 5, heights = c(1, 0.15, 1, 0.15, 1)
+r1, NULL, r2, NULL, r3, NULL, r4,
+labels = c("A.", "", "B.", "", "C.", "", "D."),
+nrow = 7, heights = c(1, 0.15, 1, 0.15, 1, 0.15, 1)
 ) 
 
 ggsave(
   filename = "tex/figures/acrs.pdf",
   plot = fig1,
   device = cairo_pdf,
-  width = 210,
-  height = 235,
+  width = 200,
+  height = 297,
   units = "mm"
 )
 # %>% annotate_figure(
