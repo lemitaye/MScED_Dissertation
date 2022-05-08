@@ -1,0 +1,51 @@
+%\ExecuteBibliographyOptions{maxcitenames=1}
+%
+%\DeclareFieldFormat{citehyperref}{%
+%  \DeclareFieldAlias{bibhyperref}{noformat}% Avoid nested links
+%  \bibhyperref{#1}}
+%
+%\DeclareFieldFormat{textcitehyperref}{%
+%  \DeclareFieldAlias{bibhyperref}{noformat}% Avoid nested links
+%  \bibhyperref{%
+%    #1%
+%    \ifbool{cbx:parens}
+%      {\bibcloseparen\global\boolfalse{cbx:parens}}
+%      {}}}
+%
+%\savebibmacro{cite}
+%\savebibmacro{textcite}
+%
+%\renewbibmacro*{cite}{%
+%  \printtext[citehyperref]{%
+%    \restorebibmacro{cite}%
+%    \usebibmacro{cite}}}
+%
+%\renewbibmacro*{textcite}{%
+%  \ifboolexpr{
+%    ( not test {\iffieldundef{prenote}} and
+%      test {\ifnumequal{\value{citecount}}{1}} )
+%    or
+%    ( not test {\iffieldundef{postnote}} and
+%      test {\ifnumequal{\value{citecount}}{\value{citetotal}}} )
+%  }
+%    {\DeclareFieldAlias{textcitehyperref}{noformat}}
+%    {}%
+%  \printtext[textcitehyperref]{%
+%    \restorebibmacro{textcite}%
+%    \usebibmacro{textcite}}}
+
+\AtEveryBibitem{% Clean up the bibtex rather than editing it
+ \clearlist{address}
+ \clearfield{date}
+ \clearfield{eprint}
+ \clearfield{isbn}
+ \clearfield{issn}
+ \clearlist{location}
+ \clearfield{month}
+ \clearfield{series}
+ 
+ \ifentrytype{book}{}{% Remove publisher and editor except for books
+  \clearlist{publisher}
+  \clearname{editor}
+ }
+}
