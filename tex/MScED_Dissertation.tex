@@ -23,18 +23,62 @@
 \usepackage[
 backend=bibtex,  % don't use "biber"!
 style=authoryear-icomp, 
-doi=false,isbn=false,url=false,eprint=false,
+isbn=false,url=false,eprint=false,
 sorting=nyt,sortcites=false
   ]{biblatex} 
 
-\addbibresource{refs.bib} 
 
 \newcommand\fnote[1]{\captionsetup{font=footnotesize}\caption*{#1}}
 \setlength{\parskip}{0.5em}
 
+\addbibresource{refs.bib} 
+
+\AtEveryBibitem{% Clean up the bibtex rather than editing it
+ \clearlist{address}
+ \clearfield{date}
+ \clearfield{eprint}
+ \clearfield{isbn}
+ \clearfield{issn}
+ \clearlist{location}
+ \clearfield{month}
+ \clearfield{series}
+ 
+ \ifentrytype{book}{}{% Remove publisher and editor except for books
+  \clearlist{publisher}
+  \clearname{editor}
+ }
+}
+
+\pagenumbering{roman}
+
 \begin{document}
+\input{sections/title}
 
 \begin{onehalfspace}
+%\section*{Disclaimers}
+%\input{disclaimer}
+%\pagebreak
+
+\input{sections/abstract}
+\pagebreak
+
+%\begin{center}
+%\section*{Acknowledgements}
+%\end{center}
+
+%\input{sections/acknowledgements}
+%\pagebreak
+
+\tableofcontents
+\pagebreak
+
+\listoffigures
+%\pagebreak
+
+\listoftables
+\pagebreak
+
+\pagenumbering{arabic}
 
 \input{sections/intro}
 \input{sections/data_methods}
@@ -95,5 +139,9 @@ sorting=nyt,sortcites=false
 \input{tables/table13}
 
 
+% rename figure labels (make them intuitive)
+% add columns for Girl12 in Figure 5 (?)
+% make whole name of references clickable
+% remove grids in figures
 
 \end{document}
