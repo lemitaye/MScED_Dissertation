@@ -33,22 +33,6 @@ sorting=nyt,sortcites=false
 
 \addbibresource{refs.bib} 
 
-\AtEveryBibitem{% Clean up the bibtex rather than editing it
- \clearlist{address}
- \clearfield{date}
- \clearfield{eprint}
- \clearfield{isbn}
- \clearfield{issn}
- \clearlist{location}
- \clearfield{month}
- \clearfield{series}
- 
- \ifentrytype{book}{}{% Remove publisher and editor except for books
-  \clearlist{publisher}
-  \clearname{editor}
- }
-}
-
 \pagenumbering{roman}
 
 \begin{document}
