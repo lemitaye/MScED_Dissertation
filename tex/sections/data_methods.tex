@@ -15,6 +15,7 @@ Columns 3-6 of \autoref{tab:01} presents summary statistics on the 3+ sample. Co
     
 
 \subsection{Model Specification and Outcome Variables}
+\label{section:outcomes}
 
 The structural equation that captures the causal relationship of interest is
 
@@ -36,6 +37,7 @@ The last outcome variable, mothers' labour force participation (Mothers' LFP) is
 
 
 \subsection{Instrumental Variables, Interpretation, and First Stages}
+\label{section:IVs}
 
 The main motivation behind the use of instrumental variables is to uncover a causal relationship between family size and outcomes for children. Following the potential outcomes framework, what we are trying to estimate using the birth of twins and the sex composition of siblings as natural experiments is what \textcite{Angrist1995} called the Average Causal Response (ACR). \textcite{Angrist1995} have shown that, given mild regularity assumptions, the Two Stages Least Squares (2SLS) estimates using a binary instrument $ Z $ to instrument for an endogenous variable that takes a finite set of integer values  (say $ 0, 1, \dots, J $) is the weighted average of per-unit causal effects (that is, the effect of going from 0 to 1, the effect of going from 1 to 2, and so on) along the length of an appropriately defined causal response function. More formally, let $ N_{0i} $ and $ N_{1i} $ be the potential number of children in the family if a binary instrument $ Z_{i} $ were equal to 0 and 1, respectively. The observed number of children $ n_{i} $ is then, $ n_{i} = N_{0i} + (N_{1i} - N_{0i})\cdot Z_{i} $. Similarly let $ Y_{i}(j) $ be the potential outcome as a function of $ j $, where j takes possible values for $ n_{i} $ in the set $ \{0, 1, \dots, J\} $. Only one of these potential outcomes is realized and we denote the observed outcome by $ y_{i} $. In the simplest case with no covariates, the IV estimator using a binary instrument $ Z $ gives the Wald estimator.\footnote{The interpretation of the ACR is more elaborate when covariates are added, but the basic idea is preserved. See \textcite[p.~437]{Angrist1995}.} Then,
 
