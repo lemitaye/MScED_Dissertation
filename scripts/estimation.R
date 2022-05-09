@@ -899,14 +899,9 @@ plot_acr <- function(vars, rows = 1, labels, x, y) {
     facet_wrap(~term, scale = "free", nrow = rows,
                labeller = as_labeller(labels)
     ) +
-    theme_pubr(
-      base_size = 10,
-      base_family = "",
-      border = FALSE,
-      margin = TRUE,
-      x.text.angle = 0
-    ) +
-    labs(x = "Number of Children", y = "")
+    labs(x = "Number of Children", y = "") +
+    scale_colour_Publication() + 
+    theme_Publication()
   
   return(p)
 }
