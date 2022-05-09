@@ -871,7 +871,7 @@ plot_acr <- function(vars, rows = 1, labels) {
     facet_wrap(~term, scale = "free", nrow = rows,
                labeller = as_labeller(labels)
     ) +
-    theme_bw() +
+    theme_pubr() +
     labs(x = "Number of Children", y = "")
   
   return(p)
