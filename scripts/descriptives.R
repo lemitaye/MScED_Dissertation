@@ -159,7 +159,9 @@ p <- mod_all %>%
   theme(legend.position = "top") +
   facet_wrap( ~ var, scale = "free_y", nrow = 2, labeller = to_string) +
   scale_shape_manual(values = c(15, 16)) +
-  labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" )
+  labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" ) +
+  scale_colour_Publication() + 
+  theme_Publication()
 
 ggsave(
   filename = "tex/figures/age_mods.pdf",
@@ -451,7 +453,7 @@ line_gr <- uni_mults %>%
     levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
     )) %>%
   ggplot(aes(year, prop,linetype = pop_group, color = pop_group)) +
-  geom_line(size = 0.5) +
+  geom_line(size = 1) +
   # scale_colour_brewer(palette = "Set1") +
   # theme_bw() +
   theme(legend.position = "top") +
@@ -461,14 +463,16 @@ line_gr <- uni_mults %>%
     y = "Multiple Births Per 1000 Live Births",
     color = "",
     linetype = ""
-  )
+  ) +
+  scale_colour_Publication() + 
+  theme_Publication()
 
 ggsave(
   filename = "tex/figures/line_pp.pdf",
   plot = line_gr,
   device = cairo_pdf,
-  width = 160,
-  height = 130,
+  width = 200,
+  height = 160,
   units = "mm"
 )
 

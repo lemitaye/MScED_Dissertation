@@ -26,9 +26,10 @@ library(fastDummies)
 library(xtable)
 library(ggpubr)
 library(GGally)  # contains "ggcoef()" to plot reg. coefs.
-# library(broom.helpers)
 
-theme_set(theme_light())
+# Credit goes to Koundinya Desiraju (https://github.com/koundy/ggplot_theme_Publication)
+# for providing the following themes for publication ready plots:
+source("scripts/ggplot_theme_Publication-2.R")  
 
 
 # Call R scripts ####

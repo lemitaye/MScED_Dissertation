@@ -899,7 +899,7 @@ plot_acr <- function(vars, rows = 1, labels, x, y) {
     facet_wrap(~term, scale = "free", nrow = rows,
                labeller = as_labeller(labels)
     ) +
-    labs(x = "Number of Children", y = "") +
+    labs(x = "", y = "") +
     scale_colour_Publication() + 
     theme_Publication()
   
@@ -920,12 +920,12 @@ r3 <- plot_acr(c("boy_12", "boy_123"),
 
 r4 <- plot_acr(c("girl_12", "girl_123"), 
                labels = c("girl_12" = "Girl12", "girl_123" = "Girl123"),
-               x= c(5, 4), y = c(0.03, 0.03)) 
+               x= c(5, 4), y = c(0.03, 0.03)) + labs(x = "Number of Children", y = "")
 
 fig1 <- ggarrange(
-r1, NULL, r2, NULL, r3, NULL, r4,
-labels = c("A.", "", "B.", "", "C.", "", "D."),
-nrow = 7, heights = c(1, 0.15, 1, 0.15, 1, 0.15, 1)
+r1, r2, r3, r4,
+labels = c("A.", "B.", "C.", "D."),
+nrow = 4, heights = c(1.2, 1.2, 1.2, 1.2)
 ) 
 
 ggsave(
