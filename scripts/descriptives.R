@@ -156,12 +156,12 @@ p <- mod_all %>%
     aes(yintercept = 0), color = "gray50", 
     size = 1, linetype = "dotted"
     ) +
-  theme(legend.position = "top") +
   facet_wrap( ~ var, scale = "free_y", nrow = 2, labeller = to_string) +
   scale_shape_manual(values = c(15, 16)) +
   labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" ) +
   scale_colour_Publication() + 
-  theme_Publication()
+  theme_Publication() +
+  theme(legend.position = "top")
 
 ggsave(
   filename = "tex/figures/age_mods.pdf",
@@ -454,9 +454,6 @@ line_gr <- uni_mults %>%
     )) %>%
   ggplot(aes(year, prop,linetype = pop_group, color = pop_group)) +
   geom_line(size = 1) +
-  # scale_colour_brewer(palette = "Set1") +
-  # theme_bw() +
-  theme(legend.position = "top") +
   labs(
     # title = "Multiple Births Per 1000 Live Births",
     x = "Year", 
@@ -465,7 +462,8 @@ line_gr <- uni_mults %>%
     linetype = ""
   ) +
   scale_colour_Publication() + 
-  theme_Publication()
+  theme_Publication() +
+  theme(legend.position = "top")
 
 ggsave(
   filename = "tex/figures/line_pp.pdf",
@@ -488,8 +486,9 @@ hist2 <- gt2_sample %>%
   geom_vline(aes(xintercept = mean(educ_attain)),
              color="red", linetype="dashed", size=1) +
   facet_wrap(~ samp) +
-  theme_bw() +
-  labs(x = "", y = "")
+  labs(x = "", y = "") +
+  theme_Publication() +
+  theme(legend.position = "top")
 
 hist3 <- gt3_sample %>% 
   mutate(samp = "3+ Sample") %>% 
@@ -499,8 +498,9 @@ hist3 <- gt3_sample %>%
   geom_vline(aes(xintercept = mean(educ_attain)),
              color="red", linetype="dashed", size=1) +
   facet_wrap(~ samp) +
-  theme_bw() +
-  labs(x = "", y = "")
+  labs(x = "", y = "") +
+  theme_Publication() +
+  theme(legend.position = "top")
 
 figure <- ggarrange(hist2, hist3, ncol = 2) 
   

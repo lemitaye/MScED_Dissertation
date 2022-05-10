@@ -412,7 +412,8 @@ plot_2 <- function( tbl ) {
     ) +
     # borrowed the following colours from "scale_colour_Publication" function:
     scale_color_manual( values = c("#7fc97f", "#f87f01", "#386cb0")  ) + 
-    theme_Publication()  
+    theme_Publication() +
+    theme(legend.position = "top")
   
   return(p)
 }

@@ -868,15 +868,6 @@ extrct <- function(var, tbl) {
   return(txt)
 }
 
-extrct("twins_2", first_gt2)
-extrct("twins_3", first_gt3)
-extrct("same_sex_12", first_gt2)
-extrct("same_sex_123", first_gt3)
-extrct("boy_12", first_gt2)
-extrct("boy_123", first_gt3)
-extrct("girl_12", first_gt2)
-extrct("girl_123", first_gt3)
-
 plot_acr <- function(vars, rows = 1, labels, x, y) {
   
   anno <- data.frame(
@@ -892,7 +883,9 @@ plot_acr <- function(vars, rows = 1, labels, x, y) {
     geom_line(aes(group = 1)) +
     geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
     geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
-    geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
+    geom_hline(
+      aes(yintercept = 0), color = "gray50", size = 1, linetype = "dotted"
+      ) +
     geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
                 fill = "grey", alpha = .3) +
     geom_text(data = anno, aes(x = x,  y = y, label = lab)) +
@@ -936,9 +929,7 @@ ggsave(
   height = 297,
   units = "mm"
 )
-# %>% annotate_figure(
-#   bottom = "Number of Children"
-# )       
+
 
 # Think of a way to add the overall first stage
 lm(no_kids ~ twins_2, data = first_gt2) %>% 
