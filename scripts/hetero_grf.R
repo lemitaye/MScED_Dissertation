@@ -5,17 +5,11 @@
 # from Athey et al. (2019) to carry out heterogeneity analysis
 
 
-# Load necessary packages
-library(tidyverse)
-library(grf)
-library(fastDummies)
-library(doParallel)
-
+# Load data:
 gt2_sample <- read_csv("data/gt2_sample.csv")
 
-# gt2_sample %>% 
-#   glimpse()
 
+# Build the necessary components: 
 X <- gt2_sample %>% 
   select(-c(
     no_kids, child_no, moth_no, child_dob, boy, birth_order, boy_1, boy_2, 
