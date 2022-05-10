@@ -348,7 +348,7 @@ to_string <- as_labeller(
     "behind" = "Left Behind", 
     "private" = "Private School",
     "Black African" = "Black African",
-    "Coloured, Indian or Asian, and Other" = "Coloured, Indian or\n Asian, and Other",
+    "Coloured, Indian or Asian, and Other" = "Coloured, Indian\n or Asian, & Other",
     "White" = "White"
   )
 )
@@ -368,12 +368,16 @@ plot_1 <- function( tbl ) {
     geom_line(aes(group = 1), color = "blue") +
     geom_line(aes(y = upper, group = 1), linetype = "dashed") +
     geom_line(aes(y = lower, group = 1), linetype = "dashed") +
-    geom_hline(aes(yintercept = 0), color = "red", size = .5, linetype = "dashed") +
+    geom_hline(
+      aes(yintercept = 0), color = "gray50", size = 1, linetype = "dotted"
+    ) + 
     facet_grid(moth_pp_group ~ outcome, scales = "free_y", 
                labeller = to_string) +
     labs(
       x = "Mother's Age at First Birth", y = ""
-    )
+    ) +
+    scale_colour_Publication() + 
+    theme_Publication()
   
   return(p)
 }
@@ -393,21 +397,22 @@ plot_2 <- function( tbl ) {
       outcome = factor(outcome,
                        levels = c("educ", "behind", "private"))
     ) %>% 
-    ggplot(aes(moth_educ, pred, color = moth_pp_group)) +
+    ggplot(aes(pred, moth_educ, color = fct_rev(moth_pp_group) )) +
     geom_point(size = 1.75, position = position_dodge(width = 0.75)) +
-    geom_errorbar(aes(ymin = lower, ymax = upper), 
+    geom_errorbar(aes(xmin = lower, xmax = upper), 
                   width = .2, position = position_dodge(width = 0.75)) +
-    geom_hline(
-      aes(yintercept = 0), color = "gray50", 
-      size = 1, linetype = "dotted"
+    geom_vline(
+      aes(xintercept = 0), color = "gray50", size = 1, linetype = "dotted"
     ) +
-    scale_x_discrete(expand=c(.1, 0)) +
-    coord_flip() +
-    theme(legend.position = "top") +
+    scale_y_discrete(expand=c(.1, 0)) +
     facet_wrap(~outcome, labeller = to_string) +
+    guides(color = guide_legend(reverse = TRUE) ) +
     labs(
-      y = "", x = "Mother's Level of Education", color = ""
-    )
+      x = "", y = "Mother's Level of Education", color = ""
+    ) +
+    # borrowed the following colours from "scale_colour_Publication" function:
+    scale_color_manual( values = c("#7fc97f", "#f87f01", "#386cb0")  ) + 
+    theme_Publication()  
   
   return(p)
 }
