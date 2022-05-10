@@ -513,4 +513,20 @@
   year     = {2020},
 }
 
+@Article{Ponczek2012,
+  author   = {Ponczek, Vladimir and Souza, Andre Portela},
+  journal  = {The Journal of Human Resources},
+  title    = {New Evidence of the Causal Effect of Family Size on Child Quality in a Developing Country},
+  year     = {2012},
+  issn     = {0022-166X},
+  note     = {Publisher: [University of Wisconsin Press, Board of Regents of the University of Wisconsin System]},
+  number   = {1},
+  pages    = {64--106},
+  volume   = {47},
+  abstract = {This paper presents new evidence of the causal effect of family size on child quality in a developing-country context. We estimate the impact of family size on child labor and educational outcomes among Brazilian children and young adults by exploring the exogenous variation of family size driven by the presence of twins in the family. Using the Brazilian Census data for 1991, we find that the exogenous increase in family size is positively related to labor force participation for boys and girls and to household chores for young women. We also find negative effects on educational outcomes for boys and girls and negative impacts on human capital formation for young female adults. Moreover, we obtain suggestive evidence that credit and time constraints faced by poor families may explain the findings.},
+  file     = {JSTOR Full Text PDF:C\:\\Users\\tayel\\Zotero\\storage\\RQ59F3TB\\Ponczek and Souza - 2012 - New Evidence of the Causal Effect of Family Size o.pdf:application/pdf},
+  url      = {https://www.jstor.org/stable/23214382},
+  urldate  = {2022-03-07},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}

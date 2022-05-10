@@ -26,7 +26,11 @@ style=authoryear-icomp,
 isbn=false,url=false,eprint=false,
 sorting=nyt,sortcites=false
   ]{biblatex} 
+%\usepackage{tocbibind}
 
+\AtEveryBibitem{%
+  \clearfield{note}%
+}
 
 \newcommand\fnote[1]{\captionsetup{font=footnotesize}\caption*{#1}}
 \setlength{\parskip}{0.5em}
@@ -126,5 +130,7 @@ sorting=nyt,sortcites=false
 % add columns for Girl12 in Figure 5 (?)
 % edit introduction and abstract
 % shorten/edit "Coloured, Indian and Asian, and Other" (suggest: "Coloured, Indian/Asian, & Other")
+% References in ToC
+% Read and follow University guideline on citation
 
 \end{document}
