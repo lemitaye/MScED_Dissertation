@@ -365,9 +365,9 @@ plot_1 <- function( tbl ) {
                        levels = c("educ", "behind", "private"))
     ) %>% 
     ggplot(aes(moth_age_fstbr, pred)) +
-    geom_line(aes(group = 1), color = "blue") +
-    geom_line(aes(y = upper, group = 1), linetype = "dashed", color = "blue") +
-    geom_line(aes(y = lower, group = 1), linetype = "dashed", color = "blue") +
+    geom_line(aes(group = 1), color = "darkblue", alpha = .8) +
+    geom_line(aes(y = upper, group = 1), linetype = "dashed", color = "darkblue", alpha=0.4) +
+    geom_line(aes(y = lower, group = 1), linetype = "dashed", color = "darkblue", alpha=0.4) +
     geom_hline(
       aes(yintercept = 0), color = "gray50", size = 1, linetype = "dotted"
     ) + 
@@ -399,7 +399,8 @@ plot_2 <- function( tbl ) {
                        levels = c("educ", "behind", "private"))
     ) %>% 
     ggplot(aes(pred, moth_educ, color = fct_rev(moth_pp_group) )) +
-    geom_point(size = 1.75, position = position_dodge(width = 0.75)) +
+    geom_point(size = 1.75, position = position_dodge(width = 0.75), 
+               aes(shape = moth_pp_group)) +
     geom_errorbar(aes(xmin = lower, xmax = upper), 
                   width = .2, position = position_dodge(width = 0.75)) +
     geom_vline(
@@ -409,7 +410,7 @@ plot_2 <- function( tbl ) {
     facet_wrap(~outcome, labeller = to_string) +
     guides(color = guide_legend(reverse = TRUE) ) +
     labs(
-      x = "", y = "Mother's Level of Education", color = ""
+      x = "", y = "Mother's Level of Education", color = "", shape = ""
     ) +
     # borrowed the following colours from "scale_colour_Publication" function:
     scale_color_manual( values = c("#7fc97f", "#f87f01", "#386cb0")  ) + 
