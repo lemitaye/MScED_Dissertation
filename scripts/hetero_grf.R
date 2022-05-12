@@ -366,8 +366,8 @@ plot_1 <- function( tbl ) {
     ) %>% 
     ggplot(aes(moth_age_fstbr, pred)) +
     geom_line(aes(group = 1), color = "darkblue", alpha = .8) +
-    geom_line(aes(y = upper, group = 1), linetype = "dashed", color = "darkblue", alpha=0.4) +
-    geom_line(aes(y = lower, group = 1), linetype = "dashed", color = "darkblue", alpha=0.4) +
+    geom_line(aes(y = upper, group = 1), linetype = "dashed", color = "darkblue", alpha=0.5) +
+    geom_line(aes(y = lower, group = 1), linetype = "dashed", color = "darkblue", alpha=0.5) +
     geom_hline(
       aes(yintercept = 0), color = "gray50", size = 1, linetype = "dotted"
     ) + 
@@ -389,7 +389,7 @@ plot_2 <- function( tbl ) {
         moth_pp_group,
         levels = c("Black African", "White", "Coloured, Indian or Asian, and Other")
       ) %>% fct_recode(
-        "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other"),
+        "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other") %>% fct_rev(),
       moth_educ = factor(
         moth_educ,
         levels = c("No schooling", "Some primary", "Completed primary", 
@@ -398,9 +398,8 @@ plot_2 <- function( tbl ) {
       outcome = factor(outcome,
                        levels = c("educ", "behind", "private"))
     ) %>% 
-    ggplot(aes(pred, moth_educ, color = fct_rev(moth_pp_group) )) +
-    geom_point(size = 1.75, position = position_dodge(width = 0.75), 
-               aes(shape = moth_pp_group)) +
+    ggplot(aes(pred, moth_educ, color = moth_pp_group, shape = moth_pp_group )) +
+    geom_point(size = 1.75, position = position_dodge(width = 0.75) ) +
     geom_errorbar(aes(xmin = lower, xmax = upper), 
                   width = .2, position = position_dodge(width = 0.75)) +
     geom_vline(
@@ -408,7 +407,7 @@ plot_2 <- function( tbl ) {
     ) +
     scale_y_discrete(expand=c(.1, 0)) +
     facet_wrap(~outcome, labeller = to_string) +
-    guides(color = guide_legend(reverse = TRUE) ) +
+    guides(color = guide_legend(reverse = TRUE), shape = guide_legend(reverse = TRUE) ) +
     labs(
       x = "", y = "Mother's Level of Education", color = "", shape = ""
     ) +
