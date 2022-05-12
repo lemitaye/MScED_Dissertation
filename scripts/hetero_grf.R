@@ -348,7 +348,7 @@ to_string <- as_labeller(
     "behind" = "Left Behind", 
     "private" = "Private School",
     "Black African" = "Black African",
-    "Coloured, Indian or Asian, and Other" = "Coloured, Indian\n or Asian, & Other",
+    "Coloured, Indian or Asian, and Other" = "Coloured, Indian/\nAsian, & Other",
     "White" = "White"
   )
 )
@@ -366,8 +366,8 @@ plot_1 <- function( tbl ) {
     ) %>% 
     ggplot(aes(moth_age_fstbr, pred)) +
     geom_line(aes(group = 1), color = "blue") +
-    geom_line(aes(y = upper, group = 1), linetype = "dashed") +
-    geom_line(aes(y = lower, group = 1), linetype = "dashed") +
+    geom_line(aes(y = upper, group = 1), linetype = "dashed", color = "blue") +
+    geom_line(aes(y = lower, group = 1), linetype = "dashed", color = "blue") +
     geom_hline(
       aes(yintercept = 0), color = "gray50", size = 1, linetype = "dotted"
     ) + 
@@ -388,7 +388,8 @@ plot_2 <- function( tbl ) {
       moth_pp_group = factor(
         moth_pp_group,
         levels = c("Black African", "White", "Coloured, Indian or Asian, and Other")
-      ),
+      ) %>% fct_recode(
+        "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other"),
       moth_educ = factor(
         moth_educ,
         levels = c("No schooling", "Some primary", "Completed primary", 

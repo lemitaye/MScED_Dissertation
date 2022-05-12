@@ -451,7 +451,8 @@ uni_mults <- read_csv("data/uni_mults.csv")
 line_gr <- uni_mults %>% 
   mutate(pop_group = factor( pop_group,
     levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
-    )) %>%
+    ) %>% fct_recode(
+      "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other") ) %>%
   ggplot(aes(year, prop,linetype = pop_group, color = pop_group)) +
   geom_line(size = 1) +
   labs(
