@@ -6,20 +6,16 @@
 \usepackage{graphicx}
 \usepackage[margin=1.00in]{geometry}
 \usepackage{csquotes}
-%\usepackage{apacite}
 \usepackage{fancyhdr}
 \usepackage{caption}
 \usepackage{rotating}
-%\usepackage{natbib}
+%\usepackage{chngcntr}
 \usepackage[flushleft]{threeparttable}
-%\usepackage[paper=portrait,pagesize]{typearea}
-%\usepackage{pdflscape}
-%\usepackage{rotating}
 \usepackage{lscape}
 \usepackage{longtable}
 \usepackage{booktabs}
 \usepackage[onehalfspacing]{setspace}
-\usepackage{float}
+%\usepackage{float}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage[
 backend=bibtex,  % don't use "biber"!
@@ -39,7 +35,6 @@ sorting=nyt,sortcites=false,date=year
 
 \addbibresource{refs.bib} 
 
-\pagenumbering{roman}
 
 \begin{document}
 \input{title}
@@ -47,7 +42,7 @@ sorting=nyt,sortcites=false,date=year
 %\section*{Disclaimers}
 %\input{disclaimer}
 %\pagebreak
-
+\pagenumbering{roman}
 \input{abstract}
 \pagebreak
 
@@ -73,28 +68,19 @@ sorting=nyt,sortcites=false,date=year
 \input{results}
 
 \printbibliography
-
-%\end{onehalfspace}
-
-
-\section*{Appendix}
-
-\input{tables/reduced}
-
 \pagebreak
 
-\section*{Addendum}
+\appendix
+\setcounter{figure}{0} 
+\renewcommand{\thefigure}{A.\arabic{figure}}
+\setcounter{table}{0} 
+\renewcommand{\thetable}{A.\arabic{table}}
 
-\begin{figure}[ht]
-\centering
-\caption{\label{fig:02}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
-\includegraphics[width=\textwidth]{figures/acrs.pdf}
-% This could go to the addendum
-\end{figure}
+\section*{Appendix}
+\input{appendix}
 
-% rename figure labels (make them intuitive)
+
 % add columns for Girl12 in Figure 5 (?)
-% shorten/edit "Coloured, Indian and Asian, and Other" (suggest: "Coloured, Indian/Asian, & Other")
 % References in ToC
 % Read and follow University guideline on citation
 % Write/edit descriptions of figures and tables

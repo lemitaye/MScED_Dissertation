@@ -66,19 +66,19 @@ I fitted a GRF for models of three outcome variables: educational attainment of 
 
 Panel A of \autoref{fig:heter1} plots the effects of sibling size, instrumented using twins birth, along the dimensions of the mother's ethnicity and age at first birth. The estimated effects on all three outcomes are insignificant and do not vary along the two dimensions. Particularly the effects on educational attainment (first column) and being left behind (second column) are almost indistinguishable from zero for any combination of the mother's ethnicity and age at first birth. The effects on educational attainment are the most precisely estimated and seem to indicate an exact null effect. \autoref{fig:heter1}B displays the corresponding estimates along the dimensions of the mother's ethnicity and level of education. Again, none of the estimates are significant for all three outcomes in any subgroup. The variation in the standard errors reflects the density of observations along the two dimensions. For example, there are more observations whose mother’s level of education is secondary schooling or above (see \autoref{tab:sum-stat}) and their confidence intervals are relatively narrower. Here also, the effects on educational attainment are the most precisely estimated but the estimates cannot be distinguished from zero for any subgroup. 
 
-\begin{figure}[p!]
-\centering
-\caption{\label{fig:heter1}Results of Generalized Random Forest Using Twins IV}
-\includegraphics[width=\textwidth]{figures/heter1.pdf}
-\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. Tuning results suggest the default values of the parameters as optimal for each forest. Each forest is based on 5000 trees. }
-\end{figure}
-
-\begin{figure}[p!]
-\centering
-\caption{\label{fig:heter2}Results of Generalized Random Forest Using Same-Sex IV}
-\includegraphics[width=\textwidth]{figures/heter2.pdf}
-\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation. Each forest is based on 5000 trees. }
-\end{figure}
+%\begin{figure}[p!]
+%\centering
+%\caption{\label{fig:heter1}Results of Generalized Random Forest Using Twins IV}
+%\includegraphics[width=\textwidth]{figures/heter1.pdf}
+%\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. Tuning results suggest the default values of the parameters as optimal for each forest. Each forest is based on 5000 trees. }
+%\end{figure}
+%
+%\begin{figure}[p!]
+%\centering
+%\caption{\label{fig:heter2}Results of Generalized Random Forest Using Same-Sex IV}
+%\includegraphics[width=\textwidth]{figures/heter2.pdf}
+%\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation. Each forest is based on 5000 trees. }
+%\end{figure}
 
 \autoref{fig:heter2} presents the corresponding results obtained using the same sex instrument (SameSex12). The general pattern of the results is very similar to those presented in \autoref{fig:heter1}. \autoref{fig:heter2}A shows that the effects on educational attainment are almost null for every combination of the mother's age at first birth and her population group, though the confidence intervals are a bit wider than those shown in \autoref{fig:heter1}A. The effect on private school attendance, on the other hand, is more stable along the mother's age at first birth with widening confidence intervals at higher values, in contrast to the estimates in \autoref{fig:heter1}A. \autoref{fig:heter2}B presents results that parallel those in \autoref{fig:heter1}B. Except for minor distinctions, the results in the two plots are qualitatively identical. The estimates for private school attendance in \autoref{fig:heter2}B are more consistent in sign and are estimated with better precision than those in \autoref{fig:heter1}B, but none are statistically significantly different from zero. Again, the estimates for educational attainment are very precise and seem to indicate an exact null effect. 
 
