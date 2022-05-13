@@ -119,7 +119,7 @@ star.out <- stargazer(
   # star.cutoffs = c(0.05, 0.01, 0.001),
   add.lines = last_lines,
   title = "OLS and 2SLS Estimates of The Effect of The Number of Children",
-  label = "tab:03"
+  label = "tab:main-res"
 )
 
 star.out <- star.out %>% 
@@ -133,7 +133,7 @@ star.out <- star.out %>%
 
 star_tex_write(
   star.out, 
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table5.tex"
+  file = "tex/tables/main-res.tex"
   )
 
 # First Stages ####
@@ -159,7 +159,7 @@ frst_stg2 <- stargazer(
   # star.cutoffs = c(0.05, 0.01, 0.001),
   add.lines = F_line_a,
   title = "First Stage Regressions",
-  label = "tab:02",
+  label = "tab:frst-stage",
   dep.var.labels = "Number of Children",
   covariate.labels = c("Twins2", "SameSex12", "Boy12", "Girl12")
 )
@@ -208,7 +208,7 @@ frst_panel <- star_panel(
 
 star_tex_write(
   frst_panel, 
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table11.tex"
+  file = "tex/tables/frst-stage.tex"
 )
 
 
@@ -292,11 +292,11 @@ long_note_ssI = "*** Significant at 1\\%, ** Significant at 5\\%, * Significant 
 $ \\dag $ Columns 1-4 have the coefficients for the Twins2
 instrument (in the 2+ sample) and in columns 5-8 are the coefficients for the
 Twins3 instrument (3+ sample). The regressions were run using the same set 
-of controls as in \\autoref{tab:03}. Robust standard errors are in parentheses and the numbers 
+of controls as in \\autoref{tab:main-res}. Robust standard errors are in parentheses and the numbers 
 in square brackets below the s.e. are F stats for the exclusion of the Twins2 or
 the Twins 3 variable from the model. \\\\[-1.8ex]
  
-$ \\ddag $ The regressions control for the same set of covariates as in \\autoref{tab:03} (see notes there). 
+$ \\ddag $ The regressions control for the same set of covariates as in \\autoref{tab:main-res} (see notes there). 
 The regressions for the 3+ sample are clustered by mother's ID. 
 "
 
@@ -337,7 +337,7 @@ star_trial <- stargazer(
   column.sep.width = "8pt",
   # star.cutoffs = c(0.05, 0.01, 0.001),
   title = "Heterogeneity by Mother's Population Group (Whites vs. Non-Whites)",
-  label = "tab:04"
+  label = "tab:whites-nonwhites"
 ) 
 
 star_trial[5] <- "\\begin{tabular}{@{\\extracolsep{8pt}}lcc@{\\hskip 0.3in}cc@{\\hskip 0.3in}cc@{\\hskip 0.3in}cc} "
@@ -402,7 +402,7 @@ star_print <- star_print[-c(19:24, 41:42)]
 
 star_sidewaystable(star_print) %>% 
   star_tex_write(
-    file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table12.tex"
+    file = "tex/tables/whites-nonwhites.tex"
   )
 
 
@@ -463,7 +463,7 @@ obs_nofrst = c(
 obs_nofrst <- paste( paste(obs_nofrst, collapse = " & "), "\\\\" )
 
 notes_nofrst <- "*** Significant at 1\\%, ** Significant at 5\\%, * Significant at 10\\%. 
-The same set of covariates as in \\autoref{tab:03} were included in all regressions. Robust standard
+The same set of covariates as in \\autoref{tab:main-res} were included in all regressions. Robust standard
 errors in parentheses.
 \\\\[-1.8ex]
 
@@ -471,7 +471,7 @@ $ \\dag $ The subsamples are restricted to firstborns from families with at leas
 
 $ \\ddag $ Subsamples includes only firstborn boys.
 
-$ \\S $ In addition to the covariates used in \\autoref{tab:03}, the reduced form regressions control for 
+$ \\S $ In addition to the covariates used in \\autoref{tab:main-res}, the reduced form regressions control for 
 the number of children in the family."
 
 
@@ -515,7 +515,7 @@ nofrst_top <- stargazer(
   dep.var.caption  = "",
   dep.var.labels.include = FALSE,
   title = "Reduced Form Effects in No-First-Stage Samples",
-  label = "tab:05"
+  label = "tab:reduced"
 )
 
 nofrst_panel <- star_panel(
@@ -537,7 +537,7 @@ nofrst_panel <- star_insert_row(
 
 star_tex_write(
   nofrst_panel, 
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table13.tex"
+  file = "tex/tables/reduced.tex"
 )
 
 

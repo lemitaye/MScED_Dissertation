@@ -381,7 +381,7 @@ z$variable[21:37] <- str_c("\\phantom{M}", as.character( z$variable[21:37] ))
 # Start building table
 xtab <- xtable(
   z, display = c("s", "s", "s", "g", "g", "s", "g", "g", "s", "g", "g"),
-  digits = 4, caption = "Summary Statistics", label = "tab:01"
+  digits = 4, caption = "Summary Statistics", label = "tab:sum-stat"
   ) 
 
 # align(xtab) <- "rllccp{0.5cm}cc" {rllrrlrrlrr}
@@ -407,7 +407,7 @@ obs_descr <- paste( nobs_descr_wrap( " $ N $ ", a = "l" ), " & ",
                     obs_descr )
 
 comm <- paste0(" \n \\\\[-1.8ex] \\multicolumn{10}{l}",
-               "{\\scriptsize{The standard deviations for proportions is 
+               "{\\footnotesize{\\textit{Note:} The standard deviations for proportions is 
                not presented.}} \n")
 
 
@@ -440,6 +440,7 @@ print(
   include.rownames = FALSE, include.colnames = FALSE, 
   booktabs = TRUE, caption.placement = "top", hline.after = c(-1, 0),
   sanitize.text.function = identity,
+  table.placement = "!htbp",
   file = "tex/tables/sum-stat.tex"
   )
 

@@ -35,8 +35,8 @@ source("scripts/ggplot_theme_Publication-2.R")
 
 
 # Call R scripts ####
-source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
-source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning
-source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive statistics
-source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of model 
-source("scripts/results.R"     ,echo=TRUE,max=1000) # Tables and Figures
+# source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
+# source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning
+# source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive statistics
+# source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of model 
+# source("scripts/results.R"     ,echo=TRUE,max=1000) # Tables and Figures
