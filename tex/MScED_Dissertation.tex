@@ -18,7 +18,8 @@
 \usepackage{lscape}
 \usepackage{longtable}
 \usepackage{booktabs}
-\usepackage{setspace}
+\usepackage[onehalfspacing]{setspace}
+\usepackage{float}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage[
 backend=bibtex,  % don't use "biber"!
@@ -33,6 +34,7 @@ sorting=nyt,sortcites=false
 }
 
 \newcommand\fnote[1]{\captionsetup{font=footnotesize}\caption*{#1}}
+
 \setlength{\parskip}{0.5em}
 
 \addbibresource{refs.bib} 
@@ -42,7 +44,6 @@ sorting=nyt,sortcites=false
 \begin{document}
 \input{title}
 
-\begin{onehalfspace}
 %\section*{Disclaimers}
 %\input{disclaimer}
 %\pagebreak
@@ -71,25 +72,17 @@ sorting=nyt,sortcites=false
 \input{data_methods}
 \input{results}
 
-%\newpage
 \printbibliography
 
-\end{onehalfspace}
+%\end{onehalfspace}
 
-\newpage
+\pagebreak
 \section*{Tables and Figures}
 
 \begin{figure}[h!]
 \centering
 \caption{\label{fig:01}Histograms of Educational Attainment Index}
 \includegraphics[width=\textwidth]{figures/hists.pdf}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\caption{\label{fig:02}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
-\includegraphics[width=\textwidth]{figures/acrs.pdf}
-% This could go to the addendum
 \end{figure}
 
 \begin{figure}[h!]
@@ -119,12 +112,24 @@ sorting=nyt,sortcites=false
 \fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation. Each forest is based on 5000 trees. }
 \end{figure}
 
-\input{tables/sum-stat}
-\input{tables/table11}
-\input{tables/table5}
-\input{tables/table12} 
-\input{tables/table13}
 
+
+
+
+\input{tables/reduced}
+
+
+\newpage
+
+\section*{Addendum}
+%\input{appendix}
+\pagebreak
+\begin{figure}[ht]
+\centering
+\caption{\label{fig:02}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
+\includegraphics[width=\textwidth]{figures/acrs.pdf}
+% This could go to the addendum
+\end{figure}
 
 % rename figure labels (make them intuitive)
 % add columns for Girl12 in Figure 5 (?)
