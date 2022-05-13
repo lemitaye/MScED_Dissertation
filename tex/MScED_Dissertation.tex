@@ -9,7 +9,7 @@
 \usepackage{fancyhdr}
 \usepackage{caption}
 \usepackage{rotating}
-%\usepackage{chngcntr}
+\usepackage[nottoc]{tocbibind}
 \usepackage[flushleft]{threeparttable}
 \usepackage{lscape}
 \usepackage{longtable}
@@ -23,33 +23,31 @@ style=authoryear-icomp,
 isbn=false,url=false,eprint=false,
 sorting=nyt,sortcites=false,date=year
   ]{biblatex} 
-%\usepackage{tocbibind}
+
+\setlength{\parskip}{0.5em}  % set space between paragraphs
+\newcommand\fnote[1]{\captionsetup{font=footnotesize}\caption*{#1}}  % add notes to figures
 
 \AtEveryBibitem{%
   \clearfield{note}%
 }
 
-\newcommand\fnote[1]{\captionsetup{font=footnotesize}\caption*{#1}}
-
-\setlength{\parskip}{0.5em}
-
 \addbibresource{refs.bib} 
-
 
 \begin{document}
 \input{title}
 
+\pagenumbering{roman}
+
 %\section*{Disclaimers}
 %\input{disclaimer}
 %\pagebreak
-\pagenumbering{roman}
+%\addcontentsline{toc}{chapter}{Abstract}
 \input{abstract}
 \pagebreak
 
 %\begin{center}
 %\section*{Acknowledgements}
 %\end{center}
-
 %\input{acknowledgements}
 %\pagebreak
 
@@ -57,7 +55,6 @@ sorting=nyt,sortcites=false,date=year
 \pagebreak
 
 \listoffigures
-
 \listoftables
 \pagebreak
 
@@ -76,7 +73,9 @@ sorting=nyt,sortcites=false,date=year
 \setcounter{table}{0} 
 \renewcommand{\thetable}{A.\arabic{table}}
 
-\section{Appendix}
+\section*{Appendix}
+\label{section:appendix}
+\addcontentsline{toc}{section}{\nameref{section:appendix}}
 \input{appendix}
 
 
