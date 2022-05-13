@@ -391,7 +391,7 @@ star_print <- star_panel(
 star_print <- star_print %>% 
   star_insert_row(
     c(
-      " & OLS & IV & OLS & IV & OLS & IV & OLS & IV \\\\",
+      " & OLS & 2SLS & OLS & 2SLS & OLS & 2SLS & OLS & 2SLS \\\\",
       " \\hline \\\\",
       last_lines_ss
     ),
