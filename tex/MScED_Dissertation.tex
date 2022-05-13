@@ -25,7 +25,7 @@
 backend=bibtex,  % don't use "biber"!
 style=authoryear-icomp, 
 isbn=false,url=false,eprint=false,
-sorting=nyt,sortcites=false
+sorting=nyt,sortcites=false,date=year
   ]{biblatex} 
 %\usepackage{tocbibind}
 
@@ -76,54 +76,15 @@ sorting=nyt,sortcites=false
 
 %\end{onehalfspace}
 
-\pagebreak
-\section*{Tables and Figures}
 
-\begin{figure}[h!]
-\centering
-\caption{\label{fig:01}Histograms of Educational Attainment Index}
-\includegraphics[width=\textwidth]{figures/hists.pdf}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\caption{\label{fig:05}Plot of Coefficient Estimates and 95\% CI by Intervals of the Mother's Age at First Birth (2$ + $ Sample)}
-\includegraphics[width=\textwidth]{figures/age_mods.pdf}
-\fnote{\textit{Notes:} Each regression was run controlling for the same set of covariates as in \autoref{tab:03} for the 2+ sample (see notes there). The sample sizes for each age range are as follows: 24,414 (15-19); 35,125 (20-24); 23,864 (25-29); and 10,021 (31+). Mothers who were younger than 15 at first birth were excluded from the analysis.}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\caption{\label{fig:04}Multiple Births Per 1000 Live Births by Mother's Population Group}
-\includegraphics[width=\textwidth]{figures/line_pp.pdf}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\caption{\label{fig:06}Results of Generalized Random Forest Using Twins IV}
-\includegraphics[width=\textwidth]{figures/heter1.pdf}
-\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. Tuning results suggest the default values of the parameters as optimal for each forest. Each forest is based on 5000 trees. }
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\caption{\label{fig:07}Results of Generalized Random Forest Using Same-Sex IV}
-\includegraphics[width=\textwidth]{figures/heter2.pdf}
-\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation. Each forest is based on 5000 trees. }
-\end{figure}
-
-
-
-
+\section*{Appendix}
 
 \input{tables/reduced}
 
-
-\newpage
+\pagebreak
 
 \section*{Addendum}
-%\input{appendix}
-\pagebreak
+
 \begin{figure}[ht]
 \centering
 \caption{\label{fig:02}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
