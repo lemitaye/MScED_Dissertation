@@ -5,6 +5,7 @@
 # This script runs the main regressions to be reported in the paper
 
 rm(list = ls())
+source("scripts/ggplot_theme_Publication-2.R")  
 
 # Load saved data
 gt2_sample <- read_csv("data/gt2_sample.csv")

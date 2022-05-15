@@ -4,6 +4,8 @@
 # A script to train and fit a "Generalized Random Forest" 
 # from Athey et al. (2019) to carry out heterogeneity analysis
 
+# Load themes for graphing:
+source("scripts/ggplot_theme_Publication-2.R")  
 
 # Load data:
 gt2_sample <- read_csv("data/gt2_sample.csv")

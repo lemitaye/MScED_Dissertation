@@ -29,10 +29,6 @@ library(GGally)  # contains "ggcoef()" to plot reg. coefs.
 library(grf)
 library(doParallel)
 
-# Credit goes to Koundinya Desiraju (https://github.com/koundy/ggplot_theme_Publication)
-# for providing the following themes for publication ready plots:
-source("scripts/ggplot_theme_Publication-2.R")  
-
 
 # Call R scripts ####
 # source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract

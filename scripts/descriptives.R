@@ -6,6 +6,10 @@
 
 rm(list = ls())
 
+# Credit goes to Koundinya Desiraju (https://github.com/koundy/ggplot_theme_Publication)
+# for providing the following themes for publication ready plots:
+source("scripts/ggplot_theme_Publication-2.R")  
+
 # Load saved data ####
 gt2_sample <- read_csv("data/gt2_sample.csv")
 gt3_sample <- read_csv("data/gt3_sample.csv")
@@ -161,7 +165,10 @@ p <- mod_all %>%
   labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" ) +
   scale_colour_Publication() + 
   theme_Publication() +
-  theme(legend.position = "top")
+  theme(
+    legend.position = "top",
+    legend.margin=margin(t = 0, unit='cm')
+    )
 
 ggsave(
   filename = "tex/figures/age_mods.pdf",
