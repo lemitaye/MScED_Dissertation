@@ -167,7 +167,8 @@ p <- mod_all %>%
   theme_Publication() +
   theme(
     legend.position = "top",
-    legend.margin=margin(t = -0.5, unit='cm')
+    legend.margin=margin(t = -0.5, unit='cm'),
+    axis.title=element_text(size=13)
     )
 
 ggsave(
@@ -473,14 +474,15 @@ line_gr <- uni_mults %>%
   scale_colour_Publication() + 
   theme_Publication() +
   theme(legend.position = "top",
-        legend.margin=margin(t = -0.5, unit='cm'))
+        legend.margin=margin(t = -0.5, unit='cm'),
+        axis.title=element_text(size=12.5))
 
 ggsave(
   filename = "tex/figures/line_pp.pdf",
   plot = line_gr,
   device = cairo_pdf,
-  width = 200,
-  height = 160,
+  width = 180,
+  height = 140,
   units = "mm"
 )
 
