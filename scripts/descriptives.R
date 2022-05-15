@@ -167,7 +167,7 @@ p <- mod_all %>%
   theme_Publication() +
   theme(
     legend.position = "top",
-    legend.margin=margin(t = 0, unit='cm')
+    legend.margin=margin(t = -0.5, unit='cm')
     )
 
 ggsave(
@@ -472,7 +472,8 @@ line_gr <- uni_mults %>%
   ) +
   scale_colour_Publication() + 
   theme_Publication() +
-  theme(legend.position = "top")
+  theme(legend.position = "top",
+        legend.margin=margin(t = -0.5, unit='cm'))
 
 ggsave(
   filename = "tex/figures/line_pp.pdf",
