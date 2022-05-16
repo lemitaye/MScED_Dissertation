@@ -15,7 +15,6 @@
 \usepackage{longtable}
 \usepackage{booktabs}
 \usepackage[onehalfspacing]{setspace}
-%\usepackage{float}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \usepackage[
 backend=bibtex,  % don't use "biber"!
@@ -75,18 +74,17 @@ sorting=nyt,sortcites=false,date=year
 
 \section{Appendix}
 \label{section:appendix}
-%\addcontentsline{toc}{section}{\nameref{section:appendix}}
 \input{appendix}
 \newpage
 
-\appendix
+% Reset the counter for figs. and tables in addendum
 \setcounter{figure}{0} 
 \renewcommand{\thefigure}{B.\arabic{figure}}
 \setcounter{table}{0} 
 \renewcommand{\thetable}{B.\arabic{table}}
 
 \section{Addendum}
-
+\label{section:addendum}
 \input{addendum}
 
 
