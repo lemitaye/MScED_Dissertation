@@ -245,11 +245,11 @@ gt2_descript <- gt2_sample %>%
     no_kids, twins_2, same_sex_12, boy_12, girl_12, male = boy,
     child_age_year, child_age_month, child_educ, educ_attain,
     behind, private_school, moth_age_year, moth_age_fstbr,
-    moth_pp_group, moth_educ, moth_marital, moth_inlf, fath_inhh
+    moth_pp_group, moth_educ, moth_inlf, fath_inhh
     ) %>% dummy_cols(
-      c("moth_pp_group", "moth_educ", "moth_marital")
+      c("moth_pp_group", "moth_educ")
       ) %>% 
-  select(-c(moth_pp_group, moth_educ, moth_marital))
+  select(-c(moth_pp_group, moth_educ))
 
 gt3_descript <- gt3_sample %>% 
   filter(!is.na(moth_pp_group)) %>% 
@@ -257,24 +257,24 @@ gt3_descript <- gt3_sample %>%
     no_kids, twins_3, same_sex_123, boy_123, girl_123, male = boy,
     child_age_year, child_age_month, child_educ, educ_attain, behind,
     private_school, moth_age_year, moth_age_fstbr, moth_pp_group,
-    moth_educ, moth_marital, moth_inlf, fath_inhh, birth_order
+    moth_educ, moth_inlf, fath_inhh, birth_order
   ) 
 
 gt3_descript_frstbrn <- gt3_descript %>% 
   filter(birth_order == 1) %>% 
   dummy_cols(
-    c("moth_pp_group", "moth_educ", "moth_marital")
+    c("moth_pp_group", "moth_educ")
   ) %>% 
   select(
-    -c(moth_pp_group, moth_educ, moth_marital, birth_order)
+    -c(moth_pp_group, moth_educ, birth_order)
   )
 
 gt3_descript_both <- gt3_descript %>%
   dummy_cols(
-  c("moth_pp_group", "moth_educ", "moth_marital")
+  c("moth_pp_group", "moth_educ")
 ) %>% 
   select(
-    -c(moth_pp_group, moth_educ, moth_marital, birth_order)
+    -c(moth_pp_group, moth_educ, birth_order)
     )
 
 sd_rm_bin <- function(x) {
@@ -330,7 +330,7 @@ z <- select(z, variable, empty0, mean_2, sd_2, empty1, mean_3_frstbrn,
 z <- z %>% 
   mutate(
     variable = str_remove(
-      variable, "moth_pp_group_|moth_educ_|moth_marital_"
+      variable, "moth_pp_group_|moth_educ_"
     ),
     variable = str_replace_all(
       variable,
@@ -354,9 +354,6 @@ z <- z %>%
         "Some primary" = "Some Primary",
         "Completed primary" = "Completed Primary",
         "Some secondary" = "Some Secondary",
-        "Living together" = "Living Together",
-        "Never married" = "Never Married",
-        "Widower/widow" = "Widower",
         "twins_3" = "Twins3",
         "same_sex_123" = "SameSex123",
         "boy_123" = "Boy123",
@@ -375,15 +372,14 @@ cols_arrg <- c(
   "Age at First Birth", "Mother in the Labour Force", "Father in Household",
   "Black African", "Coloured", "White", "Indian or Asian", "Other", 
   "No schooling", "Some Primary", "Completed Primary", "Some Secondary",
-  "Grade 12/Std 10", "Higher",  
-  "Never Married", "Married", "Living Together", "Separated", "Divorced", "Widower"
+  "Grade 12/Std 10", "Higher"
 )
 
 z$variable <- factor(z$variable, levels = cols_arrg)
 z <- z[order(z$variable), ]
 row.names(z) <- NULL  # reset the rownames
 z$variable <- as.character( z$variable )
-z$variable[21:37] <- str_c("\\phantom{M}", as.character( z$variable[21:37] )) 
+z$variable[21:31] <- str_c("\\phantom{M}", as.character( z$variable[21:31] )) 
 
 
 # Start building table
@@ -420,7 +416,7 @@ comm <- paste0(" \n \\\\[-1.8ex] \\multicolumn{10}{l}",
 
 
 addtorow <- list()
-addtorow$pos <- list(0, 0, 0, 0, 0, 0, 0, 0, 20, 25, 31, 37, 37, 37, 37)
+addtorow$pos <- list(0, 0, 0, 0, 0, 0, 0, 0, 20, 25, 31, 31, 31, 31)
 addtorow$command <- c(
   " \\\\[-1.8ex]",
   " & & \\multicolumn{2}{c}{2+ Sample} & & \\multicolumn{5}{c}{3+ Sample}  \\\\[0.2ex]",
@@ -435,7 +431,6 @@ addtorow$command <- c(
   \\multicolumn{1}{c}{(5)} & \\multicolumn{1}{c}{(6)}  \\\\ ",
   "\\multicolumn{2}{l}{Mother's Population Group} &  &  &  & & & & \\\\",
   "\\multicolumn{2}{l}{Mother's Level of Education} &  &  &  & & & & \\\\",
-  "\\multicolumn{2}{l}{Mother's Marital Status} &  &  &  & & & & \\\\",
   " \\\\[-1.8ex] \\hline \\\\[-1.8ex] ",
   obs_descr,
   " \\bottomrule ",
@@ -448,7 +443,7 @@ print(
   include.rownames = FALSE, include.colnames = FALSE, 
   booktabs = TRUE, caption.placement = "top", hline.after = c(-1, 0),
   sanitize.text.function = identity,
-  table.placement = "!htbp",
+  table.placement = "t!",
   file = "tex/tables/sum-stat.tex"
   )
 
