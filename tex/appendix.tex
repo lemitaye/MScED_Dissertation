@@ -2,11 +2,14 @@
 \input{tables/reduced}
 \pagebreak
 
+\input{tables/whites-nonwhites} 
+\pagebreak
+
 \begin{figure}[p!]
 \centering
 \caption{\label{fig:heter1}Results of Generalized Random Forest Using Twins IV}
 \includegraphics[width=\textwidth]{figures/heter1.pdf}
-\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. Tuning results suggest the default values of the parameters as optimal for each forest. Each forest is based on 5000 trees. }
+\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. Tuning results suggest the default values of the parameters as optimal for each forest: subsample fraction ($ s/n $) $ = 0.5 $, minimum leaf size ($ k $) $ = 5 $, number of splitting variables (\texttt{mtry}) $ = 26 $ (out of 33), balance parameter ($ \alpha $) $ = 0.05 $, and imbalance penalty $ = 0 $ (see the software implementation of \textcite{Athey2019} for the description of these parameters). Each forest is based on 5000 trees.}
 \end{figure}
 \pagebreak
 
@@ -14,7 +17,18 @@
 \centering
 \caption{\label{fig:heter2}Results of Generalized Random Forest Using Same-Sex IV}
 \includegraphics[width=\textwidth]{figures/heter2.pdf}
-\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation. Each forest is based on 5000 trees. }
+\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation and are shown in the table below:
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ & sample.fraction & mtry & min.node.size & alpha & imbalance.penalty \\ 
+  \hline
+educ & 0.25 & 7.00 & 53.00 & 0.21 & 0.55 \\ 
+  behind & 0.08 & 8.00 & 71.00 & 0.07 & 1.26 \\ 
+  private & 0.10 & 9.00 & 83.00 & 0.10 & 3.12 \\ 
+   \hline
+\end{tabular}
+  Each forest is based on 5000 trees. }
 \end{figure}
 \pagebreak
 
