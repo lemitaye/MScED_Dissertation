@@ -19,3 +19,39 @@ The unit causal response in \eqref{eq:02}, $ \mathbb{E}(Y_{i}(j) - Y_{i}(j-1) | 
 \end{equation}
 
 There are three assumptions that lie behind the ACR theorem: (i) independence and exclusion; (ii) the existence of a first Stage; and (iii) monotonicity \parencite{Angrist2009}. The independence assumption requires that the instrument be independent of potential outcomes and potential treatment assignments. This is sometimes alternatively stated by saying that the instrument need to be as good as randomly assigned. Both the twins and same sex instruments were originally proposed as natural experiments for fertility on the ground that both are virtually randomly assigned \parencite{rosenzweig_testing_1980,angrist_children_1998}. However, this is no longer obvious because various threats to the randomness of both instruments have been pointed out in the literature (see Section~\ref{section:valid}). The exclusion assumption, on the other hand, says that the instrument used has no effect on the outcomes other than through its effect on family size.  Although this is closely related to the independence assumption, it is distinct from it. The exclusion restriction is a \enquote{a claim about a unique channel for causal effects of the instrument} \parencite[p.~153]{Angrist2009}. Again, various authors have pointed out ways in which exclusion restriction might fail to hold for both instruments. I have tried to address some of the important concerns in Section~\ref{section:valid}.\footnote{ The other important assumption needed to estimate the ACR is monotonicity. In our case, monotonicity requires that the proposed instrument moves fertility in one direction only. In particular, we assume that the potential number of children when the instrument is switched on is at least as large as it would have been when it is switched off; i.e., $ N_{1i} \geq N_{0i} $. This is automatically satisfied by the twins instrument as fertility is always increased because of a twin birth for any mother. Although rare, it is possible that monotonocity might fail to hold for the same sex instrument. For example, there could be parents who prefer children of the same sex and therefore go on to have another child if the sexes of the first two or three children are different \parencite{Huber2015}. As a partial check on monotonicity, I estimated the same sex first stage in the 2+ sample for each combination of the mother's population group, intervals of the mother's age at first birth, and the level of education of the mother. Out of the 44 first stage regressions, corresponding to the 44 cells, only three generate negative estimates and all three were insignificant. The remaining significant estimates were all positive.} 
+
+\pagebreak
+
+\begin{figure}[ht]
+\centering
+\caption{\label{fig:02}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
+\includegraphics[width=\textwidth]{figures/acrs.pdf}
+% This could go to the addendum
+\end{figure}
+
+\begin{figure}[p!]
+\centering
+\caption{\label{fig:heter1}Results of Generalized Random Forest Using Twins IV}
+\includegraphics[width=\textwidth]{figures/heter1.pdf}
+\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. Tuning results suggest the default values of the parameters as optimal for each forest: subsample fraction ($ s/n $) $ = 0.5 $, minimum leaf size ($ k $) $ = 5 $, number of splitting variables (\texttt{mtry}) $ = 26 $ (out of 33), balance parameter ($ \alpha $) $ = 0.05 $, and imbalance penalty $ = 0 $ (see the software implementation of \textcite{Athey2019} for the description of these parameters). Each forest is based on 5000 trees.}
+\end{figure}
+\pagebreak
+
+\begin{figure}[p!]
+\centering
+\caption{\label{fig:heter2}Results of Generalized Random Forest Using Same-Sex IV}
+\includegraphics[width=\textwidth]{figures/heter2.pdf}
+\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation and are shown in the table below:
+\centering
+\begin{tabular}{rrrrrr}
+  \hline
+ & sample.fraction & mtry & min.node.size & alpha & imbalance.penalty \\ 
+  \hline
+educ & 0.25 & 7.00 & 53.00 & 0.21 & 0.55 \\ 
+  behind & 0.08 & 8.00 & 71.00 & 0.07 & 1.26 \\ 
+  private & 0.10 & 9.00 & 83.00 & 0.10 & 3.12 \\ 
+   \hline
+\end{tabular}
+  Each forest is based on 5000 trees. }
+\end{figure}
+\pagebreak
