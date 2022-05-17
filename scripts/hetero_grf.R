@@ -376,10 +376,13 @@ plot_1 <- function( tbl ) {
     facet_grid(moth_pp_group ~ outcome, scales = "free_y", 
                labeller = to_string) +
     labs(
-      x = "Mother's Age at First Birth", y = ""
+      x = "Mother's Age at First Birth", y = "CLATE"
     ) +
     scale_colour_Publication() + 
-    theme_Publication()
+    theme_Publication() #+
+    # theme(
+    #   axis.title=element_text(size=12.5)
+    # )
   
   return(p)
 }
@@ -411,13 +414,16 @@ plot_2 <- function( tbl ) {
     facet_wrap(~outcome, labeller = to_string) +
     guides(color = guide_legend(reverse = TRUE), shape = guide_legend(reverse = TRUE) ) +
     labs(
-      x = "", y = "Mother's Level of Education", color = "", shape = ""
+      x = "CLATE", y = "Mother's Level of Education", color = "", shape = ""
     ) +
     # borrowed the following colours from "scale_colour_Publication" function:
     scale_color_manual( values = c("#7fc97f", "#f87f01", "#386cb0")  ) + 
     theme_Publication() +
-    theme(legend.position = "top",
-          legend.margin = margin(t = -0.5, unit='cm'))
+    theme(
+      legend.position = "top",
+      legend.margin = margin(t = -0.5, unit='cm')#,
+      # axis.title=element_text(size=12.5)
+      )
   
   return(p)
 }
@@ -458,3 +464,38 @@ ggsave(
   height = 297,
   units = "mm"
 )
+
+# Making a table for tuning values
+
+tuning.samesx <- data.frame(
+  
+educ = c(
+  sample.fraction = 0.253441507730167,
+  mtry = 7,
+  min.node.size = 53,
+  alpha = 0.206129047670402,
+  imbalance.penalty = 0.548535325594362
+),
+
+behind = c(
+  sample.fraction = 0.0807964854175225,
+  mtry = 8,
+  min.node.size = 71,
+  alpha = 0.0728798793861642,
+  imbalance.penalty = 1.26205245650895
+),
+
+private = c(
+  sample.fraction = 0.0987349107163027,
+  mtry = 9,
+  min.node.size = 83,
+  alpha = 0.0982620577560738,
+  imbalance.penalty = 3.12435664022772
+)
+
+)
+
+tuning.samesx <- t(tuning.samesx)  # transpose to save space
+print(xtable(tuning.samesx), file = "tex/tables/tuning-samesx.tex")
+
+
