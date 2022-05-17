@@ -28,14 +28,18 @@ The other important assumption needed to estimate the ACR is monotonicity. In ou
 
 %The other important assumption needed to estimate the ACR is monotonicity. To understand the idea behind this assumption, we need to introduce the four mutually exclusive groups comprising of our quasi-experimental population: compliers, always takers, never takers, and defiers. These were first outlined in the treatment-effects framework of \textcite{angrist_identification_1996}.  Always takers always get treated regardless of their assignment, never takers never get treated regardless of their assignment, and compliers get treated when the instrument is switched on and don't get treated otherwise. The defiers, on the other hand, are a very strange group who get treated when the instrument is switched off and don't get treated when it is switched on. The assumption of monotonicity rules out the presence of defiers since they complicate the link between ACR and the reduced form \parencite{Angrist2009}.\footnote{\textcite{Angrist2009} discuss monotonicity in the context of the LATE framework of \textcite{imbens_identification_1994}. But this carries over directly to the ACR since the ACR is just an extension of the LATE \parencite[see][p.~181]{Angrist2009}.}  In other words, monotonicity rules out the case where the instrument pushes some people into treatment while pushing others out. In our case, monotonicity requires that the proposed instrument moves fertility in one direction only. In particular, we assume that the potential number of children when the instrument is switched on is at least as large as it would have been when it is switched off; i.e., $ N_{1i} \geq N_{0i} $. This is automatically satisfied by the twins instrument as fertility is always increased because of a twin birth for any mother. However, monotonicity need not hold for the same sex instrument as there could be parents who prefer children of the same sex and therefore go on to have another child if the sexes of the first two or three children are different \parencite{Huber2015}. In Section~\ref{section:samesx}, I discuss a partial check for monotonicity using first stage regressions. 
 
-\pagebreak
+%\pagebreak
 
-\begin{figure}[ht]
+\begin{figure}[!ht]
 \centering
 \caption{\label{fig:acrs}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
 \includegraphics[width=\textwidth]{figures/acrs.pdf}
 \fnote{\textit{Notes:} The coefficients and standard errors in the different panels are obtained by running a simple linear regression of a dummy for having at least $ j $ kids on the relevant instrument. Dashed lines are confidence bands. Overall first stages and standard errors are shown in the plot area.}
 \end{figure}
+
+%\pagebreak
+
+\subsection{Generalized Random Forest Estimates}
 
 \begin{figure}[p!]
 \centering
