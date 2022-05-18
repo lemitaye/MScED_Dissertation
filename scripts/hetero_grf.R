@@ -422,7 +422,7 @@ plot_2 <- function( tbl ) {
     theme(
       legend.position = "top",
       legend.margin = margin(t = -0.5, unit='cm'),
-      axis.title=element_text(size=12.5),
+      axis.title=element_text(size=12),
       plot.margin=unit(c(1, 1, -0.5, 0.5), units="line")  # top, right, bottom, & left
       )
   
