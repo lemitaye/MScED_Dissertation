@@ -331,7 +331,7 @@ write_csv(final.twins.2, file = "data/final.twins.2.csv")
 write_csv(final.samesx.2, file = "data/final.samesx.2.csv")
 
 
-# Read saved data
+# Read saved data ####
 final.twins.1 <- read_csv("data/final.twins.1.csv")
 final.samesx.1 <- read_csv("data/final.samesx.1.csv")
 
@@ -376,13 +376,13 @@ plot_1 <- function( tbl ) {
     facet_grid(moth_pp_group ~ outcome, scales = "free_y", 
                labeller = to_string) +
     labs(
-      x = "Mother's Age at First Birth", y = "CLATE"
+      x = "Mother's Age at First Birth", y = ""
     ) +
     scale_colour_Publication() + 
-    theme_Publication() #+
-    # theme(
-    #   axis.title=element_text(size=12.5)
-    # )
+    theme_Publication() +
+    theme(
+      axis.title=element_text(size=12)
+    )
   
   return(p)
 }
@@ -414,15 +414,16 @@ plot_2 <- function( tbl ) {
     facet_wrap(~outcome, labeller = to_string) +
     guides(color = guide_legend(reverse = TRUE), shape = guide_legend(reverse = TRUE) ) +
     labs(
-      x = "CLATE", y = "Mother's Level of Education", color = "", shape = ""
+      x = "", y = "Mother's Level of Education", color = "", shape = ""
     ) +
     # borrowed the following colours from "scale_colour_Publication" function:
     scale_color_manual( values = c("#7fc97f", "#f87f01", "#386cb0")  ) + 
     theme_Publication() +
     theme(
       legend.position = "top",
-      legend.margin = margin(t = -0.5, unit='cm')#,
-      # axis.title=element_text(size=12.5)
+      legend.margin = margin(t = -0.5, unit='cm'),
+      axis.title=element_text(size=12.5),
+      plot.margin=unit(c(1, 1, -0.5, 0.5), units="line")  # top, right, bottom, & left
       )
   
   return(p)
@@ -438,21 +439,21 @@ b.s <- plot_2(final.samesx.2)
 fig5 <- ggarrange(
   a.t, NULL, b.t, 
   labels = c("A.", "", "B."),
-  nrow = 3, heights = c(1, 0.05, 1)
+  nrow = 3, heights = c(1, 0.05, 0.85)
 ) 
 
 fig6 <- ggarrange(
   a.s, NULL, b.s, 
   labels = c("A.", "", "B."),
-  nrow = 3, heights = c(1, 0.05, 1)
+  nrow = 3, heights = c(1, 0.05, 0.85)
 ) 
 
 ggsave(
   filename = "tex/figures/heter1.pdf",
   plot = fig5,
   device = cairo_pdf,
-  width = 210,
-  height = 297,
+  width = 200,
+  height = 256.5,
   units = "mm"
 )
 
@@ -460,8 +461,8 @@ ggsave(
   filename = "tex/figures/heter2.pdf",
   plot = fig6,
   device = cairo_pdf,
-  width = 210,
-  height = 297,
+  width = 200,
+  height = 256.5,
   units = "mm"
 )
 
@@ -496,6 +497,17 @@ private = c(
 )
 
 tuning.samesx <- t(tuning.samesx)  # transpose to save space
-print(xtable(tuning.samesx), file = "tex/tables/tuning-samesx.tex")
+rownames(tuning.samesx) <- c(
+  "Education Attainment",
+  "Left Behind", 
+  "Private School"
+)
+
+print(
+  xtable(tuning.samesx, display = c("s", "g", "g", "g", "g", "g"),
+         digits = 4), 
+  floating = FALSE,
+  file = "tex/tables/tuning-samesx.tex"
+  )
 
 

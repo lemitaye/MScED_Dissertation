@@ -30,18 +30,18 @@ The other important assumption needed to estimate the ACR is monotonicity. In ou
 
 %\pagebreak
 
-\begin{figure}[!ht]
+\begin{figure}[!p]
 \centering
 \caption{\label{fig:acrs}Unconditional First-Stages and 95\% Confidence Intervals for Different Family Sizes}
 \includegraphics[width=\textwidth]{figures/acrs.pdf}
 \fnote{\textit{Notes:} The coefficients and standard errors in the different panels are obtained by running a simple linear regression of a dummy for having at least $ j $ kids on the relevant instrument. Dashed lines are confidence bands. Overall first stages and standard errors are shown in the plot area.}
 \end{figure}
 
-%\pagebreak
+\pagebreak
 
 \subsection{Generalized Random Forest Estimates}
 
-\begin{figure}[p!]
+\begin{figure}[!thp]
 \centering
 \caption{\label{fig:heter1}Results of Generalized Random Forest Using Twins IV}
 \includegraphics[width=\textwidth]{figures/heter1.pdf}
@@ -49,21 +49,16 @@ The other important assumption needed to estimate the ACR is monotonicity. In ou
 \end{figure}
 \pagebreak
 
-\begin{figure}[p!]
+\begin{figure}[!thp]
 \centering
 \caption{\label{fig:heter2}Results of Generalized Random Forest Using Same-Sex IV}
 \includegraphics[width=\textwidth]{figures/heter2.pdf}
-\fnote{\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation and are shown in the table below:
-\centering
-\begin{tabular}{rrrrrr}
-  \hline
- & sample.fraction & mtry & min.node.size & alpha & imbalance.penalty \\ 
-  \hline
-educ & 0.25 & 7.00 & 53.00 & 0.21 & 0.55 \\ 
-  behind & 0.08 & 8.00 & 71.00 & 0.07 & 1.26 \\ 
-  private & 0.10 & 9.00 & 83.00 & 0.10 & 3.12 \\ 
-   \hline
-\end{tabular}
-  Each forest is based on 5000 trees. }
+\fnote{
+\textit{Notes:} The above results are based on three forests, one forest for each outcome. The parameters supplied in training each forest were chosen by tuning based on cross-validation and are shown in the table below:\\[0.4em]
+
+\input{tables/tuning-samesx}\\[0.5em]
+
+Each forest is based on 5000 trees. 
+}
 \end{figure}
-\pagebreak
+%\pagebreak
