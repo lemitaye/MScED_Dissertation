@@ -452,13 +452,29 @@ print(
 
 uni_mults <- read_csv("data/uni_mults.csv")
 
+uni_mults %>% 
+  mutate(
+    p = prop/1000,
+    score = 1.96*1000*sqrt( p*(1 - p)/all ),
+    prop_lower = prop - score,
+    prop_upper = prop + score
+    )
+
 line_gr <- uni_mults %>% 
-  mutate(pop_group = factor( pop_group,
+  mutate(
+    pop_group = factor( pop_group,
     levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
     ) %>% fct_recode(
-      "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other") ) %>%
+      "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other"),
+    p = prop/1000,
+    score = 1.96*1000*sqrt( p*(1 - p)/all ),
+    prop_lower = prop - score,
+    prop_upper = prop + score
+    ) %>%
   ggplot(aes(year, prop,linetype = pop_group, color = pop_group)) +
   geom_line(size = 1) +
+  geom_line(aes(y = prop_lower)) +
+  geom_line(aes(y = prop_upper)) +
   labs(
     # title = "Multiple Births Per 1000 Live Births",
     x = "Year", 
