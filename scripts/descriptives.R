@@ -452,6 +452,7 @@ print(
 
 uni_mults <- read_csv("data/uni_mults.csv")
 
+# lines only:
 line_gr <- uni_mults %>% 
   mutate(pop_group = factor( pop_group,
     levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
@@ -472,6 +473,40 @@ line_gr <- uni_mults %>%
         legend.margin=margin(t = -0.5, unit='cm'),
         axis.title=element_text(size=12.5))
 
+# lines + CI ribbons:
+line_rib <- uni_mults %>% 
+  mutate(
+    pop_group = factor( pop_group,
+                        levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
+    ) %>% fct_recode(
+      "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other"),
+    
+    # We need the following to draw CI ribbons:
+    p = prop/1000,
+    score = 1.96*1000*sqrt( p*(1 - p)/all ),
+    prop_lower = prop - score,
+    prop_upper = prop + score
+  ) %>%
+  ggplot(aes(year, prop, linetype = pop_group, color = pop_group, fill = pop_group)) +
+  geom_line(size = 1) +
+  geom_ribbon(aes(ymin = prop_lower, ymax = prop_upper), 
+              alpha = .3, colour = NA) +
+  labs(
+    # title = "Multiple Births Per 1000 Live Births",
+    x = "Year", 
+    y = "Multiple Births Per 1000 Live Births",
+    color = "",
+    linetype = "",
+    fill = ""
+  ) +
+  scale_colour_Publication() + 
+  scale_fill_Publication() +
+  theme_Publication() +
+  theme(legend.position = "top",
+        legend.margin=margin(t = -0.5, unit='cm'),
+        axis.title=element_text(size=12.5))
+
+# Save both:
 ggsave(
   filename = "tex/figures/line_pp.pdf",
   plot = line_gr,
@@ -481,7 +516,14 @@ ggsave(
   units = "mm"
 )
 
-
+ggsave(
+  filename = "tex/figures/line_rib.pdf",
+  plot = line_rib,
+  device = cairo_pdf,
+  width = 180,
+  height = 140,
+  units = "mm"
+)
 
 # Histogram of Educ. Attainment Index ####
 
