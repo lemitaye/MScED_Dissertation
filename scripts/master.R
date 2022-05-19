@@ -26,14 +26,13 @@ library(fastDummies)
 library(xtable)
 library(ggpubr)
 library(GGally)  # contains "ggcoef()" to plot reg. coefs.
-# library(broom.helpers)
-
-theme_set(theme_light())
+library(grf)
+library(doParallel)
 
 
 # Call R scripts ####
-source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
-source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning
-source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive statistics
-source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of model 
-source("scripts/results.R"     ,echo=TRUE,max=1000) # Tables and Figures
+# source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
+# source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning
+# source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive statistics
+# source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of model 
+# source("scripts/results.R"     ,echo=TRUE,max=1000) # Tables and Figures

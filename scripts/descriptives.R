@@ -6,6 +6,10 @@
 
 rm(list = ls())
 
+# Credit goes to Koundinya Desiraju (https://github.com/koundy/ggplot_theme_Publication)
+# for providing the following themes for publication ready plots:
+source("scripts/ggplot_theme_Publication-2.R")  
+
 # Load saved data ####
 gt2_sample <- read_csv("data/gt2_sample.csv")
 gt3_sample <- read_csv("data/gt3_sample.csv")
@@ -156,10 +160,16 @@ p <- mod_all %>%
     aes(yintercept = 0), color = "gray50", 
     size = 1, linetype = "dotted"
     ) +
-  theme(legend.position = "top") +
   facet_wrap( ~ var, scale = "free_y", nrow = 2, labeller = to_string) +
   scale_shape_manual(values = c(15, 16)) +
-  labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" )
+  labs( x = "Mother's Age at First Birth", y = "", color = "", shape = "" ) +
+  scale_colour_Publication() + 
+  theme_Publication() +
+  theme(
+    legend.position = "top",
+    legend.margin=margin(t = -0.5, unit='cm'),
+    axis.title=element_text(size=13)
+    )
 
 ggsave(
   filename = "tex/figures/age_mods.pdf",
@@ -235,11 +245,11 @@ gt2_descript <- gt2_sample %>%
     no_kids, twins_2, same_sex_12, boy_12, girl_12, male = boy,
     child_age_year, child_age_month, child_educ, educ_attain,
     behind, private_school, moth_age_year, moth_age_fstbr,
-    moth_pp_group, moth_educ, moth_marital, moth_inlf, fath_inhh
+    moth_pp_group, moth_educ, moth_inlf, fath_inhh
     ) %>% dummy_cols(
-      c("moth_pp_group", "moth_educ", "moth_marital")
+      c("moth_pp_group", "moth_educ")
       ) %>% 
-  select(-c(moth_pp_group, moth_educ, moth_marital))
+  select(-c(moth_pp_group, moth_educ))
 
 gt3_descript <- gt3_sample %>% 
   filter(!is.na(moth_pp_group)) %>% 
@@ -247,24 +257,24 @@ gt3_descript <- gt3_sample %>%
     no_kids, twins_3, same_sex_123, boy_123, girl_123, male = boy,
     child_age_year, child_age_month, child_educ, educ_attain, behind,
     private_school, moth_age_year, moth_age_fstbr, moth_pp_group,
-    moth_educ, moth_marital, moth_inlf, fath_inhh, birth_order
+    moth_educ, moth_inlf, fath_inhh, birth_order
   ) 
 
 gt3_descript_frstbrn <- gt3_descript %>% 
   filter(birth_order == 1) %>% 
   dummy_cols(
-    c("moth_pp_group", "moth_educ", "moth_marital")
+    c("moth_pp_group", "moth_educ")
   ) %>% 
   select(
-    -c(moth_pp_group, moth_educ, moth_marital, birth_order)
+    -c(moth_pp_group, moth_educ, birth_order)
   )
 
 gt3_descript_both <- gt3_descript %>%
   dummy_cols(
-  c("moth_pp_group", "moth_educ", "moth_marital")
+  c("moth_pp_group", "moth_educ")
 ) %>% 
   select(
-    -c(moth_pp_group, moth_educ, moth_marital, birth_order)
+    -c(moth_pp_group, moth_educ, birth_order)
     )
 
 sd_rm_bin <- function(x) {
@@ -314,13 +324,13 @@ z <- full_join(x, y, by = "variable")
 z$empty0 <- NA
 z$empty1 <- NA
 z$empty2 <- NA
-z <- select(z, empty0, variable, mean_2, sd_2, empty1, mean_3_frstbrn,
+z <- select(z, variable, empty0, mean_2, sd_2, empty1, mean_3_frstbrn,
             sd_3_frstbrn, empty2, mean_3_both, sd_3_both)
 
 z <- z %>% 
   mutate(
     variable = str_remove(
-      variable, "moth_pp_group_|moth_educ_|moth_marital_"
+      variable, "moth_pp_group_|moth_educ_"
     ),
     variable = str_replace_all(
       variable,
@@ -344,9 +354,6 @@ z <- z %>%
         "Some primary" = "Some Primary",
         "Completed primary" = "Completed Primary",
         "Some secondary" = "Some Secondary",
-        "Living together" = "Living Together",
-        "Never married" = "Never Married",
-        "Widower/widow" = "Widower",
         "twins_3" = "Twins3",
         "same_sex_123" = "SameSex123",
         "boy_123" = "Boy123",
@@ -365,21 +372,20 @@ cols_arrg <- c(
   "Age at First Birth", "Mother in the Labour Force", "Father in Household",
   "Black African", "Coloured", "White", "Indian or Asian", "Other", 
   "No schooling", "Some Primary", "Completed Primary", "Some Secondary",
-  "Grade 12/Std 10", "Higher",  
-  "Never Married", "Married", "Living Together", "Separated", "Divorced", "Widower"
+  "Grade 12/Std 10", "Higher"
 )
 
 z$variable <- factor(z$variable, levels = cols_arrg)
 z <- z[order(z$variable), ]
 row.names(z) <- NULL  # reset the rownames
+z$variable <- as.character( z$variable )
+z$variable[21:31] <- str_c("\\phantom{M}", as.character( z$variable[21:31] )) 
 
-# 
-# names <- c("Number of Kids", "Male", "Age in years", "Age in months")
 
-
+# Start building table
 xtab <- xtable(
   z, display = c("s", "s", "s", "g", "g", "s", "g", "g", "s", "g", "g"),
-  digits = 4, caption = "Summary Statistics", label = "tab:01"
+  digits = 4, caption = "Summary Statistics", label = "tab:sum-stat"
   ) 
 
 # align(xtab) <- "rllccp{0.5cm}cc" {rllrrlrrlrr}
@@ -405,12 +411,12 @@ obs_descr <- paste( nobs_descr_wrap( " $ N $ ", a = "l" ), " & ",
                     obs_descr )
 
 comm <- paste0(" \n \\\\[-1.8ex] \\multicolumn{10}{l}",
-               "{\\scriptsize{The standard deviations for proportions is 
+               "{\\footnotesize{\\textit{Note:} The standard deviations for proportions is 
                not presented.}} \n")
 
 
 addtorow <- list()
-addtorow$pos <- list(0, 0, 0, 0, 0, 0, 0, 0, 20, 25, 31, 37, 37, 37, 37)
+addtorow$pos <- list(0, 0, 0, 0, 0, 0, 0, 0, 20, 25, 31, 31, 31, 31)
 addtorow$command <- c(
   " \\\\[-1.8ex]",
   " & & \\multicolumn{2}{c}{2+ Sample} & & \\multicolumn{5}{c}{3+ Sample}  \\\\[0.2ex]",
@@ -425,7 +431,6 @@ addtorow$command <- c(
   \\multicolumn{1}{c}{(5)} & \\multicolumn{1}{c}{(6)}  \\\\ ",
   "\\multicolumn{2}{l}{Mother's Population Group} &  &  &  & & & & \\\\",
   "\\multicolumn{2}{l}{Mother's Level of Education} &  &  &  & & & & \\\\",
-  "\\multicolumn{2}{l}{Mother's Marital Status} &  &  &  & & & & \\\\",
   " \\\\[-1.8ex] \\hline \\\\[-1.8ex] ",
   obs_descr,
   " \\bottomrule ",
@@ -437,7 +442,9 @@ print(
   xtab, add.to.row = addtorow,
   include.rownames = FALSE, include.colnames = FALSE, 
   booktabs = TRUE, caption.placement = "top", hline.after = c(-1, 0),
-  file = "D:/MSc_ED/Thesis/SA_2011_Census/outline/tables/table10.tex" 
+  sanitize.text.function = identity,
+  table.placement = "t!",
+  file = "tex/tables/sum-stat.tex"
   )
 
 
@@ -448,26 +455,29 @@ uni_mults <- read_csv("data/uni_mults.csv")
 line_gr <- uni_mults %>% 
   mutate(pop_group = factor( pop_group,
     levels = c("White", "Black African", "Coloured, Indian or Asian, and Other")
-    )) %>%
+    ) %>% fct_recode(
+      "Coloured, Indian/Asian, & Other" = "Coloured, Indian or Asian, and Other") ) %>%
   ggplot(aes(year, prop,linetype = pop_group, color = pop_group)) +
-  geom_line(size = 0.5) +
-  # scale_colour_brewer(palette = "Set1") +
-  # theme_bw() +
-  theme(legend.position = "top") +
+  geom_line(size = 1) +
   labs(
     # title = "Multiple Births Per 1000 Live Births",
     x = "Year", 
     y = "Multiple Births Per 1000 Live Births",
     color = "",
     linetype = ""
-  )
+  ) +
+  scale_colour_Publication() + 
+  theme_Publication() +
+  theme(legend.position = "top",
+        legend.margin=margin(t = -0.5, unit='cm'),
+        axis.title=element_text(size=12.5))
 
 ggsave(
   filename = "tex/figures/line_pp.pdf",
   plot = line_gr,
   device = cairo_pdf,
-  width = 120,
-  height = 90,
+  width = 180,
+  height = 140,
   units = "mm"
 )
 
@@ -483,8 +493,9 @@ hist2 <- gt2_sample %>%
   geom_vline(aes(xintercept = mean(educ_attain)),
              color="red", linetype="dashed", size=1) +
   facet_wrap(~ samp) +
-  theme_bw() +
-  labs(x = "", y = "")
+  labs(x = "", y = "") +
+  theme_Publication() +
+  theme(legend.position = "top")
 
 hist3 <- gt3_sample %>% 
   mutate(samp = "3+ Sample") %>% 
@@ -494,8 +505,9 @@ hist3 <- gt3_sample %>%
   geom_vline(aes(xintercept = mean(educ_attain)),
              color="red", linetype="dashed", size=1) +
   facet_wrap(~ samp) +
-  theme_bw() +
-  labs(x = "", y = "")
+  labs(x = "", y = "") +
+  theme_Publication() +
+  theme(legend.position = "top")
 
 figure <- ggarrange(hist2, hist3, ncol = 2) 
   
@@ -506,7 +518,7 @@ figure_annon <- annotate_figure(
   )
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/hists.pdf",
+  filename = "tex/figures/hists.pdf",
   plot = figure_annon,
   device = cairo_pdf,
   width = 220,

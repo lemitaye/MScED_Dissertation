@@ -1,0 +1,95 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[margin=1.00in]{geometry}
+\usepackage{csquotes}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{rotating}
+\usepackage[nottoc]{tocbibind}
+\usepackage[flushleft]{threeparttable}
+\usepackage{lscape}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{wrapfig}
+\usepackage[onehalfspacing]{setspace}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage[
+backend=bibtex,  % don't use "biber"!
+style=authoryear-icomp, 
+isbn=false,url=false,eprint=false,
+sorting=nyt,sortcites=false,date=year
+  ]{biblatex} 
+
+%\setlength{\parskip}{0.25em}  % set space between paragraphs
+\newcommand\fnote[1]{\captionsetup{font=footnotesize}\caption*{#1}}  % add notes to figures
+
+\AtEveryBibitem{%
+  \clearfield{note}%
+}
+
+\addbibresource{refs.bib} 
+
+\begin{document}
+\input{title}
+
+\pagenumbering{roman}
+
+%\section*{Disclaimers}
+%\input{disclaimer}
+%\pagebreak
+%\addcontentsline{toc}{chapter}{Abstract}
+\input{abstract}
+\pagebreak
+
+%\begin{center}
+%\section*{Acknowledgements}
+%\end{center}
+%\input{acknowledgements}
+%\pagebreak
+
+\tableofcontents
+\pagebreak
+
+\listoffigures
+\listoftables
+\pagebreak
+
+\pagenumbering{arabic}
+
+\input{intro}
+\input{data_methods}
+\input{results}
+
+\printbibliography%[heading=bibintoc]
+\pagebreak
+
+\appendix
+\setcounter{figure}{0} 
+\renewcommand{\thefigure}{A.\arabic{figure}}
+\setcounter{table}{0} 
+\renewcommand{\thetable}{A.\arabic{table}}
+
+\section{Appendix}
+\label{section:appendix}
+\input{appendix}
+\newpage
+
+% Reset the counter for figs. and tables in addendum
+\setcounter{figure}{0} 
+\renewcommand{\thefigure}{B.\arabic{figure}}
+\setcounter{table}{0} 
+\renewcommand{\thetable}{B.\arabic{table}}
+
+\section{Addendum}
+\input{addendum}
+
+
+% add se (CI) on the line graph
+% Write/edit descriptions of figures and tables
+% Build forest using 10000 trees (talk to Nati)
+
+\end{document}

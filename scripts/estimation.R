@@ -5,6 +5,7 @@
 # This script runs the main regressions to be reported in the paper
 
 rm(list = ls())
+source("scripts/ggplot_theme_Publication-2.R")  
 
 # Load saved data
 gt2_sample <- read_csv("data/gt2_sample.csv")
@@ -766,12 +767,12 @@ f2 <- plot_frst("boy_12", label = c("boy_12" = "Boy12"))
 f3 <- plot_frst("girl_12", label = c("girl_12" = "Girl12"))
 
 fig2 <- ggarrange(
-  f1, f2, f3, 
+  f1, f2, f3, labels = c("A.", "B.", "C."),
   ncol = 3
   ) 
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/monot.pdf",
+  filename = "tex/figures/monot.pdf",
   plot = fig2,
   device = cairo_pdf,
   width = 270,
@@ -780,7 +781,6 @@ ggsave(
 )
 
 
-# Consider removing those whose age at first birth is less than 15
 
 # First stage effects at different parities ####
 
@@ -857,7 +857,26 @@ acr_3 <- tidy_modelII(models_gt3) %>%
 
 acr <- bind_rows(acr_2, acr_3)
 
-plot_acr <- function(vars, rows = 1, labels) {
+extrct <- function(var, tbl) {
+  
+  mod <- lm(as.formula(paste("no_kids ~", var)), data = tbl) 
+  
+  est <- coef(summary(mod))[var, 1] %>% round(3)
+  se <- coef(summary(mod))[var, 2] %>% round(3)  
+  
+  txt <- paste0("Overall: ", est, "", "(", se, ")")
+  
+  return(txt)
+}
+
+plot_acr <- function(vars, rows = 1, labels, x, y) {
+  
+  anno <- data.frame(
+    x = x, y = y, # coordinates to place annotation
+    lab = c(extrct(vars[1], first_gt2), extrct(vars[2], first_gt3)),
+    term = vars
+  )
+  
   p <- acr %>%   
     filter(term %in% vars) %>% 
     ggplot(aes(parity, estimate)) + 
@@ -865,51 +884,79 @@ plot_acr <- function(vars, rows = 1, labels) {
     geom_line(aes(group = 1)) +
     geom_line(aes(y = conf.low, group = 1), linetype = "dashed") +
     geom_line(aes(y = conf.high, group = 1), linetype = "dashed") +
-    geom_hline(aes(yintercept = 0), color = "red", size = .65, linetype = 2) +
+    geom_hline(
+      aes(yintercept = 0), color = "gray50", size = 1, linetype = "dotted"
+      ) +
     geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = 1), 
                 fill = "grey", alpha = .3) +
+    geom_text(data = anno, aes(x = x,  y = y, label = lab)) +
     facet_wrap(~term, scale = "free", nrow = rows,
                labeller = as_labeller(labels)
     ) +
-    theme_bw() +
-    labs(x = "Number of Children", y = "")
+    labs(x = "", y = "") +
+    scale_colour_Publication() + 
+    theme_Publication()
   
   return(p)
 }
 
 r1 <- plot_acr(c("twins_2", "twins_3"), 
-               labels = c("twins_2" = "Twins2", "twins_3" = "Twins3")) 
-  
-r2 <- plot_acr(c("boy_12", "boy_123"), 
-               labels = c("boy_12" = "Boy12", "boy_123" = "Boy123"))
+               labels = c("twins_2" = "Twins2", "twins_3" = "Twins3"),
+               x= c(5, 4), y = c(0.4, 0.4)) 
 
-r3 <- plot_acr(c("girl_12", "girl_123"), 
-               labels = c("girl_12" = "Girl12", "girl_123" = "Girl123")) 
+r2 <- plot_acr(c("same_sex_12", "same_sex_123"), 
+               labels = c("same_sex_12" = "SameSex12", "same_sex_123" = "SameSex123"),
+               x= c(5, 4), y = c(0.02, 0.02))
+  
+r3 <- plot_acr(c("boy_12", "boy_123"), 
+               labels = c("boy_12" = "Boy12", "boy_123" = "Boy123"),
+               x= c(5, 4), y = c(0.005, -0.01))
+
+r4 <- plot_acr(c("girl_12", "girl_123"), 
+               labels = c("girl_12" = "Girl12", "girl_123" = "Girl123"),
+               x= c(5, 4), y = c(0.03, 0.03)) + 
+  labs(x = "Number of Children", y = "") +
+  theme(
+    axis.title=element_text(size=12)  
+  )
 
 fig1 <- ggarrange(
-r1, NULL, r2, NULL, r3,
-labels = c("A.", "", "B.", "", "C."),
-nrow = 5, heights = c(1, 0.15, 1, 0.15, 1)
-) 
+r1, NULL, r2, NULL, r3, NULL, r4,
+labels = c("A.", "", "B.", "", "C.", "", "D."),
+nrow = 7, heights = c(1, -0.05, 1, -0.05, 1, -0.05, 1)
+) + 
+  theme(
+    # axis.title=element_text(size=12),
+    plot.margin=unit(c(0.5, 1, -0.35, 1), units="line")  # top, right, bottom, & left
+  )
 
 ggsave(
-  filename = "D:/MSc_ED/Thesis/SA_2011_Census/outline/figures/acrs.pdf",
+  filename = "tex/figures/acrs.pdf",
   plot = fig1,
   device = cairo_pdf,
-  width = 210,
-  height = 235,
+  width = 200,
+  height = 285,
   units = "mm"
 )
-# %>% annotate_figure(
-#   bottom = "Number of Children"
-# )       
+
 
 # Think of a way to add the overall first stage
-lm(no_kids ~ twins_2, data = first_gt2) %>% coef()
-sum(acr_2$estimate)
+lm(no_kids ~ twins_2, data = first_gt2) %>% 
+  summary() %>% 
+  coef() %>% 
+  .["twins_2", 2] %>% 
+  round(3)
+
+lm(as.formula(paste("no_kids ~", "twins_2")), data = first_gt2)
+
+acr_2 %>% filter(term == "twins_2") %>% pull(estimate) %>% sum()
 
 lm(no_kids ~ twins_3, data = first_gt3) %>% coef()
-sum(acr_3$estimate)
+acr_3 %>% filter(term == "twins_3") %>% pull(estimate) %>% sum()
+
+
+
+
 
 
 # A check on the randomness of the samesex instrument
