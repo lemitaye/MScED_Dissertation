@@ -57,19 +57,19 @@ registerDoParallel(cl)
 
 start.time <- proc.time()
 
-# # Train instrumental forest using twins instrument (Z1)
+# Train instrumental forest using twins instrument (Z1)
 # (Tuning with the default params. is the best option)
 
-# tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 5000)
-# tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 5000)
-# tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 5000)
+tau.educ.twins <- instrumental_forest(X, Y1, W, Z1, num.trees = 10000)
+tau.behind.twins <- instrumental_forest(X, Y2, W, Z1, num.trees = 10000)
+tau.private.twins <- instrumental_forest(X, Y3, W, Z1, num.trees = 10000)
 
 
 # Train instrumental forest using same sex instrument (Z2)
 # (Supplied params. obtained from tuning)
 
 tau.educ.samesx <- instrumental_forest(
-  X, Y1, W, Z2, num.trees = 5000, 
+  X, Y1, W, Z2, num.trees = 10000, 
   sample.fraction = 0.253441507730167,
   mtry = 7,
   min.node.size = 53,
@@ -80,7 +80,7 @@ tau.educ.samesx <- instrumental_forest(
   )
 
 tau.behind.samesx <- instrumental_forest(
-  X, Y2, W, Z2, num.trees = 5000, 
+  X, Y2, W, Z2, num.trees = 10000, 
   sample.fraction = 0.0807964854175225,
   mtry = 8,
   min.node.size = 71,
@@ -91,7 +91,7 @@ tau.behind.samesx <- instrumental_forest(
   )
 
 tau.private.samesx <- instrumental_forest(
-  X, Y3, W, Z2, num.trees = 5000, 
+  X, Y3, W, Z2, num.trees = 10000, 
   sample.fraction = 0.0987349107163027,
   mtry = 9,
   min.node.size = 83,
