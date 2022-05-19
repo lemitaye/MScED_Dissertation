@@ -490,7 +490,7 @@ line_rib <- uni_mults %>%
   ggplot(aes(year, prop, linetype = pop_group, color = pop_group, fill = pop_group)) +
   geom_line(size = 1) +
   geom_ribbon(aes(ymin = prop_lower, ymax = prop_upper), 
-              alpha = .3, colour = NA) +
+              alpha = .2, colour = NA) +
   labs(
     # title = "Multiple Births Per 1000 Live Births",
     x = "Year", 
