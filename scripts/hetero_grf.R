@@ -376,7 +376,7 @@ plot_1 <- function( tbl ) {
     facet_grid(moth_pp_group ~ outcome, scales = "free_y", 
                labeller = to_string) +
     labs(
-      x = "Mother's Age at First Birth", y = ""
+      x = "Mother's Age at First Birth", y = quote(tau(x))
     ) +
     scale_colour_Publication() + 
     theme_Publication() +
@@ -414,7 +414,7 @@ plot_2 <- function( tbl ) {
     facet_wrap(~outcome, labeller = to_string) +
     guides(color = guide_legend(reverse = TRUE), shape = guide_legend(reverse = TRUE) ) +
     labs(
-      x = "", y = "Mother's Level of Education", color = "", shape = ""
+      x = quote(tau(x)), y = "Mother's Level of Education", color = "", shape = ""
     ) +
     # borrowed the following colours from "scale_colour_Publication" function:
     scale_color_manual( values = c("#7fc97f", "#f87f01", "#386cb0")  ) + 
@@ -423,7 +423,7 @@ plot_2 <- function( tbl ) {
       legend.position = "top",
       legend.margin = margin(t = -0.5, unit='cm'),
       axis.title=element_text(size=12),
-      plot.margin=unit(c(1, 1, -0.5, 0.5), units="line")  # top, right, bottom, & left
+      plot.margin=unit(c(1, 1, -0.05, 0.5), units="line")  # top, right, bottom, & left
       )
   
   return(p)
@@ -431,21 +431,23 @@ plot_2 <- function( tbl ) {
 
 # plots
 a.t <- plot_1(final.twins.1)
-b.t <- plot_2(final.twins.2)
+b.t <- plot_2(final.twins.2) +
+  scale_x_continuous(breaks = c(-0.1, 0, 0.1))
 
 a.s <- plot_1(final.samesx.1)
-b.s <- plot_2(final.samesx.2)
+b.s <- plot_2(final.samesx.2) +
+  scale_x_continuous(breaks = c(-0.25, 0, 0.25))
 
 fig5 <- ggarrange(
   a.t, NULL, b.t, 
   labels = c("A.", "", "B."),
-  nrow = 3, heights = c(1, 0.05, 0.85)
+  nrow = 3, heights = c(1.05, 0.025, 0.85)
 ) 
 
 fig6 <- ggarrange(
   a.s, NULL, b.s, 
   labels = c("A.", "", "B."),
-  nrow = 3, heights = c(1, 0.05, 0.85)
+  nrow = 3, heights = c(1.05, 0.025, 0.85)
 ) 
 
 ggsave(
@@ -453,7 +455,7 @@ ggsave(
   plot = fig5,
   device = cairo_pdf,
   width = 200,
-  height = 256.5,
+  height = 251.5,
   units = "mm"
 )
 
@@ -462,9 +464,11 @@ ggsave(
   plot = fig6,
   device = cairo_pdf,
   width = 200,
-  height = 256.5,
+  height = 251.5,
   units = "mm"
 )
+
+
 
 # Making a table for tuning values
 
