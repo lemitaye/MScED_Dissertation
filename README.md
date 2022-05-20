@@ -15,7 +15,8 @@ R takes over from here. The R script `master.R` loads all necesarry packages and
 
 The following is a list of the main scripts, in proper sequence, and their function in brief:
 
-* `data_extract`: loads 
+* `data_extract`: loads the data produced by Stata, processes it, and
+produces raw data for further cleaning (Warning: some of the code chunks take considerably long time to run because of the size of the data.)
 * `data_samples`:
 * `descriptives`:
 * `estimation`:
