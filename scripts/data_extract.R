@@ -25,7 +25,7 @@ all_persons <- all_persons %>%
   select(sn, f00_nr, dob, f03_sex, age_month, age_year, everything())
 
 
-# prepare kids, mothers, and fathers data sets ####
+# prepare kids' and mothers' data sets ####
 
 kids <- all_persons %>%
   filter(p02_relation == 3) %>% # extracts sons/daughters
@@ -33,17 +33,14 @@ kids <- all_persons %>%
     p14_motheralive == 1, # mother alive
     p15_fatheralive == 1, # father alive
     !(p14a_motherpnr %in% c(98, 99)) # mother in the hh
-    # !(p15a_fatherpnr %in% c(98, 99)) # father in the hh
   ) %>%
   mutate(
     child_no = str_c(sn, f00_nr),
     moth_no = str_c(sn, p14a_motherpnr)
   ) %>%
   select(
-    # other variables need to be added (not final list)
     child_no,
     moth_no,
-    # fath_no,
     child_dob = dob,
     child_sex = f03_sex,
     child_age_year = age_year,
@@ -63,7 +60,6 @@ mothers <- all_persons %>%
   # semi_join(x, y) keeps all obs. in x that have a match in y:
   semi_join(kids, by = "moth_no") %>%
   select(
-    # other variables need to be added (not final list)
     moth_no,
     moth_age_year = age_year,
     moth_age_month = age_month,
@@ -77,32 +73,10 @@ mothers <- all_persons %>%
     moth_income = p16_income
   )
 
-# fathers <- all_persons %>%
-#   mutate(fath_no = str_c(sn, f00_nr)) %>%
-#   semi_join(kids, by = "fath_no") %>%
-#   select(
-#     # other variables need to be added (not final list)
-#     fath_no,
-#     fath_age_year = age_year,
-#     fath_age_month = age_month,
-#     fath_dob = dob,
-#     fath_marital = p03_marital_st,
-#     fath_pp_group = p05_pop_group,
-#     fath_educ = derp_educational_level,
-#     fath_employ = derp_employ_status_expanded,
-#     fath_income =  p16_income
-#   )
-
-
 # join the above
 data <- kids %>%
   left_join(mothers, by = "moth_no") 
-# %>%
-#   left_join(fathers, by = "fath_no")
 
-# free-up some memory
-# rm(list = c("mothers", "kids", "all_persons"))
-# gc()
 
 # The following function enables us to extract first- and second-borns
 dobs <- function(tbl = data, n) {
@@ -176,17 +150,6 @@ data <- data %>%
         moth_educ == 6 ~ "Higher",
         moth_educ == 7 ~ "Other"
       ) %>% factor()
-    # ,
-    # fath_educ =
-    #   case_when(
-    #     fath_educ == 1 ~ "No schooling",
-    #     fath_educ == 2 ~ "Some primary",
-    #     fath_educ == 3 ~ "Completed primary",
-    #     fath_educ == 4 ~ "Some secondary",
-    #     fath_educ == 5 ~ "Grade 12/Std 10",
-    #     fath_educ == 6 ~ "Higher",
-    #     fath_educ == 7 ~ "Other"
-    #   ) %>% factor()
   )
 
 data <- data %>%
@@ -212,15 +175,6 @@ data <- data %>%
         fath_pnr %in% 1:30 ~ 1,
         fath_pnr == 98 ~ 0
       )
-    # ,
-    # fath_pp_group =
-    #   case_when(
-    #     fath_pp_group == 1 ~ "Black African",
-    #     fath_pp_group == 2 ~ "Coloured",
-    #     fath_pp_group == 3 ~ "Indian or Asian",
-    #     fath_pp_group == 4 ~ "White",
-    #     fath_pp_group == 5 ~ "Other",
-    #   ) %>% factor()
   )
 
 data <- data %>%
@@ -229,23 +183,12 @@ data <- data %>%
       moth_employ %in% 1:2 ~ 1,
       moth_employ == 3 ~ 0
     ),
-    # fath_inlf = case_when(
-    #   fath_employ %in% 1:2 ~ 1,
-    #   fath_employ == 3 ~ 0
-    # ),
     moth_employ =
       case_when(
         moth_employ == 1 ~ "Employed",
         moth_employ == 2 ~ "Unemployed",
         moth_employ == 3 ~ "Not economically active"
       ) %>% factor()
-    # ,
-    # fath_employ =
-    #   case_when(
-    #     fath_employ == 1 ~ "Employed",
-    #     fath_employ == 2 ~ "Unemployed",
-    #     fath_employ == 3 ~ "Not economically active"
-    #   ) %>% factor()
   )
 
 data <- data %>%
@@ -283,23 +226,6 @@ data <- data %>%
         moth_income == 12 ~ "R 2457601 or more",
         moth_income == 99 ~ "Unspecified"
       ) %>% factor()
-    # ,
-    # fath_income =
-    #   case_when(
-    #     fath_income == 1 ~ "No income",
-    #     fath_income == 2 ~ "R 1 - R 4800",
-    #     fath_income == 3 ~ "R 4801 - R 9600",
-    #     fath_income == 4 ~ "R 9601 - R 19200",
-    #     fath_income == 5 ~ "R 19201 - R 38400",
-    #     fath_income == 6 ~ "R 38401 - R 76800",
-    #     fath_income == 7 ~ "R 76801 - R 153600",
-    #     fath_income == 8 ~ "R 153601 - R 307200",
-    #     fath_income == 9 ~ "R 307201 - R 614400",
-    #     fath_income == 10 ~ "R 614401 - R 1228800",
-    #     fath_income == 11 ~ "R 1228801 - R 2457600",
-    #     fath_income == 12 ~ "R 2457601 or more",
-    #     fath_income == 99 ~ "Unspecified"
-    #   ) %>% factor()
   )
 
 data <- data %>%
@@ -312,15 +238,6 @@ data <- data %>%
       moth_marital == 5 ~ "Separated",
       moth_marital == 6 ~ "Divorced"
     ) %>% factor()
-    # ,
-    # fath_marital = case_when(
-    #   fath_marital == 1 ~ "Married",
-    #   fath_marital == 2 ~ "Living together",
-    #   fath_marital == 3 ~ "Never married",
-    #   fath_marital == 4 ~ "Widower/widow",
-    #   fath_marital == 5 ~ "Separated",
-    #   fath_marital == 6 ~ "Divorced"
-    # ) %>% factor()
   )
 
 # Construct mother's age at first birth (the one in the data has NAs)
@@ -341,13 +258,9 @@ dobs_pp_group <- all_persons %>%
     pop_group =
       case_when(
         pop_group == 1 ~ "Black African",
-        # pop_group == 2 ~ "Coloured",
-        # pop_group == 3 ~ "Indian or Asian",
         pop_group == 4 ~ "White",
-        # pop_group == 5 ~ "Other",
         pop_group %in% c(2, 3, 5) ~ "Coloured, Indian or Asian, and Other"
       ) %>% factor() 
-    # %>% fct_lump(n = 3)
   )
 
 all_births <- dobs_pp_group %>% 
