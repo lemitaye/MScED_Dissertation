@@ -5,7 +5,7 @@
 # Title: "The Relationship Between Sibling Size and Educational Attainment 
 #         of Children: Evidence from South Africa"
 #
-# R Script "master" (runs all scripts)
+# R Script "master" (runs all other scripts)
 # Date created: February 22, 2022
 ########################################################################~
 
@@ -26,16 +26,15 @@ library(starpolishr)
 library(fastDummies)
 library(xtable)
 library(ggpubr)
-library(GGally)  # contains "ggcoef()" to plot reg. coefs.
 library(grf)
 library(doParallel)
 
 
 # Call R scripts ####
-source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
-source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning, analysis samples
-source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive stats (Table & Figures)
-source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of models
-source("scripts/results.R"     ,echo=TRUE,max=1000) # Export tables in LaTeX format
-source("scripts/hetero_grf.R"  ,echo=TRUE,max=1000) # Trains GRFs
+source("scripts/data_extract.R", echo=TRUE, max=1000) # Data import and extract
+source("scripts/data_samples.R", echo=TRUE, max=1000) # Data cleaning, get analysis samples
+source("scripts/descriptives.R", echo=TRUE, max=1000) # Descriptive stats (table & figures)
+source("scripts/estimation.R"  , echo=TRUE, max=1000) # Estimation of models
+source("scripts/results.R"     , echo=TRUE, max=1000) # Export tables in LaTeX format
+source("scripts/hetero_grf.R"  , echo=TRUE, max=1000) # Trains GRFs
 
