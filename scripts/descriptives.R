@@ -63,24 +63,13 @@ fIV_A5 <- make_formula_gt2("private_school", "twins_2")
 fOLS_A3 <- make_formula_gt2("moth_inlf")
 fIV_A9 <- make_formula_gt2("moth_inlf", "twins_2")
 
-# specify the age range here:
-# age_range <- 21:40
-# # create an empty list to store data sets
-# age_data <- vector("list", length = length(age_range))
-
-# for (age in age_range) {
-#   # create a list containing all the data
-#   index <- which(age_range == age)
-#   age_data[[index]] <- filter(gt2_sample, moth_age_year >= age)
-# }
-
+# create a list of tibbles by age:
 age_data <- list(
   filter(gt2_sample, moth_age_fstbr %>% between(15, 19)),
   filter(gt2_sample, moth_age_fstbr %>% between(20, 24)),
   filter(gt2_sample, moth_age_fstbr %>% between(25, 29)),
   filter(gt2_sample, moth_age_fstbr >= 30)
 )
-
 
 # loop through the tibbles running the appropriate model 
 ols_educ <- map( age_data, ~felm(fOLS_A1, data = .) )
@@ -182,64 +171,7 @@ ggsave(
 )
 
 
-# Regression by child's age #### 
-data_model_ols <- gt2_sample %>%
-  filter(child_age_year > 7) %>% 
-  group_by(child_age_year) %>% 
-  nest() %>% 
-  arrange(child_age_year) %>% 
-  mutate(
-    model = map(data, model_ols), 
-    summaries = map(model, tidy), 
-    conf_ints = map(model, get_confs)
-  ) %>% 
-  unnest(c(summaries, conf_ints)) %>% 
-  select(-data, -model) %>% 
-  filter(term == "no_kids") %>% 
-  rename("conf_low" = `2.5 %`, "conf_high" = `97.5 %`) 
-
-data_model_twins <- gt2_sample %>%
-  filter(child_age_year > 7) %>% 
-  group_by(child_age_year) %>% 
-  nest() %>% 
-  arrange(child_age_year) %>% 
-  mutate(
-    model = map(data, model_twins), 
-    summaries = map(model, tidy), 
-    conf_ints = map(model, get_confs)
-  ) %>% 
-  unnest(c(summaries, conf_ints)) %>% 
-  select(-data, -model) %>% 
-  filter(term == "`no_kids(fit)`") %>% 
-  rename("conf_low" = `2.5 %`, "conf_high" = `97.5 %`) %>% 
-  mutate(term = str_replace(term, fixed("`no_kids(fit)`"), "no_kids_iv"))
-
-data_model_ols %>% 
-  bind_rows(data_model_twins)
-
-
-data_model_ols %>% 
-  bind_rows(data_model_twins) %>% 
-  # mutate(
-  #   term = recode(
-  #     factor(term), "no_kids" = "OLS", "no_kids_iv" = "IV (twins2)"
-  #     )
-  # ) %>% 
-  ggplot(aes(factor(child_age_year), estimate)) + 
-  geom_point(color = "red") + 
-  facet_wrap(~ term) +
-  geom_errorbar(aes(ymin = conf_low, ymax = conf_high), 
-                width = .1, position = "dodge") +
-  geom_hline(aes(yintercept = 0)) +
-  # coord_flip() +
-  labs(
-    title = "Plot of 2SLS Coefficients using Twins2 instrument",
-    x = "Age of Child",
-    y = "Coefficient",
-    caption = "The red dots indicate coefficient estimate and the lines are 95% confidence intervals"
-  )
-
-# Tables of Summary Statistics ####
+# Table of Summary Statistics ####
 
 gt2_descript <- gt2_sample %>% 
   select(
@@ -388,9 +320,6 @@ xtab <- xtable(
   z, display = c("s", "s", "s", "g", "g", "s", "g", "g", "s", "g", "g"),
   digits = 4, caption = "Summary Statistics", label = "tab:sum-stat"
   ) 
-
-# align(xtab) <- "rllccp{0.5cm}cc" {rllrrlrrlrr}
-# digits(xtab) <- 3
 
 nobs_descr_wrap <- function(chr, n = 2, a = "c") {
   
@@ -568,125 +497,8 @@ ggsave(
 
 # Comparison of twins birth by pp. group and educ. level ####
 
-gt2_sample %>%
-  filter(moth_pp_group != "Other") %>% 
-  group_by(moth_pp_group) %>%
-  summarize(prop_twins = mean(twins_2)) %>%
-  mutate(
-    moth_pp_group = fct_reorder(moth_pp_group, prop_twins) %>% fct_rev()
-  ) %>%
-  ggplot(aes(moth_pp_group, prop_twins)) +
-  geom_col() +
-  scale_y_continuous(label = percent)
-
-gt3_sample %>%
-  filter(moth_pp_group != "Other") %>% 
-  group_by(moth_pp_group) %>%
-  summarize(prop_twins = mean(twins_3)) %>%
-  mutate(
-    moth_pp_group = fct_reorder(moth_pp_group, prop_twins) %>% fct_rev()
-  ) %>%
-  ggplot(aes(moth_pp_group, prop_twins)) +
-  geom_col() +
-  scale_y_continuous(label = percent)
-
-gt2_sample %>%
-  group_by(moth_educ) %>%
-  summarize(prop_twins = mean(twins_2)) %>%
-  mutate(
-    moth_educ = fct_reorder(moth_educ, prop_twins) %>% fct_rev()
-  ) %>%
-  ggplot(aes(moth_educ, prop_twins)) +
-  geom_col() +
-  scale_y_continuous(label = percent)
-
-gt3_sample %>%
-  filter(moth_educ != "Other") %>% 
-  group_by(moth_educ) %>%
-  summarize(prop_twins = mean(twins_3)) %>%
-  mutate(
-    moth_educ = fct_reorder(moth_educ, prop_twins) %>% fct_rev()
-  ) %>%
-  ggplot(aes(moth_educ, prop_twins)) +
-  geom_col() +
-  scale_y_continuous(label = percent)
-
-# # of kids by pp. group
-
-gt2_sample %>%
-  filter(moth_pp_group != "Other") %>% 
-  group_by(moth_pp_group) %>%
-  # mutate(
-  #   moth_pp_group = fct_reorder(moth_pp_group, prop_twins) %>% fct_rev()
-  # ) %>%
-  ggplot(aes(moth_pp_group, no_kids)) +
-  geom_boxplot() 
-
-gt2_sample %>% 
-  filter(no_kids > 4) %>% 
-  count(twins_2)
-
-# mother's starting birth at a younger age are likely to have more kids
-gt2_sample %>%
-  filter(moth_age_fstbr %>% between(14, 35)) %>%
-  ggplot(aes(moth_age_fstbr, no_kids)) +
-  geom_smooth()
-
-gt2_sample %>% count(spacing)
-  ggplot(aes(spacing, no_kids)) +
-  geom_smooth()
-
-gt2_sample %>%
-  filter(moth_age_fstbr %>% between(14, 38)) %>%
-  group_by(moth_age_fstbr) %>% 
-  summarise(prop_twins = mean(twins_2)) %>% 
-  ggplot(aes(moth_age_fstbr, prop_twins)) +
-  geom_col() +
-  scale_y_continuous(label = percent)
-
-
-gt2_sample %>%
-  filter(moth_educ != "Other") %>% 
-  group_by(moth_educ) %>%
-  summarize(avg_kids = mean(no_kids)) %>%
-  mutate(
-    moth_educ = fct_reorder(moth_educ, avg_kids) 
-  ) %>% 
-  ggplot(aes(moth_educ, avg_kids)) +
-  geom_col() +
-  coord_flip()
-
-gt2_sample %>%
-  filter(moth_educ != "Other") %>% 
-  # mutate(
-  #   moth_educ = fct_reorder(moth_educ, avg_kids) 
-  # ) %>% 
-  ggplot(aes(moth_educ, no_kids)) +
-  geom_boxplot() 
-
-gt2_sample %>% 
-  # filter(moth_pp_group != "Other") %>%
-  group_by(moth_pp_group) %>%
-  summarize(avg_kids = mean(no_kids)) %>%
-  ggplot(aes(moth_pp_group, avg_kids)) +
-  geom_col() 
-
-
-gt2_sample %>% 
-  ggplot(aes(x = educ_attain)) +
-  geom_boxplot()
-
-
-# Statistically significant d/ce in mean in the 2+ sample
+# Statistically significant d/ce in mean in the 2+ sample:
 t.test(moth_age_fstbr ~ twins_2, data = gt2_sample) %>% tidy()
-
-gt3_sample %>% 
-  group_by(twins_3) %>% 
-  summarise(
-    n = n(),
-    mean_age_frstbr = mean(moth_age_fstbr_gen),
-    sd_age_frstbr = sd(moth_age_fstbr_gen)        
-  )
 
 # Not that much robust in the 3+ sample
 t.test(moth_age_fstbr_gen ~ twins_3, data = gt3_sample) %>% tidy()
@@ -741,17 +553,3 @@ TukeyHSD(aov_educ_3)
 
 # => Occurence of twins is higher among older mothers and 
 # whites
-
-
-
-
-
-
-
-
-
-
-
-
-
-
