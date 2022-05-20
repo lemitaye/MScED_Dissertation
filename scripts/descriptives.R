@@ -6,8 +6,7 @@
 
 rm(list = ls())
 
-# Credit goes to Koundinya Desiraju (https://github.com/koundy/ggplot_theme_Publication)
-# for providing the following themes for publication ready plots:
+# Load themes for pulication ready plots:
 source("scripts/ggplot_theme_Publication-2.R")  
 
 # Load saved data ####
