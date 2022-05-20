@@ -1,10 +1,12 @@
 ########################################################################~
 # MSc Thesis of Lemi Taye Daba
 # Univestiy of Oxford
-# Title: "The Relationship Between ..."
+# 
+# Title: "The Relationship Between Sibling Size and Educational Attainment 
+#         of Children: Evidence from South Africa"
 #
-# R Script "master"
-# Date of this version: February 22, 2022
+# R Script "master" (runs all scripts)
+# Date created: February 22, 2022
 ########################################################################~
 
 # Some preparations: ####
@@ -15,7 +17,6 @@ rm(list = ls())
 library(tidyverse)
 library(janitor)
 library(lubridate)
-library(AER)
 library(stargazer)
 library(scales)
 library(broom)
@@ -31,8 +32,10 @@ library(doParallel)
 
 
 # Call R scripts ####
-# source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
-# source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning
-# source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive statistics
-# source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of model 
-# source("scripts/results.R"     ,echo=TRUE,max=1000) # Tables and Figures
+source("scripts/data_extract.R",echo=TRUE,max=1000) # Data import and extract
+source("scripts/data_samples.R",echo=TRUE,max=1000) # Data cleaning, analysis samples
+source("scripts/descriptives.R",echo=TRUE,max=1000) # Descriptive stats (Table & Figures)
+source("scripts/estimation.R"  ,echo=TRUE,max=1000) # Estimation of models
+source("scripts/results.R"     ,echo=TRUE,max=1000) # Export tables in LaTeX format
+source("scripts/hetero_grf.R"  ,echo=TRUE,max=1000) # Trains GRFs
+
