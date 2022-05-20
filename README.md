@@ -25,7 +25,7 @@ produces raw data for further cleaning (Warning: some of the code chunks take co
 
 ### Credit
 
-Statistics were done using R 4.1.2, the `tidyverse`, the `lubridate`  the `lfe`, and the `grf` packages. `statgazer` and `xtable` were used to generate $\LaTeX$~tables.
+Statistics were done using R 4.1.2 ([R Core Team, 2021](https://www.R-project.org/)), the `tidyverse` ([Wickham et al., 2019](https://doi.org/10.21105/joss.01686)), the `lubridate` ([Grolemund and Wickham, 2011](https://www.jstatsoft.org/v40/i03/)),  the `lfe` ([Gaure, 2021](https://CRAN.R-project.org/package=lfe)), and the `grf` ([Tibshirani et al., 2022](https://CRAN.R-project.org/package=grf)) packages. `statgazer` ([Hlavac, 2022](https://CRAN.R-project.org/package=stargazer)) and `xtable` ([Dahl et al., 2019](https://CRAN.R-project.org/package=xtable)) were used to generate LaTeX tables.
 
 Credit goes to Koundinya Desiraju (https://github.com/koundy/ggplot_theme_Publication) for providing the following themes for publication ready plots: `ggplot_theme_Publication-2.R`
 
