@@ -527,44 +527,35 @@ ggsave(
 
 # Histogram of Educ. Attainment Index ####
 
-hist2 <- gt2_sample %>% 
+hists_data <- gt2_sample %>% 
+  select(educ_attain) %>% 
   mutate(samp = "2+ Sample") %>% 
-  # filter(educ_attain <= 1.75) %>%
+  bind_rows(
+    gt3_sample %>% 
+      select(educ_attain) %>% 
+      mutate(samp = "3+ Sample")
+  )
+
+hists <- hists_data %>% 
   ggplot(aes(x = educ_attain)) +
   geom_histogram(color="darkblue", fill="lightblue") +
   geom_vline(aes(xintercept = mean(educ_attain)),
              color="red", linetype="dashed", size=1) +
-  facet_wrap(~ samp) +
-  labs(x = "", y = "") +
+  facet_wrap(~ samp, scales = "free_y") +
+  labs(x = "", y = "Count") +
   theme_Publication() +
-  theme(legend.position = "top")
-
-hist3 <- gt3_sample %>% 
-  mutate(samp = "3+ Sample") %>% 
-  # filter(educ_attain <= 1.75) %>%
-  ggplot(aes(x = educ_attain)) +
-  geom_histogram(color="darkblue", fill="lightblue") +
-  geom_vline(aes(xintercept = mean(educ_attain)),
-             color="red", linetype="dashed", size=1) +
-  facet_wrap(~ samp) +
-  labs(x = "", y = "") +
-  theme_Publication() +
-  theme(legend.position = "top")
-
-figure <- ggarrange(hist2, hist3, ncol = 2) 
-  
-figure_annon <- annotate_figure( 
-  figure, 
-  # bottom = "Educational Attainment Index",
-  left = "Count"
+  theme(legend.position = "top") +
+  theme(
+    axis.title=element_text(size=12),
+    plot.margin=unit(c(-0.05, 1, -0.5, 1), units="line")  # top, right, bottom, & left
   )
 
 ggsave(
   filename = "tex/figures/hists.pdf",
-  plot = figure_annon,
+  plot = hists,
   device = cairo_pdf,
   width = 220,
-  height = 90,
+  height = 80,
   units = "mm"
 )
 
