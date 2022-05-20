@@ -17,11 +17,11 @@ The following is a list of the main scripts, in proper sequence, and their funct
 
 * `data_extract`: loads the data produced by Stata, processes it, and
 produces raw data for further cleaning (Warning: some of the code chunks take considerably long time to run because of the size of the data.)
-* `data_samples`:
-* `descriptives`:
-* `estimation`:
-* `results`:
-* `hetero_grf`:
+* `data_samples`: loads the data produced by `data_extract.R`, processes it, and produces cleaned data ready for analysis (these are named `gt2_sample.csv` and `gt3_sample.csv`).
+* `descriptives`: produces table of summary statistics and some descriptive figures.
+* `estimation`: runs the main regressions to be reported in the paper.
+* `results`: produces LaTex tables for regression outputs
+* `hetero_grf`: trains and fits Generalized Random Forests (GRFs)
 
 ## Credit
 
