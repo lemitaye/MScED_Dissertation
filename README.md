@@ -23,6 +23,8 @@ produces raw data for further cleaning (*Warning*: some of the code chunks take 
 * `results`: produces LaTex tables for regression outputs
 * `hetero_grf`: trains and fits Generalized Random Forests (GRFs) (*Warning*: fitting GRFs, particularly with large number of trees, is computationally intensive and requires a computer with powerful processors and a large memory.)
 
+The repository also contains the Tex source code for the final document.
+
 ### Credit
 
 Statistics were done using R 4.1.2 ([R Core Team, 2021](https://www.R-project.org/)), the `tidyverse` ([Wickham et al., 2019](https://doi.org/10.21105/joss.01686)), the `lubridate` ([Grolemund and Wickham, 2011](https://www.jstatsoft.org/v40/i03/)),  the `lfe` ([Gaure, 2021](https://CRAN.R-project.org/package=lfe)), and the `grf` ([Tibshirani et al., 2022](https://CRAN.R-project.org/package=grf)) packages. `statgazer` ([Hlavac, 2022](https://CRAN.R-project.org/package=stargazer)) and `xtable` ([Dahl et al., 2019](https://CRAN.R-project.org/package=xtable)) were used to generate LaTeX tables.
