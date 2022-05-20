@@ -168,7 +168,8 @@ p <- mod_all %>%
   theme(
     legend.position = "top",
     legend.margin=margin(t = -0.5, unit='cm'),
-    axis.title=element_text(size=13)
+    axis.title=element_text(size=13),
+    plot.margin=unit(c(1, 1, 0.5, 1), units="line")  # top, right, bottom, & left
     )
 
 ggsave(
@@ -471,7 +472,9 @@ line_gr <- uni_mults %>%
   theme_Publication() +
   theme(legend.position = "top",
         legend.margin=margin(t = -0.5, unit='cm'),
-        axis.title=element_text(size=12.5))
+        axis.title=element_text(size = 12.5),
+        plot.margin=unit(c(1, 1, 0.5, 1), units="line")  # top, right, bottom, & left
+        )
 
 # lines + CI ribbons:
 line_rib <- uni_mults %>% 
@@ -502,9 +505,12 @@ line_rib <- uni_mults %>%
   scale_colour_Publication() + 
   scale_fill_Publication() +
   theme_Publication() +
-  theme(legend.position = "top",
-        legend.margin=margin(t = -0.5, unit='cm'),
-        axis.title=element_text(size=12.5))
+  theme(
+    legend.position = "top",
+    legend.margin = margin(t = -0.4, unit = "cm"),
+    axis.title = element_text(size = 12.5),
+    plot.margin = unit(c(1, 1, 0.5, 1), units = "line") # top, right, bottom, & left
+  )
 
 # Save both:
 ggsave(
