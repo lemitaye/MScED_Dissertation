@@ -177,7 +177,7 @@ ggsave(
   plot = p,
   device = cairo_pdf,
   width = 210,
-  height = 150,
+  height = 140,
   units = "mm"
 )
 
