@@ -1,1 +1,2 @@
+## README Data
 Because of their large sizes, the two raw data sets (in Stata format), and the csv files `all_persons.csv` and `kids_data.csv` were not pushed to the online repository. You can download the raw datasets from [here](https://www.datafirst.uct.ac.za/dataportal/index.php/catalog/485). `all_persons.csv` can be produced by running the do file `import_append.do`, whereas `kids_data.csv` is the output of `data_extract.R`. 
