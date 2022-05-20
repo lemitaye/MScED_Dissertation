@@ -451,8 +451,7 @@ for (i in seq_along(models_nofrst)) {
 header_nofrst <- c(
   " & \\multicolumn{2}{c}{Twins2$^{\\dag}$} & \\multicolumn{2}{c}{Boy12$^{\\ddag}$} \\\\",
   " \\cline{2-3} \\cline{4-5} \\\\",
-  " & Spacing & No & Spacing & No \\\\",
-  " & $<$ 2 & Schooling & $<$ 2 & Schooling \\\\"
+  " & Spacing $<$ 2 & No Schooling & Spacing $<$ 2 & No Schooling \\\\"
 )
 
 obs_nofrst = c(
@@ -529,7 +528,7 @@ nofrst_panel <- star_insert_row(
   nofrst_panel,
   c( header_nofrst,
   obs_nofrst ),
-  insert.after = c(7, 7, 7, 7, 28)
+  insert.after = c(7, 7, 7, 28)
 ) %>% star_notes_tex(
   note.type = "threeparttable",
   note = notes_nofrst
