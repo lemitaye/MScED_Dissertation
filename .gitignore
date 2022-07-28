@@ -39,3 +39,6 @@ tex/MScED_Dissertation.lof
 tex/MScED_Dissertation.lot
 tex/MScED_Dissertation.lof
 README.html
+data/all_persons.csv
+data/sa-census-2011-person-prov-1to5-v1.2-20150825.dta
+data/sa-census-2011-person-prov-6to9-v1.2-20150825.dta
