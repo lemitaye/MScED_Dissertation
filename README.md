@@ -1,11 +1,11 @@
 # MScED Dissertation
 
 ### Overview
-Replication Files for my graduate dissertation at the University of Oxford for the program MSc in Economics for Development, 2021/22.
+Replication Files for my graduate dissertation at the University of Oxford for the program "MSc in Economics for Development", 2021/22.
 
 
 ### Introduction
-This repository contains replication files for my graduate dissertation titled "The Relationship Between Sibling Size and Educational Attainment of Children: Evidence from South Africa".
+This repository contains replication files for my graduate dissertation titled "The Relationship Between Sibling Size and Educational Attainment of Children: Evidence from South Africa" (the final version of the paper can be downloaded from [here](https://drive.google.com/file/d/1crjhlKiPioZWe635nyC8OP9Py7UTrTQS/view?usp=sharing)).
 
 The raw data comes from the 2011 South African Census (10% public use sample), which can be freely accessed from [here](https://www.datafirst.uct.ac.za/dataportal/index.php/catalog/485). In the "Get Microdata" tab, you can find two zip files named "sa-census-2011-person-prov-1to5-v2-20150825-stata.zip" and "sa-census-2011-person-prov-6to9-v2-20150825-stata.zip", which contain individual level data in Stata format. 
 
@@ -23,7 +23,7 @@ produces raw data for further cleaning (*Warning*: some of the code chunks take 
 * `results`: produces LaTex tables for regression outputs
 * `hetero_grf`: trains and fits Generalized Random Forests (GRFs) (*Warning*: fitting GRFs, particularly with large number of trees, is computationally intensive and requires a computer with powerful processors and a large memory.)
 
-The repository also contains the Tex source code for the final document.
+The repository also contains the Tex source code for the final document. 
 
 ### Credits
 
