@@ -5,9 +5,9 @@ Replication Files for my graduate dissertation at the University of Oxford for t
 
 
 ### Introduction
-This repository contains replication files for my graduate dissertation titled "The Relationship Between Sibling Size and Educational Attainment of Children: Evidence from South Africa" (the final version of the paper can be downloaded from [here](https://drive.google.com/file/d/1lz-9Tp55zYg3v-_-COC_jQDdhy0DhoIR/view?usp=sharing).
+This repository contains replication files for my graduate dissertation titled "The Relationship Between Sibling Size and Educational Attainment of Children: Evidence from South Africa" (the final version of the paper can be downloaded from <a href="https://drive.google.com/file/d/1lz-9Tp55zYg3v-_-COC_jQDdhy0DhoIR/view?usp=sharing" target="_blank">here</a>.
 
-The raw data comes from the 2011 South African Census (10% public use sample), which can be freely accessed from [here](https://www.datafirst.uct.ac.za/dataportal/index.php/catalog/485). In the "Get Microdata" tab, you can find two zip files named "sa-census-2011-person-prov-1to5-v2-20150825-stata.zip" and "sa-census-2011-person-prov-6to9-v2-20150825-stata.zip", which contain individual level data in Stata format. 
+The raw data comes from the 2011 South African Census (10% public use sample), which can be freely accessed from <a href="https://www.datafirst.uct.ac.za/dataportal/index.php/catalog/485" target="_blank">here</a>. In the "Get Microdata" tab, you can find two zip files named `sa-census-2011-person-prov-1to5-v2-20150825-stata.zip` and `sa-census-2011-person-prov-6to9-v2-20150825-stata.zip`, which contain individual level data in Stata format. 
 
 We start with the Stata do file `import_append.do`, which reads in the raw data above, appends them, and exports a .csv file ready to be imported in R.
 
